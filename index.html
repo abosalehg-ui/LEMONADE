@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍋 Lemonade Tycoon</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* أنماط CSS الأساسية (لم تتغير) */
         * {
@@ -547,7 +547,7 @@
         
         /* نمط الزبون المتحرك */
         .customer-icon {
-            font-size: 3em;
+            font-size: 1.8em; /* تم تصغير الأيقونة */
             position: relative;
             animation: walkIn 0.5s ease-out;
             transition: transform 0.3s, opacity 0.3s;
@@ -561,11 +561,11 @@
 
         .feedback-bubble {
             position: absolute;
-            top: -20px;
-            right: -10px;
+            top: -10px; /* تم تعديل الموضع */
+            right: -5px; /* تم تعديل الموضع */
             background: white;
             border-radius: 50%;
-            padding: 5px;
+            padding: 3px; /* تم تصغير الحجم */
             font-size: 0.5em;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             animation: fadeInOut 2s ease-in-out forwards;
@@ -582,6 +582,55 @@
             from { transform: translateX(-50px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
+        /* أنماط المحاكاة المرئية المعدلة */
+        #liveSimulationModal .modal-content {
+            max-width: 250px; /* تصغير عرض النافذة */
+            margin: 10px auto; /* تعديل الهامش */
+        }
+        
+        #standView {
+            width: 100%; 
+            height: 200px !important; /* تصغير ارتفاع المحاكاة المرئية */
+            position: relative; 
+            background: linear-gradient(180deg, #b0e57c 0%, #8bc34a 100%); 
+            border-bottom: 3px solid #3d5e27; 
+            overflow: hidden;
+        }
+        
+        #standSetup {
+            right: 50%; 
+            transform: translateX(50%); 
+        }
+        
+        #standSetup #tableDisplay {
+            font-size: 2em; /* تصغير أيقونة الطاولة */
+        }
+        
+        #standSetup #umbrellaDisplay {
+            font-size: 2em; /* تصغير أيقونة المظلة */
+            top: -20px !important; /* تعديل موضع المظلة */
+        }
+        
+        #standSetup #vendor {
+            font-size: 1.8em; /* تصغير أيقونة البائع */
+            top: -20px !important; /* تعديل موضع البائع */
+            left: 40px !important;
+        }
+
+        #customerQueue {
+            gap: 10px !important; /* تقليل المسافة بين الزبائن */
+            bottom: 5px !important;
+        }
+        
+        #simulationControls {
+            padding: 5px 10px !important; /* تقليل حشوة التحكم */
+        }
+        
+        #simTimer {
+             font-size: 0.9em !important; /* تصغير خط المؤقت */
+        }
+        
     </style>
 </head>
 <body>
@@ -638,20 +687,20 @@
 
         <div class="icon-bar bottom-bar" id="bottomIconBar">
             <div class="icon-display-item" id="cupsSoldDisplay">
-                <span class="icon-display-icon">🥤</span>
                 <span class="icon-display-value">0</span>
+                <span class="icon-display-icon">🥤</span>
             </div>
             <div class="icon-display-item" id="profitDisplay">
-                <span class="icon-display-icon">🪙</span>
                 <span class="icon-display-value">0.00 $</span>
+                <span class="icon-display-icon">🪙</span>
             </div>
             <div class="icon-display-item" id="dayDisplay">
-                <span class="icon-display-icon">📅</span>
                 <span class="icon-display-value">1</span>
+                <span class="icon-display-icon">📅</span>
             </div>
             <div class="icon-display-item" id="reputationDisplay">
-                <span class="icon-display-icon">👍</span>
                 <span class="icon-display-value">50%</span>
+                <span class="icon-display-icon">👍</span>
             </div>
         </div>
     </div>
@@ -776,24 +825,24 @@
         </div>
         
         <div class="modal" id="liveSimulationModal">
-            <div class="modal-content" style="max-width: 800px; height: 600px; padding: 0;">
+            <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
                 <div class="modal-title" style="margin-bottom: 0;">LIVE SIMULATION - DAY <span id="simDayDisplay">1</span></div>
                 
-                <div id="standView" style="position: relative; width: 100%; height: 480px; background: linear-gradient(180deg, #b0e57c 0%, #8bc34a 100%); border-bottom: 3px solid #3d5e27; overflow: hidden;">
+                <div id="standView" style="position: relative; width: 100%; height: 200px; background: linear-gradient(180deg, #b0e57c 0%, #8bc34a 100%); border-bottom: 3px solid #3d5e27; overflow: hidden;">
                     
                     <div id="standSetup" style="position: absolute; bottom: 0; right: 50%; transform: translateX(50%); display: flex; flex-direction: column; align-items: center; z-index: 10;">
-                        <div id="tableDisplay" style="font-size: 5em;">🪑</div>
-                        <div id="umbrellaDisplay" style="font-size: 5em; position: absolute; top: -70px; display: none;">☂️</div>
-                        <div id="vendor" style="font-size: 4em; position: absolute; top: -50px; left: 100px;">🧑‍🍳</div>
+                        <div id="tableDisplay" style="font-size: 2em;">🪑</div>
+                        <div id="umbrellaDisplay" style="font-size: 2em; position: absolute; top: -20px; display: none;">☂️</div>
+                        <div id="vendor" style="font-size: 1.8em; position: absolute; top: -20px; left: 40px;">🧑‍🍳</div>
                     </div>
 
-                    <div id="customerQueue" style="position: absolute; bottom: 10px; left: 20px; display: flex; gap: 20px; align-items: flex-end; z-index: 5;">
+                    <div id="customerQueue" style="position: absolute; bottom: 5px; left: 10px; display: flex; gap: 10px; align-items: flex-end; z-index: 5;">
                         </div>
 
                 </div>
-                <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 10px 15px; background: #3d6520; border-top: 2px solid #1a3d0a;">
+                <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 5px 10px; background: #3d6520; border-top: 2px solid #1a3d0a;">
                     <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
-                    <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 1.1em;">TIME: 0%</div>
+                    <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 0.9em;">TIME: 0%</div>
                     <button id="skipDayBtn" class="action-btn" style="width: 30%; padding: 8px 10px; background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border-color: #990000;">⏭️ SKIP</button>
                 </div>
             </div>
@@ -1510,7 +1559,7 @@
             updateDisplay();
         }
 
-        // دالة المحاكاة الرئيسية (لم تتغير)
+        // دالة المحاكاة الرئيسية (تم تعديل تحديث المؤقت)
         function startDay() {
             playSound('click');
             
@@ -1579,19 +1628,21 @@
             const cupsToMiss = actualDemand - cupsToSell;
             const totalEvents = cupsToSell + cupsToMiss;
             const eventsPerSecond = totalEvents / simDuration;
-            
+            const totalSteps = simDuration / (50 / 1000); // عدد الخطوات الإجمالي
+
             function runSimulationStep() {
-                if (totalEvents <= 0 && simTime * (50 / 1000) >= simDuration) {
+                if (simTime >= totalSteps) {
                     finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
                     document.getElementById('startDayBtn').disabled = false;
                     return;
                 }
 
                 simTime++;
-                const timeRatio = Math.min(1, simTime / (simDuration / (1000 / 50)));
-                document.getElementById('simTimer').textContent = `TIME: ${Math.floor(timeRatio * 100)}%`;
+                const timeRatio = simTime / totalSteps;
+                // تم تصحيح عرض النسبة المئوية
+                document.getElementById('simTimer').textContent = `TIME: ${Math.min(100, Math.floor(timeRatio * 100))}%`; 
 
-                if (simTime % (50 / eventsPerSecond) === 0) {
+                if (totalEvents > 0 && simTime % Math.max(1, Math.round(50 / eventsPerSecond)) === 0) {
                     if (currentCupsSold < cupsToSell) {
                         if (Math.random() < angryRatio) {
                              spawnCustomer('😡', true);
@@ -1620,11 +1671,6 @@
 
                 if (Math.random() < 0.2) {
                     spawnCustomer('⏳', false);
-                }
-
-                if (simTime * (50 / 1000) >= simDuration) {
-                    finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
-                    document.getElementById('startDayBtn').disabled = false;
                 }
             }
 
