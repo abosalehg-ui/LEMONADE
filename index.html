@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍋 Lemonade Tycoon</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* أنماط CSS الأساسية (لم تتغير) */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Cairo', sans-serif;
             background: linear-gradient(180deg, #6fba52 0%, #8BC34A 100%);
@@ -19,14 +20,12 @@
             padding-top: 60px;
         }
 
-        /* شريط الموارد العلوي - مثبت */
         .resources-bar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            /* التعديل 2: جعل الخلفية شبه شفافة */
-            background: rgba(74, 124, 44, 0.9); /* #4a7c2c بشفافية 90% */
+            background: rgba(74, 124, 44, 0.9);
             border-bottom: 3px solid #000;
             padding: 5px 8px;
             display: flex;
@@ -67,7 +66,6 @@
             padding: 10px;
         }
 
-        /* قائمة الأزرار */
         .menu-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -104,96 +102,83 @@
             text-transform: lowercase;
         }
 
-        /* قسم الأداء */
-        .performance-section {
-            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-            border: 2px solid #1a3d0a;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-            margin-bottom: 10px;
+        /* حجب قسم الأداء القديم */
+        .performance-section, .feedback-icons {
+            display: none !important; 
         }
 
-        .performance-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        /* تنسيقات الصورة والحاويات الجديدة */
+        .image-container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .perf-stats {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 8px;
+        .lemonade-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 5px solid #FFD700;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        .perf-row {
+        /* أنماط الأيقونات الجديدة (العلوية والسفلية) */
+        .icon-bar {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.9em;
+            gap: 15px;
+            padding: 5px;
+            z-index: 500;
         }
 
-        .perf-row:last-child {
-            border-bottom: none;
+        .icon-bar.top-bar {
+            top: 15px;
         }
 
-        .perf-label {
-            font-weight: bold;
+        .icon-bar.bottom-bar {
+            bottom: 15px;
         }
 
-        .perf-value {
-            font-weight: bold;
-            color: #7ab84a;
-        }
-
-        .feedback-icons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-        }
-
-        .feedback-item {
+        .icon-display-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            background: rgba(0,0,0,0.2);
-            padding: 4px;
-            border-radius: 5px;
-            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 60px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
-        .feedback-icon {
-            font-size: 1.1em;
+        .icon-display-icon {
+            font-size: 1.8em; /* حجم الأيقونة */
+            line-height: 1;
         }
 
-        .feedback-count {
+        .icon-display-value {
+            color: white;
+            font-weight: 900;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px #000;
+            margin-top: 2px;
+        }
+
+        /* --- تأثير التطاير --- */
+        .particle {
+            position: absolute;
+            font-size: 1.2em;
+            color: yellow; /* لون الأيقونة المتطايرة */
+            pointer-events: none;
+            user-select: none;
+            z-index: 10000;
+            animation: fadeAndFly 1.5s forwards;
             font-weight: bold;
-            font-size: 0.75em;
-        }
-
-        /* الطقس */
-        .weather-banner {
-            /* تم حذف هذا الجزء وإدماجه في شريط الموارد */
-            display: none;
-        }
-
-        .weather-icon {
-            font-size: 1.5em;
-            /* تم تعديل هذا ليناسب الشريط العلوي */
-            width: 24px;
-            height: 24px;
-            background: white;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
-            border: 1px solid #666;
         }
 
         /* بانر الأحداث */
@@ -210,12 +195,116 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        @keyframes fadeAndFly {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
         }
 
-        /* قسم الإعدادات */
+        /* باقي الأنماط (لم تتغير) */
+        .weather-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .weather-icon-display {
+            font-size: 1.5em;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .action-btn {
+            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+            border: 2px solid #3d5e27;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 3px 0 #2d4a1d, 0 3px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        .action-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .log-section {
+            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+            border: 2px solid #1a3d0a;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+        }
+        .log-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .log-content {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 6px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .log-entry.success {
+            background: rgba(34, 139, 34, 0.3);
+            border-right: 3px solid #32CD32;
+        }
+
+        .log-entry.warning {
+            background: rgba(255, 165, 0, 0.3);
+            border-right: 3px solid #FFA500;
+        }
+
+        .log-entry.error {
+            background: rgba(220, 20, 60, 0.3);
+            border-right: 3px solid #DC143C;
+        }
+
+        .log-entry.info {
+            background: rgba(100, 149, 237, 0.3);
+            border-right: 3px solid #6495ED;
+        }
         .settings-section {
             background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
             border: 2px solid #1a3d0a;
@@ -239,7 +328,6 @@
             padding: 8px;
             margin-bottom: 8px;
         }
-
         .setting-label {
             font-weight: bold;
             margin-bottom: 6px;
@@ -283,105 +371,7 @@
             color: #7ab84a;
             font-size: 0.85em;
         }
-
-        /* الأزرار الرئيسية */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .action-btn {
-            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
-            border: 2px solid #3d5e27;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 0 3px 0 #2d4a1d, 0 3px 8px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-
-        .action-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-
-        /* سجل الأحداث */
-        .log-section {
-            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-            border: 2px solid #1a3d0a;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-        }
-
-        .log-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .log-content {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 8px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-
-        .log-entry {
-            padding: 6px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .log-entry.success {
-            background: rgba(34, 139, 34, 0.3);
-            border-right: 3px solid #32CD32;
-        }
-
-        .log-entry.warning {
-            background: rgba(255, 165, 0, 0.3);
-            border-right: 3px solid #FFA500;
-        }
-
-        .log-entry.error {
-            background: rgba(220, 20, 60, 0.3);
-            border-right: 3px solid #DC143C;
-        }
-
-        .log-entry.info {
-            background: rgba(100, 149, 237, 0.3);
-            border-right: 3px solid #6495ED;
-        }
-
-        /* نافذة التحسينات */
+        
         .modal {
             display: none;
             position: fixed;
@@ -394,7 +384,6 @@
             padding: 20px;
             overflow-y: auto;
         }
-
         .modal-content {
             background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
             border: 3px solid #1a3d0a;
@@ -404,7 +393,6 @@
             padding: 15px;
             color: white;
         }
-
         .modal-title {
             font-size: 1.5em;
             font-weight: bold;
@@ -413,7 +401,6 @@
             text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
         }
         
-        /* عناصر القوائم المشروطة */
         .upgrade-item, .achievement-item, .supply-item {
             background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
@@ -604,7 +591,7 @@
             <div class="resource-value" id="lemons">20</div>
         </div>
         <div class="resource-item">
-            <div class="resource-icon">🍬</div>
+            <div class="resource-icon">🍯</div>
             <div class="resource-value" id="sugar">20</div>
         </div>
         <div class="resource-item">
@@ -616,17 +603,59 @@
             <div class="resource-value" id="money">100</div>
         </div>
         <div class="resource-item">
-            <div class="resource-icon">🍹</div>
-            <div class="resource-value" id="pitcher-display">عادي</div>
+            <div class="resource-icon">🥤</div>
+            <div class="resource-value" id="pitcher-display">normal</div>
         </div>
         <div class="resource-item">
-             <div class="resource-icon" id="weatherIcon"></div>
+            <div class="weather-group">
+                 <div class="weather-icon-display" id="weatherIcon"></div>
+                 <div class="weather-icon-display">🌡️</div>
+            </div>
         </div>
     </div>
     
-    <img src="LEMONADE.jpg" alt="Lemonade Stand Image" style="width: 960px; height: 960px; max-width: 100%; height: auto; display: block; margin: 0 auto; border: 5px solid #FFD700; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-            </div>
+    <div class="image-container">
+        <img src="LEMONADE.jpg" alt="Lemonade Stand Image" class="lemonade-image">
 
+        <div class="icon-bar top-bar" id="topIconBar">
+            <div class="icon-display-item" id="angryDisplay">
+                <span class="icon-display-icon">😡</span>
+                <span class="icon-display-value">0</span>
+            </div>
+            <div class="icon-display-item" id="happyDisplay">
+                <span class="icon-display-icon">😊</span>
+                <span class="icon-display-value">0</span>
+            </div>
+            <div class="icon-display-item" id="waitingDisplay">
+                <span class="icon-display-icon">⏳</span>
+                <span class="icon-display-value">0</span>
+            </div>
+            <div class="icon-display-item" id="expensiveDisplay">
+                <span class="icon-display-icon">💵</span>
+                <span class="icon-display-value">0</span>
+            </div>
+        </div>
+
+        <div class="icon-bar bottom-bar" id="bottomIconBar">
+            <div class="icon-display-item" id="cupsSoldDisplay">
+                <span class="icon-display-icon">🥤</span>
+                <span class="icon-display-value">0</span>
+            </div>
+            <div class="icon-display-item" id="profitDisplay">
+                <span class="icon-display-icon">🪙</span>
+                <span class="icon-display-value">0.00 $</span>
+            </div>
+            <div class="icon-display-item" id="dayDisplay">
+                <span class="icon-display-icon">📅</span>
+                <span class="icon-display-value">1</span>
+            </div>
+            <div class="icon-display-item" id="reputationDisplay">
+                <span class="icon-display-icon">👍</span>
+                <span class="icon-display-value">50%</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="sound-toggle" id="soundToggle">🔊</div>
 
     <div class="achievement-notification" id="achievementNotif"></div>
@@ -639,7 +668,7 @@
 
         <div id="eventBanner" class="event-banner" style="display: none;"></div>
 
-        <div class="performance-section">
+        <div class="performance-section" style="display: none;">
             <div class="performance-title">PERFORMANCE</div>
             <div class="perf-stats">
                 <div class="perf-row">
@@ -691,7 +720,7 @@
             </div>
 
             <div class="setting-row">
-                <div class="setting-label">🍬 Sugar per cup:</div>
+                <div class="setting-label">🍯 Sugar per cup:</div>
                 <div class="setting-controls">
                     <input type="range" class="slider" id="sugarSlider" min="1" max="10" value="3">
                     <div class="slider-value" id="sugarValue">3</div>
@@ -775,7 +804,7 @@
                 <div class="modal-title">🏪 UPGRADES</div>
                 
                 <div class="upgrade-item">
-                    <div class="upgrade-header">🍹 Pitcher Quality</div>
+                    <div class="upgrade-header">🥤 Pitcher Quality</div>
                     <div class="upgrade-status">Level: <span id="pitcherLevel">Basic</span></div>
                     <button class="upgrade-btn" id="pitcherUpgradeBtn">Upgrade (50 $)</button>
                 </div>
@@ -825,7 +854,7 @@
                     </div>
                     
                     <div class="supply-item">
-                        <div class="supply-header">🍬 Sugar</div>
+                        <div class="supply-header">🍯 Sugar</div>
                         <div id="sugarPacks">
                             <div class="supply-item-row">
                                 <span>20 Sugar: <span id="sugarPrice1">3</span> $</span>
@@ -876,19 +905,30 @@
     <script>
         // نظام الأصوات
         const sounds = {
-            bgMusic: 'background-music.mp3',  // موسيقى خلفية هادئة
-            click: 'button-click.mp3',        // صوت ضغط الزر
-            sell: 'cash-register.mp3',        // صوت البيع
-            upgrade: 'upgrade-sound.mp3',     // صوت الترقية
-            achievement: 'achievement.mp3',    // صوت الإنجاز
-            happy: 'happy-customer.mp3',      // زبون سعيد
-            angry: 'angry-customer.mp3'       // زبون غاضب
+            bgMusic: 'background-music.mp3',
+            click: 'button-click.mp3',
+            sell: 'cash-register.mp3',
+            upgrade: 'upgrade-sound.mp3',
+            achievement: 'achievement.mp3',
+            happy: 'happy-customer.mp3',
+            angry: 'angry-customer.mp3'
         };
 
         let soundEnabled = true;
         let audioElements = {};
+        
+        // المتغيرات السابقة لتتبع التغيرات وتشغيل تأثير التطاير
+        let prevCupsSold = 0;
+        let prevProfit = 0;
+        let prevDay = 0;
+        let prevReputation = 0;
+        let prevAngry = 0;
+        let prevHappy = 0;
+        let prevWaiting = 0;
+        let prevExpensive = 0;
 
-        // تحميل الأصوات
+
+        // تحميل الأصوات (لم يتغير)
         function initSounds() {
             for (let key in sounds) {
                 const audio = new Audio(sounds[key]);
@@ -898,7 +938,6 @@
                 audioElements[key] = audio;
             }
             
-            // الموسيقى الخلفية تعيد نفسها
             if (audioElements.bgMusic) {
                 audioElements.bgMusic.loop = true;
                 audioElements.bgMusic.volume = 0.3;
@@ -926,16 +965,53 @@
             }
         }
         
-        // نظام المحاكاة المرئية
+        // **الدالة الجديدة لتأثير التطاير (Particle Effect)**
+        function createParticleEffect(elementId, icon) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+
+            // تحديد موقع العنصر بالنسبة للنافذة
+            const rect = container.getBoundingClientRect();
+            
+            // إنشاء 10 جزيئات
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = icon; // استخدام الأيقونة المطلوبة (مثل 🪙 أو 🥤)
+                
+                // تحديد موضع البداية (داخل العنصر الأب)
+                const startX = rect.left + rect.width / 2;
+                const startY = rect.top + rect.height / 2;
+                
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                
+                // تحديد موضع النهاية العشوائي
+                const endX = (Math.random() - 0.5) * 80; // من -40 إلى 40
+                const endY = (Math.random() - 0.5) * 80 - 40; // من -80 إلى 0 (للأعلى)
+                
+                particle.style.setProperty('--x', `${endX}px`);
+                particle.style.setProperty('--y', `${endY}px`);
+
+                document.body.appendChild(particle);
+
+                // إزالة الجسيم بعد انتهاء الأنميشن
+                setTimeout(() => {
+                    particle.remove();
+                }, 1500);
+            }
+        }
+
+        // نظام المحاكاة المرئية (لم يتغير)
         let simulationInterval = null;
         let simTime = 0;
-        let simDuration = 20; // 20 ثانية زمن حقيقي
+        let simDuration = 20;
         let simSpeed = 1;
 
-        // قائمة أيقونات الزبائن
+        // قائمة أيقونات الزبائن (لم تتغير)
         const customerIcons = ['🧍', '🚶‍♀️', '🧑', '👵', '🧓', '👩‍🦱'];
 
-        // نظام الإنجازات
+        // نظام الإنجازات (لم يتغير)
         const achievements = [
             { id: 'first_sale', name: 'First Sale', desc: 'Sell your first cup', icon: '🎉', req: () => game.cupsSold >= 1 },
             { id: 'big_day', name: 'Big Day', desc: 'Sell 50 cups in one day', icon: '📈', req: () => game.dailyCups >= 50 },
@@ -979,7 +1055,7 @@
 
         const weatherTypes = [
             { type: 'sunny', name: 'Sunny', icon: '☀️', demand: 1.5 },
-            { type: 'hot', name: 'Very Hot', icon: '🔥', demand: 2.0 },
+            { type: 'hot', name: 'Very Hot', icon: '🥵', demand: 2.0 },
             { type: 'cloudy', name: 'Cloudy', icon: '☁️', demand: 1.0 },
             { type: 'rainy', name: 'Rainy', icon: '🌧️', demand: 0.5 }
         ];
@@ -992,7 +1068,7 @@
             null, null, null
         ];
 
-        // حفظ اللعبة تلقائياً
+        // حفظ اللعبة تلقائياً (لم يتغير)
         function saveGame() {
             localStorage.setItem('lemonadeTycoonSave', JSON.stringify(game));
         }
@@ -1049,34 +1125,82 @@
             });
         }
 
+        // **دالة تحديث العرض المعدلة**
         function updateDisplay() {
+            // التحقق من التغيرات قبل التحديث
+            const currentCupsSold = game.cupsSold;
+            const currentProfit = game.totalProfit;
+            const currentDay = game.day;
+            const currentReputation = game.reputation;
+            const currentAngry = game.feedback.angry;
+            const currentHappy = game.feedback.happy;
+            const currentWaiting = game.feedback.waiting;
+            const currentExpensive = game.feedback.expensive;
+
+            // 1. تحديث الأيقونات في الشريط العلوي (الموارد)
             document.getElementById('money').textContent = Math.floor(game.money);
             document.getElementById('lemons').textContent = game.lemons;
             document.getElementById('sugar').textContent = game.sugar;
             document.getElementById('ice').textContent = game.ice;
-            document.getElementById('day').textContent = game.day;
-            document.getElementById('reputation').textContent = game.reputation;
-            document.getElementById('cupsSold').textContent = game.cupsSold;
-            document.getElementById('profit').textContent = game.totalProfit.toFixed(2) + ' $';
-            
-            document.getElementById('angry').textContent = game.feedback.angry;
-            document.getElementById('happy').textContent = game.feedback.happy;
-            document.getElementById('waiting').textContent = game.feedback.waiting;
-            document.getElementById('expensive').textContent = game.feedback.expensive;
-            
-            const pitcherLevels = ['عادي', 'جيد', 'ممتاز'];
+            const pitcherLevels = ['normal', 'Good', 'premium'];
             document.getElementById('pitcher-display').textContent = pitcherLevels[game.upgrades.pitcher];
-            
-            // تحديث حالة أزرار الشراء في قائمة الإمدادات
-            updateSuppliesModalButtons();
-            
-            // التعديل 1: تحديث أيقونة الطقس في الشريط العلوي
             const weatherIcon = weatherTypes.find(w => w.type === game.weather).icon;
             document.getElementById('weatherIcon').textContent = weatherIcon;
+
+            // 2. تحديث الأيقونات على الصورة مع تشغيل تأثير التطاير
+            
+            // الأيقونات السفلية (Cups Sold, Profit, Day, Reputation)
+            const cupsDisplay = document.querySelector('#cupsSoldDisplay .icon-display-value');
+            if (currentCupsSold > prevCupsSold) createParticleEffect('cupsSoldDisplay', '🥤');
+            cupsDisplay.textContent = currentCupsSold;
+
+            const profitDisplay = document.querySelector('#profitDisplay .icon-display-value');
+            if (currentProfit > prevProfit) createParticleEffect('profitDisplay', '🪙');
+            profitDisplay.textContent = currentProfit.toFixed(2) + ' $';
+
+            const dayDisplay = document.querySelector('#dayDisplay .icon-display-value');
+            if (currentDay > prevDay) createParticleEffect('dayDisplay', '📅');
+            dayDisplay.textContent = currentDay;
+
+            const reputationDisplay = document.querySelector('#reputationDisplay .icon-display-value');
+            if (currentReputation > prevReputation) createParticleEffect('reputationDisplay', '👍');
+            reputationDisplay.textContent = currentReputation + '%';
+
+            // الأيقونات العلوية (😡, 😊, ⏳, 💵)
+            const angryDisplay = document.querySelector('#angryDisplay .icon-display-value');
+            if (currentAngry > prevAngry) createParticleEffect('angryDisplay', '😡');
+            angryDisplay.textContent = currentAngry;
+
+            const happyDisplay = document.querySelector('#happyDisplay .icon-display-value');
+            if (currentHappy > prevHappy) createParticleEffect('happyDisplay', '😊');
+            happyDisplay.textContent = currentHappy;
+
+            const waitingDisplay = document.querySelector('#waitingDisplay .icon-display-value');
+            if (currentWaiting > prevWaiting) createParticleEffect('waitingDisplay', '⏳');
+            waitingDisplay.textContent = currentWaiting;
+
+            const expensiveDisplay = document.querySelector('#expensiveDisplay .icon-display-value');
+            if (currentExpensive > prevExpensive) createParticleEffect('expensiveDisplay', '💵');
+            expensiveDisplay.textContent = currentExpensive;
+
+
+            // 3. تحديث القيم السابقة
+            prevCupsSold = currentCupsSold;
+            prevProfit = currentProfit;
+            prevDay = currentDay;
+            prevReputation = currentReputation;
+            prevAngry = currentAngry;
+            prevHappy = currentHappy;
+            prevWaiting = currentWaiting;
+            prevExpensive = currentExpensive;
+            
+            // 4. تحديث حالة أزرار الشراء في قائمة الإمدادات
+            updateSuppliesModalButtons();
 
             saveGame();
             checkAchievements();
         }
+        // **نهاية دالة تحديث العرض المعدلة**
 
         function showUpgrades() {
             playSound('click');
@@ -1106,7 +1230,7 @@
             const sugar = document.getElementById('sugarSlider').value;
             const ice = document.getElementById('iceSlider').value;
             const price = document.getElementById('priceSlider').value;
-            addLog(`📋 Recipe: ${lemons}🍋 + ${sugar}🍬 + ${ice}🧊 = ${price}$`, 'info');
+            addLog(`📋 Recipe: ${lemons}🍋 + ${sugar}🍯 + ${ice}🧊 = ${price}$`, 'info');
         }
         
         // **الدوال الجديدة لقائمة الشراء**
@@ -1152,7 +1276,7 @@
                 
                 let icon;
                 if (type === 'lemons') icon = '🍋';
-                else if (type === 'sugar') icon = '🍬';
+                else if (type === 'sugar') icon = '🍯';
                 else if (type === 'ice') icon = '🧊';
                 
                 addLog(`🛒 Bought ${amount} ${icon} for ${cost}$.`, 'success');
@@ -1247,7 +1371,6 @@
         function setWeather() {
             const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
             game.weather = weather.type;
-            // تم حذف تحديث النص هنا لأنه أصبح في الشريط العلوي
             return weather;
         }
 
@@ -1275,11 +1398,10 @@
             log.scrollTop = 0;
         }
         
-        // دالة لعرض الزبائن والتفاعلات
+        // دالة لعرض الزبائن والتفاعلات (لم تتغير)
         function spawnCustomer(feedbackIcon = '⏳', isServed = false) {
             const queue = document.getElementById('customerQueue');
             
-            // Limit queue size for visual appeal
             if (queue.children.length >= 7) return; 
 
             const customer = document.createElement('div');
@@ -1292,35 +1414,30 @@
                 bubble.textContent = feedbackIcon;
                 customer.appendChild(bubble);
 
-                // إزالة الزبون بعد انتهاء التغذية الراجعة
                 setTimeout(() => {
                     customer.remove();
                 }, 1800 / simSpeed);
 
-                // إزالة الفقاعة بعد انتهاء الأنميشن
                 setTimeout(() => {
                     bubble.remove();
                 }, 2000 / simSpeed);
             } else {
-                 // إضافة الزبون للطابور (الانتظار)
                 queue.appendChild(customer);
             }
         }
         
-        // تحديث إعدادات المحل في نافذة المحاكاة
+        // تحديث إعدادات المحل في نافذة المحاكاة (لم تتغير)
         function updateStandVisuals() {
             document.getElementById('simDayDisplay').textContent = game.day;
             
-            // تحديث المظلة
             const umbrella = document.getElementById('umbrellaDisplay');
             umbrella.style.display = game.upgrades.umbrella ? 'block' : 'none';
 
-            // تحديث الطاولة
             const tableLevels = ['🪑', '🛋️', '👑'];
             document.getElementById('tableDisplay').textContent = tableLevels[game.upgrades.table];
         }
 
-        // دالة لإنهاء المحاكاة وتطبيق النتائج
+        // دالة لإنهاء المحاكاة وتطبيق النتائج (لم تتغير)
         function finalizeDay(totalMaxCups, actualDemand, recipeQuality, price, comfortBonus) {
             if (simulationInterval) {
                 clearInterval(simulationInterval);
@@ -1336,7 +1453,6 @@
                     addLog('📉 No customers today.', 'warning');
                 }
             } else {
-                 // تطبيق النتائج كما كان يحدث سابقاً
                 const lemons = parseInt(document.getElementById('lemonSlider').value);
                 const sugar = parseInt(document.getElementById('sugarSlider').value);
                 const ice = parseInt(document.getElementById('iceSlider').value);
@@ -1354,7 +1470,6 @@
                 game.dailyCups = maxCups;
                 game.totalProfit += profit;
                 
-                // حساب معدل الرضا مرة واحدة لتحديث السمعة
                 const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
 
                 if (satisfactionRate > 2.0) {
@@ -1376,7 +1491,6 @@
                 addLog(`💰 Earned ${revenue}$ selling ${maxCups} cups.`, 'success');
             }
 
-            // تحديث حالة المنافسين
             if (Math.random() < 0.15 && game.reputation > 70) {
                 game.competitors = Math.max(0, game.competitors - 1);
                 if (game.competitors === 0) {
@@ -1396,7 +1510,7 @@
             updateDisplay();
         }
 
-        // دالة المحاكاة الرئيسية (تحل محل الدالة القديمة)
+        // دالة المحاكاة الرئيسية (لم تتغير)
         function startDay() {
             playSound('click');
             
@@ -1410,7 +1524,6 @@
                 return;
             }
 
-            // 1. حساب جميع المتغيرات اليومية مقدماً
             const weather = weatherTypes.find(w => w.type === game.weather);
             game.feedback = { angry: 0, happy: 0, waiting: 0, expensive: 0 };
             game.dailyCups = 0;
@@ -1453,10 +1566,9 @@
             const angryRatio = satisfactionRate < 0.7 ? 0.3 : 0;
             const expensiveRatio = (price > 10) ? 0.2 : 0;
             
-            // 2. إعداد واجهة المحاكاة
             document.getElementById('startDayBtn').disabled = true;
             document.getElementById('liveSimulationModal').style.display = 'block';
-            document.getElementById('customerQueue').innerHTML = ''; // تفريغ الطابور
+            document.getElementById('customerQueue').innerHTML = '';
             simTime = 0;
             simSpeed = 1;
             document.getElementById('speedToggleBtn').textContent = '⏩ x1';
@@ -1465,12 +1577,10 @@
             let currentCupsSold = 0;
             const cupsToSell = maxCups;
             const cupsToMiss = actualDemand - cupsToSell;
-            const totalEvents = cupsToSell + cupsToMiss; // إجمالي الأحداث (بيع أو انتظار)
-            const eventsPerSecond = totalEvents / simDuration; // معدل الأحداث في الثانية
+            const totalEvents = cupsToSell + cupsToMiss;
+            const eventsPerSecond = totalEvents / simDuration;
             
-            // 3. تشغيل المؤقت (محرك اللعبة)
             function runSimulationStep() {
-                // If there are no events to run, just finalize quickly
                 if (totalEvents <= 0 && simTime * (50 / 1000) >= simDuration) {
                     finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
                     document.getElementById('startDayBtn').disabled = false;
@@ -1481,10 +1591,8 @@
                 const timeRatio = Math.min(1, simTime / (simDuration / (1000 / 50)));
                 document.getElementById('simTimer').textContent = `TIME: ${Math.floor(timeRatio * 100)}%`;
 
-                // **ظهور الزبائن/التفاعل**
-                if (simTime % (50 / eventsPerSecond) === 0) { // لتوزيع الأحداث بالتساوي على الوقت
+                if (simTime % (50 / eventsPerSecond) === 0) {
                     if (currentCupsSold < cupsToSell) {
-                        // زبون سعيد / غاضب
                         if (Math.random() < angryRatio) {
                              spawnCustomer('😡', true);
                              game.feedback.angry++;
@@ -1500,7 +1608,6 @@
                         currentCupsSold++;
                         playSound('sell');
                     } else if (cupsToMiss > 0 && Math.random() < 0.5) {
-                        // زبون لم يستطع الشراء (انتظار أو غلاء)
                         if (Math.random() < expensiveRatio) {
                             spawnCustomer('💵', true);
                             game.feedback.expensive++;
@@ -1511,44 +1618,38 @@
                     }
                 }
 
-                // **ظهور الزبائن الواقفين في الطابور**
                 if (Math.random() < 0.2) {
                     spawnCustomer('⏳', false);
                 }
 
-                // **إنهاء المحاكاة بعد انتهاء الوقت**
                 if (simTime * (50 / 1000) >= simDuration) {
                     finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
                     document.getElementById('startDayBtn').disabled = false;
                 }
             }
 
-            simulationInterval = setInterval(runSimulationStep, 50 / simSpeed); // 50ms = 20 تحديث في الثانية (x1)
+            simulationInterval = setInterval(runSimulationStep, 50 / simSpeed);
             
-            // 4. دالة التسريع
             document.getElementById('speedToggleBtn').onclick = function() {
                 if (simulationInterval) {
                     clearInterval(simulationInterval);
                     simSpeed = simSpeed === 1 ? 10 : 1;
                     this.textContent = simSpeed === 1 ? '⏩ x1' : '🚀 x10';
-                    // إعادة تشغيل المؤقت بالسرعة الجديدة
                     simulationInterval = setInterval(runSimulationStep, 50 / simSpeed);
                 }
             };
             
-            // 5. دالة التخطي
             document.getElementById('skipDayBtn').onclick = function() {
-                // يجب أن تتوقف المحاكاة وتطبق النتائج فوراً
                 finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
                 document.getElementById('startDayBtn').disabled = false;
             };
         }
 
-        // **تعديل دالة buySupplies لتصبح فقط للشراء السريع**
+        // دالة الشراء السريع (لم تتغير)
         function quickBuySupplies() {
             playSound('click');
-            const cost = 30; // تكلفة ثابتة للشراء السريع
-            const items = 20; // كمية ثابتة للشراء السريع
+            const cost = 30;
+            const items = 20;
             if (game.money < cost) {
                 addLog('❌ Not enough money! Need 30$.', 'error');
                 return;
@@ -1560,23 +1661,22 @@
             game.ice += items;
 
             playSound('sell');
-            addLog(`🛒 QUICK BUY: ${items}🍋 ${items}🍬 ${items}🧊 (-${cost}$)`, 'success');
+            addLog(`🛒 QUICK BUY: ${items}🍋 ${items}🍯 ${items}🧊 (-${cost}$)`, 'success');
             updateDisplay();
         }
 
-        // ربط الأزرار - التعديل هنا:
+        // ربط الأزرار (لم يتغير)
         document.getElementById('upgradesBtn').onclick = showUpgrades;
-        document.getElementById('suppliesBtn').onclick = showSuppliesModal; // يفتح النافذة
+        document.getElementById('suppliesBtn').onclick = showSuppliesModal;
         document.getElementById('recipeBtn').onclick = showRecipe;
         document.getElementById('achievementsBtn').onclick = showAchievements;
         document.getElementById('startDayBtn').onclick = startDay;
-        document.getElementById('buySuppliesBtn').onclick = quickBuySupplies; // الشراء السريع
+        document.getElementById('buySuppliesBtn').onclick = quickBuySupplies;
         document.getElementById('closeUpgradesBtn').onclick = closeUpgrades;
-        document.getElementById('closeSuppliesBtn').onclick = closeSuppliesModal; // إغلاق قائمة الإمدادات
+        document.getElementById('closeSuppliesBtn').onclick = closeSuppliesModal;
         document.getElementById('closeAchievementsBtn').onclick = closeAchievements;
         document.getElementById('soundToggle').onclick = toggleSound;
         
-        // ربط أزرار شراء الحزم الجديدة
         document.querySelectorAll('.supply-buy-btn').forEach(btn => {
             btn.onclick = buySupplyPack;
         });
@@ -1586,7 +1686,7 @@
         document.getElementById('tableUpgradeBtn').onclick = function() { buyUpgrade('table'); };
         document.getElementById('umbrellaUpgradeBtn').onclick = function() { buyUpgrade('umbrella'); };
 
-        // ربط السلايدرات
+        // ربط السلايدرات (لم يتغير)
         document.getElementById('lemonSlider').oninput = function() {
             document.getElementById('lemonValue').textContent = this.value;
         };
@@ -1603,14 +1703,24 @@
             document.getElementById('priceValue').textContent = this.value + ' $';
         };
 
-        // بدء اللعبة
+        // بدء اللعبة (تمت إضافة حفظ القيم السابقة للتحكم في التطاير)
         initSounds();
         loadGame();
         setWeather();
         triggerEvent();
+        
+        // إعداد القيم السابقة لعدم تشغيل التطاير عند التحميل
+        prevCupsSold = game.cupsSold;
+        prevProfit = game.totalProfit;
+        prevDay = game.day;
+        prevReputation = game.reputation;
+        prevAngry = game.feedback.angry;
+        prevHappy = game.feedback.happy;
+        prevWaiting = game.feedback.waiting;
+        prevExpensive = game.feedback.expensive;
+
         updateDisplay();
         
-        // تشغيل الموسيقى بعد أول تفاعل
         document.body.addEventListener('click', function() {
             if (soundEnabled && audioElements.bgMusic && audioElements.bgMusic.paused) {
                 playSound('bgMusic');
