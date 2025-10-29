@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍋 Lemonade Tycoon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(180deg, #6fba52 0%, #8BC34A 100%);
+            min-height: 10vh;
+            padding-top: 60px;
+        }
+
+        /* شريط الموارد العلوي - مثبت */
+        .resources-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #4a7c2c 0%, #5a8c3a 100%);
+            border-bottom: 3px solid #000;
+            padding: 5px 8px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .resource-icon {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            border: 1px solid #666;
+        }
+
+        .resource-value {
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* قائمة الأزرار */
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+            border: 2px solid #3d5e27;
+            border-radius: 8px;
+            padding: 8px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 0 #2d4a1d, 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .menu-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .menu-btn-icon {
+            font-size: 1.5em;
+            margin-bottom: 2px;
+        }
+
+        .menu-btn-text {
+            color: white;
+            font-weight: bold;
+            font-size: 0.7em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-transform: lowercase;
+        }
+
+        /* قسم الأداء */
+        .performance-section {
+            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+            border: 2px solid #1a3d0a;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .performance-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .perf-stats {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .perf-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9em;
+        }
+
+        .perf-row:last-child {
+            border-bottom: none;
+        }
+
+        .perf-label {
+            font-weight: bold;
+        }
+
+        .perf-value {
+            font-weight: bold;
+            color: #7ab84a;
+        }
+
+        .feedback-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .feedback-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feedback-icon {
+            font-size: 1.1em;
+        }
+
+        .feedback-count {
+            font-weight: bold;
+            font-size: 0.75em;
+        }
+
+        /* الطقس */
+        .weather-banner {
+            background: linear-gradient(135deg, #6fba52 0%, #8BC34A 100%);
+            border: 2px solid #4a7c2c;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .weather-icon {
+            font-size: 1.5em;
+            margin-left: 5px;
+        }
+
+        /* بانر الأحداث */
+        .event-banner {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* قسم الإعدادات */
+        .settings-section {
+            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+            border: 2px solid #1a3d0a;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .settings-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .setting-row {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .setting-label {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .setting-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(0,0,0,0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #7ab84a;
+            font-size: 0.85em;
+        }
+
+        /* الأزرار الرئيسية */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+            border: 2px solid #3d5e27;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 3px 0 #2d4a1d, 0 3px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        /* سجل الأحداث */
+        .log-section {
+            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+            border: 2px solid #1a3d0a;
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+        }
+
+        .log-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .log-content {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 6px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .log-entry.success {
+            background: rgba(34, 139, 34, 0.3);
+            border-right: 3px solid #32CD32;
+        }
+
+        .log-entry.warning {
+            background: rgba(255, 165, 0, 0.3);
+            border-right: 3px solid #FFA500;
+        }
+
+        .log-entry.error {
+            background: rgba(220, 20, 60, 0.3);
+            border-right: 3px solid #DC143C;
+        }
+
+        .log-entry.info {
+            background: rgba(100, 149, 237, 0.3);
+            border-right: 3px solid #6495ED;
+        }
+
+        /* نافذة التحسينات */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+            border: 3px solid #1a3d0a;
+            border-radius: 12px;
+            max-width: 450px;
+            margin: 20px auto;
+            padding: 15px;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* عناصر القوائم المشروطة */
+        .upgrade-item, .achievement-item, .supply-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-header, .achievement-header, .supply-header {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        .supply-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .supply-buy-btn {
+            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 6px;
+            padding: 5px 10px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
+            font-size: 0.8em;
+        }
+        
+        .supply-buy-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #CD8500;
+        }
+        
+        .supply-buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-status, .achievement-progress {
+            margin-bottom: 8px;
+            color: #7ab84a;
+            font-size: 0.9em;
+        }
+
+        .upgrade-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 6px;
+            padding: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
+            font-size: 0.85em;
+        }
+
+        .upgrade-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0px 0 #CD8500;
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .close-modal-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: linear-gradient(180deg, #666 0%, #444 100%);
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .achievement-unlocked {
+            border: 2px solid #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .achievement-locked {
+            opacity: 0.6;
+        }
+
+        /* إشعار الإنجاز */
+        .achievement-notification {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border: 3px solid #FF8C00;
+            border-radius: 12px;
+            padding: 15px 25px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1em;
+            z-index: 3000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            animation: achievementPop 3s ease-out;
+            display: none;
+        }
+
+        @keyframes achievementPop {
+            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            10% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            90% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+        }
+
+        /* زر الصوت */
+        .sound-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border: 2px solid #FF8C00;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+            z-index: 1500;
+        }
+
+        .sound-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        /* نمط الزبون المتحرك */
+        .customer-icon {
+            font-size: 3em;
+            position: relative;
+            animation: walkIn 0.5s ease-out;
+            transition: transform 0.3s, opacity 0.3s;
+            cursor: default;
+        }
+
+        .customer-icon.served {
+            opacity: 0.5;
+            transform: translateY(10px);
+        }
+
+        .feedback-bubble {
+            position: absolute;
+            top: -20px;
+            right: -10px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            font-size: 0.5em;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            animation: fadeInOut 2s ease-in-out forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        @keyframes walkIn {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="resources-bar">
+        <div class="resource-item">
+            <div class="resource-icon">🍋</div>
+            <div class="resource-value" id="lemons">20</div>
+        </div>
+        <div class="resource-item">
+            <div class="resource-icon">🍬</div>
+            <div class="resource-value" id="sugar">20</div>
+        </div>
+        <div class="resource-item">
+            <div class="resource-icon">🧊</div>
+            <div class="resource-value" id="ice">20</div>
+        </div>
+        <div class="resource-item">
+            <div class="resource-icon">💰</div>
+            <div class="resource-value" id="money">100</div>
+        </div>
+        <div class="resource-item">
+            <div class="resource-icon">🍹</div>
+            <div class="resource-value" id="pitcher-display">عادي</div>
+        </div>
+    </div>
+
+    <div class="sound-toggle" id="soundToggle">🔊</div>
+
+    <div class="achievement-notification" id="achievementNotif"></div>
+
+    <div class="container">
+        <div class="menu-buttons">
+            <button class="menu-btn" id="upgradesBtn">
+                <div class="menu-btn-icon">⬆️</div>
+                <div class="menu-btn-text">upgrades</div>
+            </button>
+            <button class="menu-btn" id="suppliesBtn">
+                <div class="menu-btn-icon">📦</div>
+                <div class="menu-btn-text">supplies</div>
+            </button>
+            <button class="menu-btn" id="recipeBtn">
+                <div class="menu-btn-icon">📋</div>
+                <div class="menu-btn-text">recipe</div>
+            </button>
+            <button class="menu-btn" id="achievementsBtn">
+                <div class="menu-btn-icon">🏆</div>
+                <div class="menu-btn-text">achievements</div>
+            </button>
+        </div>
+
+        <div class="weather-banner">
+            <span id="weatherText">الطقس اليوم</span>
+            <span class="weather-icon" id="weatherIcon"></span>
+        </div>
+
+        <div id="eventBanner" class="event-banner" style="display: none;"></div>
+
+        <div class="performance-section">
+            <div class="performance-title">PERFORMANCE</div>
+            <div class="perf-stats">
+                <div class="perf-row">
+                    <span class="perf-label">Cups Sold:</span>
+                    <span class="perf-value" id="cupsSold">0</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-label">Profit:</span>
+                    <span class="perf-value" id="profit">0.00 $</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-label">Day:</span>
+                    <span class="perf-value" id="day">1</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-label">Reputation:</span>
+                    <span class="perf-value"><span id="reputation">50</span>%</span>
+                </div>
+            </div>
+            <div class="feedback-icons">
+                <div class="feedback-item">
+                    <span class="feedback-icon">😡</span>
+                    <span class="feedback-count" id="angry">0</span>
+                </div>
+                <div class="feedback-item">
+                    <span class="feedback-icon">😊</span>
+                    <span class="feedback-count" id="happy">0</span>
+                </div>
+                <div class="feedback-item">
+                    <span class="feedback-icon">⏳</span>
+                    <span class="feedback-count" id="waiting">0</span>
+                </div>
+                <div class="feedback-item">
+                    <span class="feedback-icon">💵</span>
+                    <span class="feedback-count" id="expensive">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-title">TODAY'S SETTING</div>
+            
+            <div class="setting-row">
+                <div class="setting-label">🍋 Lemons per cup:</div>
+                <div class="setting-controls">
+                    <input type="range" class="slider" id="lemonSlider" min="1" max="10" value="3">
+                    <div class="slider-value" id="lemonValue">3</div>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">🍬 Sugar per cup:</div>
+                <div class="setting-controls">
+                    <input type="range" class="slider" id="sugarSlider" min="1" max="10" value="3">
+                    <div class="slider-value" id="sugarValue">3</div>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">🧊 Ice per cup:</div>
+                <div class="setting-controls">
+                    <input type="range" class="slider" id="iceSlider" min="1" max="10" value="3">
+                    <div class="slider-value" id="iceValue">3</div>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">💵 Cup Price:</div>
+                <div class="setting-controls">
+                    <input type="range" class="slider" id="priceSlider" min="1" max="20" value="5">
+                    <div class="slider-value" id="priceValue">5 $</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn" id="startDayBtn">🚀 START DAY</button>
+            <button class="action-btn" id="buySuppliesBtn">🛒 BUY SUPPLIES (Quick)</button>
+        </div>
+
+        <div class="log-section">
+            <div class="log-title">📋 Activity Log</div>
+            <div class="log-content" id="logContent">
+                <div class="log-entry info">🎮 Welcome to Lemonade Tycoon! Set your recipe and start selling.</div>
+            </div>
+        </div>
+        
+        <div class="modal" id="liveSimulationModal">
+            <div class="modal-content" style="max-width: 800px; height: 600px; padding: 0;">
+                <div class="modal-title" style="margin-bottom: 0;">LIVE SIMULATION - DAY <span id="simDayDisplay">1</span></div>
+                
+                <div id="standView" style="position: relative; width: 100%; height: 480px; background: linear-gradient(180deg, #b0e57c 0%, #8bc34a 100%); border-bottom: 3px solid #3d5e27; overflow: hidden;">
+                    
+                    <div id="standSetup" style="position: absolute; bottom: 0; right: 50%; transform: translateX(50%); display: flex; flex-direction: column; align-items: center; z-index: 10;">
+                        <div id="tableDisplay" style="font-size: 5em;">🪑</div>
+                        <div id="umbrellaDisplay" style="font-size: 5em; position: absolute; top: -70px; display: none;">☂️</div>
+                        <div id="vendor" style="font-size: 4em; position: absolute; top: -50px; left: 100px;">🧑‍🍳</div>
+                    </div>
+
+                    <div id="customerQueue" style="position: absolute; bottom: 10px; left: 20px; display: flex; gap: 20px; align-items: flex-end; z-index: 5;">
+                        </div>
+
+                </div>
+                <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 10px 15px; background: #3d6520; border-top: 2px solid #1a3d0a;">
+                    <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
+                    <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 1.1em;">TIME: 0%</div>
+                    <button id="skipDayBtn" class="action-btn" style="width: 30%; padding: 8px 10px; background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border-color: #990000;">⏭️ SKIP</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="upgradesModal">
+            <div class="modal-content">
+                <div class="modal-title">🏪 UPGRADES</div>
+                
+                <div class="upgrade-item">
+                    <div class="upgrade-header">🍹 Pitcher Quality</div>
+                    <div class="upgrade-status">Level: <span id="pitcherLevel">Basic</span></div>
+                    <button class="upgrade-btn" id="pitcherUpgradeBtn">Upgrade (50 $)</button>
+                </div>
+
+                <div class="upgrade-item">
+                    <div class="upgrade-header">🪧 Sign</div>
+                    <div class="upgrade-status">Level: <span id="signLevel">None</span></div>
+                    <button class="upgrade-btn" id="signUpgradeBtn">Upgrade (40 $)</button>
+                </div>
+
+                <div class="upgrade-item">
+                    <div class="upgrade-header">🪑 Table</div>
+                    <div class="upgrade-status">Level: <span id="tableLevel">Basic</span></div>
+                    <button class="upgrade-btn" id="tableUpgradeBtn">Upgrade (60 $)</button>
+                </div>
+
+                <div class="upgrade-item">
+                    <div class="upgrade-header">☂️ Umbrella</div>
+                    <div class="upgrade-status">Status: <span id="umbrellaStatus">Not Owned</span></div>
+                    <button class="upgrade-btn" id="umbrellaUpgradeBtn">Buy (80 $)</button>
+                </div>
+
+                <button class="close-modal-btn" id="closeUpgradesBtn">❌ CLOSE</button>
+            </div>
+        </div>
+        
+        <div class="modal" id="suppliesModal">
+            <div class="modal-content">
+                <div class="modal-title">📦 BUY SUPPLIES</div>
+                <div id="supplyList">
+                    <div class="supply-item">
+                        <div class="supply-header">🍋 Lemons</div>
+                        <div id="lemonPacks">
+                            <div class="supply-item-row">
+                                <span>20 Lemons: <span id="lemonPrice1">4</span> $</span>
+                                <button class="supply-buy-btn" data-type="lemons" data-amount="20" data-cost-id="lemonPrice1">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>50 Lemons: <span id="lemonPrice2">10</span> $</span>
+                                <button class="supply-buy-btn" data-type="lemons" data-amount="50" data-cost-id="lemonPrice2">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>100 Lemons: <span id="lemonPrice3">18</span> $</span>
+                                <button class="supply-buy-btn" data-type="lemons" data-amount="100" data-cost-id="lemonPrice3">Buy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="supply-item">
+                        <div class="supply-header">🍬 Sugar</div>
+                        <div id="sugarPacks">
+                            <div class="supply-item-row">
+                                <span>20 Sugar: <span id="sugarPrice1">3</span> $</span>
+                                <button class="supply-buy-btn" data-type="sugar" data-amount="20" data-cost-id="sugarPrice1">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>50 Sugar: <span id="sugarPrice2">7</span> $</span>
+                                <button class="supply-buy-btn" data-type="sugar" data-amount="50" data-cost-id="sugarPrice2">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>100 Sugar: <span id="sugarPrice3">13</span> $</span>
+                                <button class="supply-buy-btn" data-type="sugar" data-amount="100" data-cost-id="sugarPrice3">Buy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="supply-item">
+                        <div class="supply-header">🧊 Ice</div>
+                        <div id="icePacks">
+                            <div class="supply-item-row">
+                                <span>20 Ice: <span id="icePrice1">2</span> $</span>
+                                <button class="supply-buy-btn" data-type="ice" data-amount="20" data-cost-id="icePrice1">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>50 Ice: <span id="icePrice2">4</span> $</span>
+                                <button class="supply-buy-btn" data-type="ice" data-amount="50" data-cost-id="icePrice2">Buy</button>
+                            </div>
+                            <div class="supply-item-row">
+                                <span>100 Ice: <span id="icePrice3">7</span> $</span>
+                                <button class="supply-buy-btn" data-type="ice" data-amount="100" data-cost-id="icePrice3">Buy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="close-modal-btn" id="closeSuppliesBtn">❌ CLOSE</button>
+            </div>
+        </div>
+
+        <div class="modal" id="achievementsModal">
+            <div class="modal-content">
+                <div class="modal-title">🏆 ACHIEVEMENTS</div>
+                <div id="achievementsList"></div>
+                <button class="close-modal-btn" id="closeAchievementsBtn">❌ CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // نظام الأصوات
+        const sounds = {
+            bgMusic: 'background-music.mp3',  // موسيقى خلفية هادئة
+            click: 'button-click.mp3',        // صوت ضغط الزر
+            sell: 'cash-register.mp3',        // صوت البيع
+            upgrade: 'upgrade-sound.mp3',     // صوت الترقية
+            achievement: 'achievement.mp3',    // صوت الإنجاز
+            happy: 'happy-customer.mp3',      // زبون سعيد
+            angry: 'angry-customer.mp3'       // زبون غاضب
+        };
+
+        let soundEnabled = true;
+        let audioElements = {};
+
+        // تحميل الأصوات
+        function initSounds() {
+            for (let key in sounds) {
+                const audio = new Audio(sounds[key]);
+                audio.onerror = function() {
+                    console.log(`Sound file not found: ${sounds[key]}`);
+                };
+                audioElements[key] = audio;
+            }
+            
+            // الموسيقى الخلفية تعيد نفسها
+            if (audioElements.bgMusic) {
+                audioElements.bgMusic.loop = true;
+                audioElements.bgMusic.volume = 0.3;
+            }
+        }
+
+        function playSound(soundName) {
+            if (!soundEnabled || !audioElements[soundName]) return;
+            try {
+                audioElements[soundName].currentTime = 0;
+                audioElements[soundName].play().catch(e => console.log('Audio play failed:', e));
+            } catch(e) {
+                console.log('Error playing sound:', e);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+            
+            if (soundEnabled) {
+                playSound('bgMusic');
+            } else {
+                if (audioElements.bgMusic) audioElements.bgMusic.pause();
+            }
+        }
+        
+        // نظام المحاكاة المرئية
+        let simulationInterval = null;
+        let simTime = 0;
+        let simDuration = 20; // 20 ثانية زمن حقيقي
+        let simSpeed = 1;
+
+        // قائمة أيقونات الزبائن
+        const customerIcons = ['🧍', '🚶‍♀️', '🧑', '👵', '🧓', '👩‍🦱'];
+
+        // نظام الإنجازات
+        const achievements = [
+            { id: 'first_sale', name: 'First Sale', desc: 'Sell your first cup', icon: '🎉', req: () => game.cupsSold >= 1 },
+            { id: 'big_day', name: 'Big Day', desc: 'Sell 50 cups in one day', icon: '📈', req: () => game.dailyCups >= 50 },
+            { id: 'rich', name: 'Getting Rich', desc: 'Earn 500$', icon: '💰', req: () => game.money >= 500 },
+            { id: 'tycoon', name: 'Lemonade Tycoon', desc: 'Earn 1000$ and 80% reputation', icon: '👑', req: () => game.money >= 1000 && game.reputation >= 80 },
+            { id: 'week', name: 'One Week', desc: 'Survive 7 days', icon: '📅', req: () => game.day >= 8 },
+            { id: 'month', name: 'One Month', desc: 'Survive 30 days', icon: '🗓️', req: () => game.day >= 31 },
+            { id: 'popular', name: 'Popular Stand', desc: 'Reach 90% reputation', icon: '⭐', req: () => game.reputation >= 90 },
+            { id: 'perfect', name: 'Perfect Recipe', desc: 'Get 50 happy customers in one day', icon: '😊', req: () => game.feedback.happy >= 50 },
+            { id: 'monopoly', name: 'Monopoly', desc: 'Eliminate all competitors', icon: '🏆', req: () => game.competitors === 0 },
+            { id: 'upgraded', name: 'Fully Upgraded', desc: 'Max all upgrades', icon: '⬆️', req: () => game.upgrades.pitcher >= 2 && game.upgrades.sign >= 2 && game.upgrades.table >= 2 && game.upgrades.umbrella }
+        ];
+
+        let game = {
+            money: 100,
+            lemons: 20,
+            sugar: 20,
+            ice: 20,
+            day: 1,
+            weather: 'sunny',
+            reputation: 50,
+            cupsSold: 0,
+            dailyCups: 0,
+            totalProfit: 0,
+            feedback: { angry: 0, happy: 0, waiting: 0, expensive: 0 },
+            upgrades: {
+                pitcher: 0,
+                sign: 0,
+                table: 0,
+                umbrella: false
+            },
+            supplyPrices: { // إضافة لأسعار الإمدادات
+                lemons: { 20: 4, 50: 10, 100: 18 },
+                sugar: { 20: 3, 50: 7, 100: 13 },
+                ice: { 20: 2, 50: 4, 100: 7 }
+            },
+            competitors: 2,
+            lastEvent: null,
+            unlockedAchievements: []
+        };
+
+        const weatherTypes = [
+            { type: 'sunny', name: 'Sunny', icon: '☀️', demand: 1.5 },
+            { type: 'hot', name: 'Very Hot', icon: '🔥', demand: 2.0 },
+            { type: 'cloudy', name: 'Cloudy', icon: '☁️', demand: 1.0 },
+            { type: 'rainy', name: 'Rainy', icon: '🌧️', demand: 0.5 }
+        ];
+
+        const events = [
+            { type: 'festival', name: 'Festival in the Park', icon: '🎉', demandBonus: 2.0 },
+            { type: 'competition', name: 'New Competitor Nearby', icon: '🏪', demandPenalty: 0.7 },
+            { type: 'celebrity', name: 'Celebrity Visit', icon: '⭐', demandBonus: 1.5 },
+            { type: 'roadwork', name: 'Road Construction', icon: '🚧', demandPenalty: 0.6 },
+            null, null, null
+        ];
+
+        // حفظ اللعبة تلقائياً
+        function saveGame() {
+            localStorage.setItem('lemonadeTycoonSave', JSON.stringify(game));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('lemonadeTycoonSave');
+            if (saved) {
+                try {
+                    const loadedGame = JSON.parse(saved);
+                    game = { ...game, ...loadedGame };
+                    addLog('💾 Game loaded successfully!', 'success');
+                } catch(e) {
+                    console.log('Error loading game:', e);
+                }
+            }
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!game.unlockedAchievements.includes(achievement.id) && achievement.req()) {
+                    game.unlockedAchievements.push(achievement.id);
+                    showAchievement(achievement);
+                    playSound('achievement');
+                }
+            });
+        }
+
+        function showAchievement(achievement) {
+            const notif = document.getElementById('achievementNotif');
+            notif.textContent = `🏆 ${achievement.name} Unlocked!`;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateAchievementsList() {
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const unlocked = game.unlockedAchievements.includes(achievement.id);
+                const item = document.createElement('div');
+                item.className = `achievement-item ${unlocked ? 'achievement-unlocked' : 'achievement-locked'}`;
+                item.innerHTML = `
+                    <div class="achievement-header">${achievement.icon} ${achievement.name}</div>
+                    <div class="achievement-progress">${achievement.desc}</div>
+                    <div style="text-align: center; font-weight: bold; color: ${unlocked ? '#FFD700' : '#999'};">
+                        ${unlocked ? '✅ UNLOCKED' : '🔒 LOCKED'}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateDisplay() {
+            document.getElementById('money').textContent = Math.floor(game.money);
+            document.getElementById('lemons').textContent = game.lemons;
+            document.getElementById('sugar').textContent = game.sugar;
+            document.getElementById('ice').textContent = game.ice;
+            document.getElementById('day').textContent = game.day;
+            document.getElementById('reputation').textContent = game.reputation;
+            document.getElementById('cupsSold').textContent = game.cupsSold;
+            document.getElementById('profit').textContent = game.totalProfit.toFixed(2) + ' $';
+            
+            document.getElementById('angry').textContent = game.feedback.angry;
+            document.getElementById('happy').textContent = game.feedback.happy;
+            document.getElementById('waiting').textContent = game.feedback.waiting;
+            document.getElementById('expensive').textContent = game.feedback.expensive;
+            
+            const pitcherLevels = ['عادي', 'جيد', 'ممتاز'];
+            document.getElementById('pitcher-display').textContent = pitcherLevels[game.upgrades.pitcher];
+            
+            // تحديث حالة أزرار الشراء في قائمة الإمدادات
+            updateSuppliesModalButtons();
+
+            saveGame();
+            checkAchievements();
+        }
+
+        function showUpgrades() {
+            playSound('click');
+            document.getElementById('upgradesModal').style.display = 'block';
+            updateUpgradeDisplay();
+        }
+
+        function closeUpgrades() {
+            playSound('click');
+            document.getElementById('upgradesModal').style.display = 'none';
+        }
+
+        function showAchievements() {
+            playSound('click');
+            document.getElementById('achievementsModal').style.display = 'block';
+            updateAchievementsList();
+        }
+
+        function closeAchievements() {
+            playSound('click');
+            document.getElementById('achievementsModal').style.display = 'none';
+        }
+
+        function showRecipe() {
+            playSound('click');
+            const lemons = document.getElementById('lemonSlider').value;
+            const sugar = document.getElementById('sugarSlider').value;
+            const ice = document.getElementById('iceSlider').value;
+            const price = document.getElementById('priceSlider').value;
+            addLog(`📋 Recipe: ${lemons}🍋 + ${sugar}🍬 + ${ice}🧊 = ${price}$`, 'info');
+        }
+        
+        // **الدوال الجديدة لقائمة الشراء**
+        function showSuppliesModal() {
+            playSound('click');
+            document.getElementById('suppliesModal').style.display = 'block';
+            updateSuppliesModalButtons();
+        }
+        
+        function closeSuppliesModal() {
+            playSound('click');
+            document.getElementById('suppliesModal').style.display = 'none';
+        }
+
+        function updateSuppliesModalButtons() {
+            const buttons = document.querySelectorAll('#supplyList .supply-buy-btn');
+            buttons.forEach(btn => {
+                const type = btn.getAttribute('data-type');
+                const amount = parseInt(btn.getAttribute('data-amount'));
+                const cost = game.supplyPrices[type][amount];
+                
+                // تحديث نص السعر (في حالة تغير السعر مستقبلاً)
+                const costId = btn.getAttribute('data-cost-id');
+                if (costId) {
+                     document.getElementById(costId).textContent = cost;
+                }
+                
+                // تحديث حالة الزر
+                btn.disabled = game.money < cost;
+            });
+        }
+        
+        function buySupplyPack(event) {
+            const btn = event.target;
+            const type = btn.getAttribute('data-type');
+            const amount = parseInt(btn.getAttribute('data-amount'));
+            const cost = game.supplyPrices[type][amount];
+            
+            if (game.money >= cost) {
+                game.money -= cost;
+                game[type] += amount;
+                playSound('sell');
+                
+                let icon;
+                if (type === 'lemons') icon = '🍋';
+                else if (type === 'sugar') icon = '🍬';
+                else if (type === 'ice') icon = '🧊';
+                
+                addLog(`🛒 Bought ${amount} ${icon} for ${cost}$.`, 'success');
+                updateDisplay();
+            } else {
+                addLog('❌ Not enough money!', 'error');
+            }
+        }
+        // **نهاية الدوال الجديدة لقائمة الشراء**
+
+        function updateUpgradeDisplay() {
+            const pitcherLevels = ['Basic', 'Good', 'Excellent'];
+            const pitcherCosts = [50, 100];
+            document.getElementById('pitcherLevel').textContent = pitcherLevels[game.upgrades.pitcher];
+            const pitcherBtn = document.getElementById('pitcherUpgradeBtn');
+            if (game.upgrades.pitcher >= 2) {
+                pitcherBtn.textContent = '✅ MAX LEVEL';
+                pitcherBtn.disabled = true;
+            } else {
+                pitcherBtn.textContent = `Upgrade (${pitcherCosts[game.upgrades.pitcher]} $)`;
+                pitcherBtn.disabled = game.money < pitcherCosts[game.upgrades.pitcher];
+            }
+
+            const signLevels = ['None', 'Small', 'Large'];
+            const signCosts = [40, 80];
+            document.getElementById('signLevel').textContent = signLevels[game.upgrades.sign];
+            const signBtn = document.getElementById('signUpgradeBtn');
+            if (game.upgrades.sign >= 2) {
+                signBtn.textContent = '✅ MAX LEVEL';
+                signBtn.disabled = true;
+            } else {
+                signBtn.textContent = `Upgrade (${signCosts[game.upgrades.sign]} $)`;
+                signBtn.disabled = game.money < signCosts[game.upgrades.sign];
+            }
+
+            const tableLevels = ['Basic', 'Good', 'Luxury'];
+            const tableCosts = [60, 120];
+            document.getElementById('tableLevel').textContent = tableLevels[game.upgrades.table];
+            const tableBtn = document.getElementById('tableUpgradeBtn');
+            if (game.upgrades.table >= 2) {
+                tableBtn.textContent = '✅ MAX LEVEL';
+                tableBtn.disabled = true;
+            } else {
+                tableBtn.textContent = `Upgrade (${tableCosts[game.upgrades.table]} $)`;
+                tableBtn.disabled = game.money < tableCosts[game.upgrades.table];
+            }
+
+            document.getElementById('umbrellaStatus').textContent = game.upgrades.umbrella ? 'Owned ✅' : 'Not Owned';
+            const umbrellaBtn = document.getElementById('umbrellaUpgradeBtn');
+            if (game.upgrades.umbrella) {
+                umbrellaBtn.textContent = '✅ PURCHASED';
+                umbrellaBtn.disabled = true;
+            } else {
+                umbrellaBtn.disabled = game.money < 80;
+            }
+        }
+
+        function buyUpgrade(type) {
+            const costs = {
+                pitcher: [50, 100],
+                sign: [40, 80],
+                table: [60, 120],
+                umbrella: 80
+            };
+
+            if (type === 'umbrella') {
+                if (game.money >= costs.umbrella && !game.upgrades.umbrella) {
+                    game.money -= costs.umbrella;
+                    game.upgrades.umbrella = true;
+                    playSound('upgrade');
+                    addLog('☂️ Purchased umbrella! Better sales in hot weather.', 'success');
+                }
+            } else {
+                const level = game.upgrades[type];
+                if (level < 2 && game.money >= costs[type][level]) {
+                    game.money -= costs[type][level];
+                    game.upgrades[type]++;
+                    playSound('upgrade');
+                    const names = {
+                        pitcher: 'Pitcher',
+                        sign: 'Sign',
+                        table: 'Table'
+                    };
+                    addLog(`⬆️ Upgraded ${names[type]} to level ${game.upgrades[type] + 1}!`, 'success');
+                }
+            }
+            
+            updateDisplay();
+            updateUpgradeDisplay();
+        }
+
+        function setWeather() {
+            const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+            game.weather = weather.type;
+            document.getElementById('weatherText').textContent = `Weather: ${weather.name}`;
+            document.getElementById('weatherIcon').textContent = weather.icon;
+            return weather;
+        }
+
+        function triggerEvent() {
+            const event = events[Math.floor(Math.random() * events.length)];
+            game.lastEvent = event;
+            
+            const banner = document.getElementById('eventBanner');
+            if (event) {
+                banner.style.display = 'block';
+                banner.textContent = `${event.icon} Event: ${event.name}`;
+            } else {
+                banner.style.display = 'none';
+            }
+            
+            return event;
+        }
+
+        function addLog(message, type = '') {
+            const log = document.getElementById('logContent');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[Day ${game.day}] ${message}`;
+            log.insertBefore(entry, log.firstChild);
+            log.scrollTop = 0;
+        }
+        
+        // دالة لعرض الزبائن والتفاعلات
+        function spawnCustomer(feedbackIcon = '⏳', isServed = false) {
+            const queue = document.getElementById('customerQueue');
+            
+            // Limit queue size for visual appeal
+            if (queue.children.length >= 7) return; 
+
+            const customer = document.createElement('div');
+            customer.className = 'customer-icon';
+            customer.textContent = customerIcons[Math.floor(Math.random() * customerIcons.length)];
+            
+            if (isServed) {
+                const bubble = document.createElement('span');
+                bubble.className = 'feedback-bubble';
+                bubble.textContent = feedbackIcon;
+                customer.appendChild(bubble);
+
+                // إزالة الزبون بعد انتهاء التغذية الراجعة
+                setTimeout(() => {
+                    customer.remove();
+                }, 1800 / simSpeed);
+
+                // إزالة الفقاعة بعد انتهاء الأنميشن
+                setTimeout(() => {
+                    bubble.remove();
+                }, 2000 / simSpeed);
+            } else {
+                 // إضافة الزبون للطابور (الانتظار)
+                queue.appendChild(customer);
+            }
+        }
+        
+        // تحديث إعدادات المحل في نافذة المحاكاة
+        function updateStandVisuals() {
+            document.getElementById('simDayDisplay').textContent = game.day;
+            
+            // تحديث المظلة
+            const umbrella = document.getElementById('umbrellaDisplay');
+            umbrella.style.display = game.upgrades.umbrella ? 'block' : 'none';
+
+            // تحديث الطاولة
+            const tableLevels = ['🪑', '🛋️', '👑'];
+            document.getElementById('tableDisplay').textContent = tableLevels[game.upgrades.table];
+        }
+
+        // دالة لإنهاء المحاكاة وتطبيق النتائج
+        function finalizeDay(totalMaxCups, actualDemand, recipeQuality, price, comfortBonus) {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+            }
+
+            const maxCups = totalMaxCups;
+            
+            if (maxCups <= 0) {
+                if(actualDemand > 0) {
+                    addLog('⚠️ Demand exists, but no supplies!', 'error');
+                } else {
+                    addLog('📉 No customers today.', 'warning');
+                }
+            } else {
+                 // تطبيق النتائج كما كان يحدث سابقاً
+                const lemons = parseInt(document.getElementById('lemonSlider').value);
+                const sugar = parseInt(document.getElementById('sugarSlider').value);
+                const ice = parseInt(document.getElementById('iceSlider').value);
+                
+                game.lemons -= maxCups * lemons;
+                game.sugar -= maxCups * sugar;
+                game.ice -= maxCups * ice;
+
+                const revenue = maxCups * price;
+                const cost = maxCups * (lemons * 0.2 + sugar * 0.15 + ice * 0.1);
+                const profit = revenue - cost;
+                
+                game.money += revenue;
+                game.cupsSold += maxCups;
+                game.dailyCups = maxCups;
+                game.totalProfit += profit;
+                
+                // حساب معدل الرضا مرة واحدة لتحديث السمعة
+                const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
+
+                if (satisfactionRate > 2.0) {
+                    game.reputation = Math.min(100, game.reputation + 10);
+                    addLog(`⭐⭐⭐ Customers love it! Sold ${maxCups} cups! Rep +10`, 'success');
+                } else if (satisfactionRate > 1.5) {
+                    game.reputation = Math.min(100, game.reputation + 7);
+                    addLog(`⭐⭐ Very happy! Sold ${maxCups} cups! Rep +7`, 'success');
+                } else if (satisfactionRate >= 1) {
+                    game.reputation = Math.min(100, game.reputation + 3);
+                    addLog(`⭐ Satisfied. Sold ${maxCups} cups. Rep +3`, 'success');
+                } else if (satisfactionRate < 0.7) {
+                    game.reputation = Math.max(0, game.reputation - 5);
+                    addLog(`😞 Customers unhappy. Rep -5`, 'error');
+                } else {
+                    addLog(`✅ Good day! Sold ${maxCups} cups.`, 'info');
+                }
+                
+                addLog(`💰 Earned ${revenue}$ selling ${maxCups} cups.`, 'success');
+            }
+
+            // تحديث حالة المنافسين
+            if (Math.random() < 0.15 && game.reputation > 70) {
+                game.competitors = Math.max(0, game.competitors - 1);
+                if (game.competitors === 0) {
+                    addLog('🏆 You are the only stand!', 'success');
+                } else {
+                    addLog('👋 A competitor closed!', 'success');
+                }
+            } else if (Math.random() < 0.1) {
+                game.competitors++;
+                addLog('🏪 New competitor opened!', 'warning');
+            }
+            
+            document.getElementById('liveSimulationModal').style.display = 'none';
+            game.day++;
+            setWeather();
+            triggerEvent();
+            updateDisplay();
+        }
+
+        // دالة المحاكاة الرئيسية (تحل محل الدالة القديمة)
+        function startDay() {
+            playSound('click');
+            
+            const lemons = parseInt(document.getElementById('lemonSlider').value);
+            const sugar = parseInt(document.getElementById('sugarSlider').value);
+            const ice = parseInt(document.getElementById('iceSlider').value);
+            const price = parseInt(document.getElementById('priceSlider').value);
+            
+            if (game.lemons < lemons || game.sugar < sugar || game.ice < ice) {
+                addLog('❌ Not enough supplies for even one cup! Buy supplies.', 'error');
+                return;
+            }
+
+            // 1. حساب جميع المتغيرات اليومية مقدماً
+            const weather = weatherTypes.find(w => w.type === game.weather);
+            game.feedback = { angry: 0, happy: 0, waiting: 0, expensive: 0 };
+            game.dailyCups = 0;
+            
+            let baseDemand = Math.floor(10 + Math.random() * 20) + Math.floor(game.reputation / 10);
+            let demandMultiplier = weather.demand;
+            
+            if (game.weather === 'hot' && game.upgrades.umbrella) {
+                demandMultiplier *= 1.3;
+            }
+            if (game.upgrades.sign === 1) baseDemand += 5; 
+            else if (game.upgrades.sign === 2) baseDemand += 12;
+            
+            const comfortBonus = 1 + (game.upgrades.table * 0.15);
+            
+            if (game.lastEvent) {
+                if (game.lastEvent.demandBonus) demandMultiplier *= game.lastEvent.demandBonus;
+                if (game.lastEvent.demandPenalty) demandMultiplier *= game.lastEvent.demandPenalty;
+            }
+            const competitorEffect = Math.max(0.5, 1 - (game.competitors * 0.1));
+            demandMultiplier *= competitorEffect;
+            
+            const totalDemand = Math.floor(baseDemand * demandMultiplier);
+            const recipeQuality = (lemons + sugar + ice) / 3;
+            const pitcherBonus = 1 + (game.upgrades.pitcher * 0.2);
+            const finalQuality = recipeQuality * pitcherBonus;
+            const qualityFactor = Math.min(finalQuality / 5, 2.0);
+            const priceResistance = Math.max(0.2, 1 - (price - 5) / 10);
+            const actualDemand = Math.floor(totalDemand * qualityFactor * priceResistance);
+
+            const maxCups = Math.min(
+                Math.floor(game.lemons / lemons),
+                Math.floor(game.sugar / sugar),
+                Math.floor(game.ice / ice),
+                actualDemand
+            );
+            
+            const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
+            const happyRatio = satisfactionRate > 2.0 ? 0.8 : (satisfactionRate > 1.5 ? 0.6 : (satisfactionRate >= 1 ? 0.4 : (satisfactionRate < 0.7 ? 0.3 : 0.3)));
+            const angryRatio = satisfactionRate < 0.7 ? 0.3 : 0;
+            const expensiveRatio = (price > 10) ? 0.2 : 0;
+            
+            // 2. إعداد واجهة المحاكاة
+            document.getElementById('startDayBtn').disabled = true;
+            document.getElementById('liveSimulationModal').style.display = 'block';
+            document.getElementById('customerQueue').innerHTML = ''; // تفريغ الطابور
+            simTime = 0;
+            simSpeed = 1;
+            document.getElementById('speedToggleBtn').textContent = '⏩ x1';
+            updateStandVisuals();
+            
+            let currentCupsSold = 0;
+            const cupsToSell = maxCups;
+            const cupsToMiss = actualDemand - cupsToSell;
+            const totalEvents = cupsToSell + cupsToMiss; // إجمالي الأحداث (بيع أو انتظار)
+            const eventsPerSecond = totalEvents / simDuration; // معدل الأحداث في الثانية
+            
+            // 3. تشغيل المؤقت (محرك اللعبة)
+            function runSimulationStep() {
+                // If there are no events to run, just finalize quickly
+                if (totalEvents <= 0 && simTime * (50 / 1000) >= simDuration) {
+                    finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
+                    document.getElementById('startDayBtn').disabled = false;
+                    return;
+                }
+
+                simTime++;
+                const timeRatio = Math.min(1, simTime / (simDuration / (1000 / 50)));
+                document.getElementById('simTimer').textContent = `TIME: ${Math.floor(timeRatio * 100)}%`;
+
+                // **ظهور الزبائن/التفاعل**
+                if (simTime % (50 / eventsPerSecond) === 0) { // لتوزيع الأحداث بالتساوي على الوقت
+                    if (currentCupsSold < cupsToSell) {
+                        // زبون سعيد / غاضب
+                        if (Math.random() < angryRatio) {
+                             spawnCustomer('😡', true);
+                             game.feedback.angry++;
+                             playSound('angry');
+                        } else if (Math.random() < happyRatio) {
+                            spawnCustomer('😊', true);
+                            game.feedback.happy++;
+                            playSound('happy');
+                        } else {
+                            spawnCustomer('👍', true);
+                        }
+                        
+                        currentCupsSold++;
+                        playSound('sell');
+                    } else if (cupsToMiss > 0 && Math.random() < 0.5) {
+                        // زبون لم يستطع الشراء (انتظار أو غلاء)
+                        if (Math.random() < expensiveRatio) {
+                            spawnCustomer('💵', true);
+                            game.feedback.expensive++;
+                        } else {
+                            spawnCustomer('⏳', true);
+                            game.feedback.waiting++;
+                        }
+                    }
+                }
+
+                // **ظهور الزبائن الواقفين في الطابور**
+                if (Math.random() < 0.2) {
+                    spawnCustomer('⏳', false);
+                }
+
+                // **إنهاء المحاكاة بعد انتهاء الوقت**
+                if (simTime * (50 / 1000) >= simDuration) {
+                    finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
+                    document.getElementById('startDayBtn').disabled = false;
+                }
+            }
+
+            simulationInterval = setInterval(runSimulationStep, 50 / simSpeed); // 50ms = 20 تحديث في الثانية (x1)
+            
+            // 4. دالة التسريع
+            document.getElementById('speedToggleBtn').onclick = function() {
+                if (simulationInterval) {
+                    clearInterval(simulationInterval);
+                    simSpeed = simSpeed === 1 ? 10 : 1;
+                    this.textContent = simSpeed === 1 ? '⏩ x1' : '🚀 x10';
+                    // إعادة تشغيل المؤقت بالسرعة الجديدة
+                    simulationInterval = setInterval(runSimulationStep, 50 / simSpeed);
+                }
+            };
+            
+            // 5. دالة التخطي
+            document.getElementById('skipDayBtn').onclick = function() {
+                // يجب أن تتوقف المحاكاة وتطبق النتائج فوراً
+                finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
+                document.getElementById('startDayBtn').disabled = false;
+            };
+        }
+
+        // **تعديل دالة buySupplies لتصبح فقط للشراء السريع**
+        function quickBuySupplies() {
+            playSound('click');
+            const cost = 30; // تكلفة ثابتة للشراء السريع
+            const items = 20; // كمية ثابتة للشراء السريع
+            if (game.money < cost) {
+                addLog('❌ Not enough money! Need 30$.', 'error');
+                return;
+            }
+
+            game.money -= cost;
+            game.lemons += items;
+            game.sugar += items;
+            game.ice += items;
+
+            playSound('sell');
+            addLog(`🛒 QUICK BUY: ${items}🍋 ${items}🍬 ${items}🧊 (-${cost}$)`, 'success');
+            updateDisplay();
+        }
+
+        // ربط الأزرار - التعديل هنا:
+        document.getElementById('upgradesBtn').onclick = showUpgrades;
+        document.getElementById('suppliesBtn').onclick = showSuppliesModal; // يفتح النافذة
+        document.getElementById('recipeBtn').onclick = showRecipe;
+        document.getElementById('achievementsBtn').onclick = showAchievements;
+        document.getElementById('startDayBtn').onclick = startDay;
+        document.getElementById('buySuppliesBtn').onclick = quickBuySupplies; // الشراء السريع
+        document.getElementById('closeUpgradesBtn').onclick = closeUpgrades;
+        document.getElementById('closeSuppliesBtn').onclick = closeSuppliesModal; // إغلاق قائمة الإمدادات
+        document.getElementById('closeAchievementsBtn').onclick = closeAchievements;
+        document.getElementById('soundToggle').onclick = toggleSound;
+        
+        // ربط أزرار شراء الحزم الجديدة
+        document.querySelectorAll('.supply-buy-btn').forEach(btn => {
+            btn.onclick = buySupplyPack;
+        });
+        
+        document.getElementById('pitcherUpgradeBtn').onclick = function() { buyUpgrade('pitcher'); };
+        document.getElementById('signUpgradeBtn').onclick = function() { buyUpgrade('sign'); };
+        document.getElementById('tableUpgradeBtn').onclick = function() { buyUpgrade('table'); };
+        document.getElementById('umbrellaUpgradeBtn').onclick = function() { buyUpgrade('umbrella'); };
+
+        // ربط السلايدرات
+        document.getElementById('lemonSlider').oninput = function() {
+            document.getElementById('lemonValue').textContent = this.value;
+        };
+
+        document.getElementById('sugarSlider').oninput = function() {
+            document.getElementById('sugarValue').textContent = this.value;
+        };
+
+        document.getElementById('iceSlider').oninput = function() {
+            document.getElementById('iceValue').textContent = this.value;
+        };
+
+        document.getElementById('priceSlider').oninput = function() {
+            document.getElementById('priceValue').textContent = this.value + ' $';
+        };
+
+        // بدء اللعبة
+        initSounds();
+        loadGame();
+        setWeather();
+        triggerEvent();
+        updateDisplay();
+        
+        // تشغيل الموسيقى بعد أول تفاعل
+        document.body.addEventListener('click', function() {
+            if (soundEnabled && audioElements.bgMusic && audioElements.bgMusic.paused) {
+                playSound('bgMusic');
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
