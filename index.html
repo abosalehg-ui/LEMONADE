@@ -728,7 +728,63 @@
         #simTimer {
              font-size: 0.9em !important; /* تصغير خط المؤقت */
         }
-        
+     /* ===== GAME DESCRIPTION DRAWER (Right Side) ===== */
+.description-drawer {
+    position: absolute;
+    top: 0;
+    right: -320px; /* Hidden by default */
+    height: 100%;
+    width: 300px;
+    z-index: 600;
+    transition: right 0.3s ease-in-out;
+    padding: 10px 0;
+}
+
+.description-drawer.open {
+    right: 0; /* Slide into view */
+}
+
+.description-section {
+    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+    border: 2px solid #1a3d0a;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.description-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Toggle button (❔) */
+.description-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 8px 0 0 8px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+    font-size: 1.2em;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: right 0.3s ease-in-out;
+}
+
+.description-drawer.open + .description-toggle-btn {
+    right: 300px; /* Move button beside open drawer */
+}   
     </style>
 </head>
 <body>
@@ -763,6 +819,27 @@
     
     <div class="image-container" id="imageContainer">
         <img src="LEMONADE.jpg" alt="Lemonade Stand Image" class="lemonade-image">
+    <!-- ✅ GAME DESCRIPTION DRAWER (Right Side) -->
+    <div class="description-drawer" id="descriptionDrawer">
+        <div class="description-section">
+            <div class="description-title">🍋 Game Description</div>
+            <p>
+                Lemonade Tycoon Simulation is a business management game where you run your own lemonade stand.<br><br>
+                Each day, you decide how much lemon, sugar, and ice to use in your recipe — and set the perfect price per cup.<br><br>
+                Your success depends on weather conditions, customer satisfaction, and smart upgrades.<br><br>
+                Buy supplies, improve your equipment, and build your reputation to attract more customers and increase profits.<br><br>
+                Face random events, deal with competitors, and try to become the ultimate Lemonade Tycoon! 🏆
+           </p>
+           <hr style="border: 1px solid rgba(255,255,255,0.2); margin: 10px 0;">
+           <p style="font-size: 0.8em; color: #ccc; text-align:center;">
+               Created by <b>ABDULKARIM ALOBUD</b><br>
+               <a href="mailto:abo.saleh.g@gmail.com" style="color:#7ab84a;">abo.saleh.g@gmail.com</a>
+           </p>
+       </div>
+   </div>
+
+   <!-- ❔ Toggle Button -->
+   <button class="description-toggle-btn" id="descriptionToggleBtn" title="Game Info">❔</button>
 
         <div class="icon-bar top-bar" id="topIconBar">
             <div class="icon-display-item" id="angryDisplay" title="Angry">
@@ -1849,6 +1926,17 @@
                 playSound('bgMusic');
             }
         }, { once: true });
+        // ===== GAME DESCRIPTION DRAWER TOGGLE =====
+function toggleDescriptionDrawer() {
+playSound('click'); // 🔊 تشغيل صوت الزر (button-click.mp3)
+    const drawer = document.getElementById('descriptionDrawer');
+    const toggleBtn = document.getElementById('descriptionToggleBtn');
+    drawer.classList.toggle('open');
+    toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '❔';
+}
+
+document.getElementById('descriptionToggleBtn').addEventListener('click', toggleDescriptionDrawer);
+
     </script>
 </body>
 </html>
