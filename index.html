@@ -784,7 +784,12 @@
 
 .description-drawer.open + .description-toggle-btn {
     right: 300px; /* Move button beside open drawer */
-}   
+}
+        /* === تأثير التظليل عند فتح قائمة الوصف === */
+        .image-container.desc-open::before {
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }  
     </style>
 </head>
 <body>
@@ -1392,16 +1397,26 @@
         
         // **دالة تبديل قائمة الإعدادات المنزلقة الجديدة والمصححة**
         function toggleSettingsDrawer() {
-            playSound('click');
-            const drawer = document.getElementById('settingsDrawer');
-            const container = document.getElementById('imageContainer');
-            
-            drawer.classList.toggle('open');
-            container.classList.toggle('drawer-open');
-            
-            const toggleBtn = document.getElementById('settingsToggleBtn');
-            toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '⚙️';
-        }
+    playSound('click');
+    const drawer = document.getElementById('settingsDrawer');
+    const container = document.getElementById('imageContainer');
+    const toggleBtn = document.getElementById('settingsToggleBtn');
+    const descDrawer = document.getElementById('descriptionDrawer');
+    const descBtn = document.getElementById('descriptionToggleBtn');
+
+    // إذا كانت قائمة الوصف مفتوحة، أغلقها
+    if (descDrawer.classList.contains('open')) {
+        descDrawer.classList.remove('open');
+        container.classList.remove('desc-open');
+        descBtn.textContent = '❔';
+    }
+
+    // فتح/إغلاق الإعدادات
+    drawer.classList.toggle('open');
+    container.classList.toggle('drawer-open');
+    toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '⚙️';
+}
+
 
         function showUpgrades() {
             playSound('click');
@@ -1928,12 +1943,26 @@
         }, { once: true });
         // ===== GAME DESCRIPTION DRAWER TOGGLE =====
 function toggleDescriptionDrawer() {
-playSound('click'); // 🔊 تشغيل صوت الزر (button-click.mp3)
+    playSound('click');
     const drawer = document.getElementById('descriptionDrawer');
     const toggleBtn = document.getElementById('descriptionToggleBtn');
+    const container = document.getElementById('imageContainer');
+    const settingsDrawer = document.getElementById('settingsDrawer');
+    const settingsBtn = document.getElementById('settingsToggleBtn');
+
+    // إذا كانت قائمة الإعدادات مفتوحة، أغلقها أولاً
+    if (settingsDrawer.classList.contains('open')) {
+        settingsDrawer.classList.remove('open');
+        container.classList.remove('drawer-open');
+        settingsBtn.textContent = '⚙️';
+    }
+
+    // الآن افتح أو أغلق قائمة الوصف
     drawer.classList.toggle('open');
+    container.classList.toggle('desc-open');
     toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '❔';
 }
+
 
 document.getElementById('descriptionToggleBtn').addEventListener('click', toggleDescriptionDrawer);
 
