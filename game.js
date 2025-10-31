@@ -494,7 +494,7 @@ class LemonadeStandScene extends Phaser.Scene {
 const phaserConfig = {
     type: Phaser.AUTO,
     width: 800,
-    height: 800,
+    height: 400,
     parent: 'phaser-container',
     backgroundColor: '#8bc34a',
     scene: LemonadeStandScene,
