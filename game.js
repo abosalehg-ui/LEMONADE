@@ -13,6 +13,9 @@ class LemonadeStandScene extends Phaser.Scene {
         this.simSpeed = 1;
         this.weather = 'sunny';
         this.dayCount = 1;
+        this.currentTimer = null;
+        this.activeTimers = [];
+        this.activeTweens = [];
     }
 
     preload() {
@@ -571,7 +574,7 @@ class LemonadeStandScene extends Phaser.Scene {
         this.customerGroup = this.add.group();
 
         // Status text above vendor
-        this.statusText = this.add.text(200, 170, 'Ready to Start!', {
+        this.statusText = this.add.text(200, 190, 'Ready to Start!', {
             fontSize: '14px',
             color: '#fff',
             backgroundColor: '#000',
@@ -668,8 +671,16 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     startSimulation(maxCups, satisfactionRate) {
-        if (this.isSimulating) return;
+        if (this.isSimulating) {
+            console.log('Already simulating, skipping...');
+            return;
+        }
+        
+        console.log('Starting simulation with', maxCups, 'cups');
         this.isSimulating = true;
+        
+        // Clean up any existing timers/tweens
+        this.cleanupSimulation();
         
         this.weather = Math.random() > 0.5 ? 'sunny' : 'cloudy';
         this.createWeatherDisplay();
@@ -680,11 +691,14 @@ class LemonadeStandScene extends Phaser.Scene {
         let cupsSold = 0;
         const baseDelay = 2000;
         
-        const spawnTimer = this.time.addEvent({
+        this.currentTimer = this.time.addEvent({
             delay: baseDelay / this.simSpeed,
             callback: () => {
                 if (cupsSold >= maxCups) {
-                    spawnTimer.remove();
+                    if (this.currentTimer) {
+                        this.currentTimer.remove();
+                        this.currentTimer = null;
+                    }
                     this.endSimulation();
                     return;
                 }
@@ -699,8 +713,31 @@ class LemonadeStandScene extends Phaser.Scene {
             },
             loop: true
         });
+    }
 
-        this.currentTimer = spawnTimer;
+    cleanupSimulation() {
+        // Remove all active timers
+        if (this.currentTimer) {
+            this.currentTimer.remove();
+            this.currentTimer = null;
+        }
+        
+        this.activeTimers.forEach(timer => {
+            if (timer && timer.remove) {
+                timer.remove();
+            }
+        });
+        this.activeTimers = [];
+        
+        // Clean up customer group
+        if (this.customerGroup) {
+            this.customerGroup.getChildren().forEach(customer => {
+                if (customer.shadow) {
+                    customer.shadow.destroy();
+                }
+            });
+            this.customerGroup.clear(true, true);
+        }
     }
 
     spawnCustomer(satisfactionRate) {
@@ -723,8 +760,17 @@ class LemonadeStandScene extends Phaser.Scene {
             walkDir = 'left';
         }
         
-        const customer = this.add.image(startX, startY, `customer${customerNum}_${walkDir}`).setOrigin(0.5, 1);
+        const textureKey = `customer${customerNum}_${walkDir}`;
+        
+        // Check if texture exists
+        if (!this.textures.exists(textureKey)) {
+            console.error('Texture does not exist:', textureKey);
+            return;
+        }
+        
+        const customer = this.add.image(startX, startY, textureKey).setOrigin(0.5, 1);
         customer.customerNum = customerNum;
+        customer.isActive = true;
         
         const shadow = this.add.ellipse(startX, startY + 10, 20, 6, 0x000000, 0.4);
         customer.shadow = shadow;
@@ -735,13 +781,19 @@ class LemonadeStandScene extends Phaser.Scene {
         const walkTimer = this.time.addEvent({
             delay: 200 / this.simSpeed,
             callback: () => {
+                if (!customer.isActive) {
+                    walkTimer.remove();
+                    return;
+                }
                 frame = (frame + 1) % 2;
                 customer.y += (frame * 2 - 1);
             },
-            repeat: -1
+            loop: true
         });
+        
+        this.activeTimers.push(walkTimer);
 
-        this.tweens.add({
+        const walkTween = this.tweens.add({
             targets: customer,
             x: targetX,
             y: targetY,
@@ -754,14 +806,25 @@ class LemonadeStandScene extends Phaser.Scene {
                 }
             },
             onComplete: () => {
-                if (walkTimer) walkTimer.remove();
-                customer.setTexture(`customer${customer.customerNum}_up`);
+                if (!customer.isActive) return;
+                
+                if (walkTimer && walkTimer.remove) {
+                    walkTimer.remove();
+                }
+                
+                const upTextureKey = `customer${customer.customerNum}_up`;
+                if (this.textures.exists(upTextureKey)) {
+                    customer.setTexture(upTextureKey);
+                }
+                
                 this.serveCustomer(customer, satisfactionRate);
             }
         });
     }
 
     serveCustomer(customer, satisfactionRate) {
+        if (!customer || !customer.active || !customer.isActive) return;
+        
         let feedbackIcon = 'icon_happy';
         const rand = Math.random();
         
@@ -800,14 +863,16 @@ class LemonadeStandScene extends Phaser.Scene {
             duration: 600 / this.simSpeed,
             ease: 'Cubic.easeOut',
             onComplete: () => {
-                coin.destroy();
+                if (coin && coin.active) coin.destroy();
                 const sparkle = this.add.circle(this.vendor.x, this.vendor.y - 20, 8, 0xFFD700);
                 this.tweens.add({
                     targets: sparkle,
                     alpha: 0,
                     scale: 2,
                     duration: 300,
-                    onComplete: () => sparkle.destroy()
+                    onComplete: () => {
+                        if (sparkle && sparkle.active) sparkle.destroy();
+                    }
                 });
             }
         });
@@ -828,28 +893,41 @@ class LemonadeStandScene extends Phaser.Scene {
             yoyo: true
         });
 
-        this.time.delayedCall(1200 / this.simSpeed, () => {
+        const leaveTimer = this.time.delayedCall(1200 / this.simSpeed, () => {
+            if (!customer || !customer.active || !customer.isActive) return;
+            
             this.tweens.add({
                 targets: icon,
                 alpha: 0,
                 duration: 300,
-                onComplete: () => icon.destroy()
+                onComplete: () => {
+                    if (icon && icon.active) icon.destroy();
+                }
             });
             
             const exitSide = customer.x < 200 ? 'left' : 'right';
             const exitX = exitSide === 'left' ? -50 : 450;
             
-            customer.setTexture(`customer${customer.customerNum}_${exitSide}`);
+            const exitTextureKey = `customer${customer.customerNum}_${exitSide}`;
+            if (this.textures.exists(exitTextureKey)) {
+                customer.setTexture(exitTextureKey);
+            }
             
             let frame = 0;
             const walkTimer = this.time.addEvent({
                 delay: 200 / this.simSpeed,
                 callback: () => {
+                    if (!customer.isActive) {
+                        walkTimer.remove();
+                        return;
+                    }
                     frame = (frame + 1) % 2;
                     customer.y += (frame * 2 - 1);
                 },
-                repeat: -1
+                loop: true
             });
+            
+            this.activeTimers.push(walkTimer);
             
             this.tweens.add({
                 targets: customer,
@@ -864,12 +942,21 @@ class LemonadeStandScene extends Phaser.Scene {
                     }
                 },
                 onComplete: () => {
-                    if (walkTimer) walkTimer.remove();
-                    if (customer.shadow) customer.shadow.destroy();
-                    customer.destroy();
+                    if (walkTimer && walkTimer.remove) {
+                        walkTimer.remove();
+                    }
+                    customer.isActive = false;
+                    if (customer.shadow && customer.shadow.active) {
+                        customer.shadow.destroy();
+                    }
+                    if (customer && customer.active) {
+                        customer.destroy();
+                    }
                 }
             });
         });
+        
+        this.activeTimers.push(leaveTimer);
     }
 
     endSimulation() {
@@ -916,11 +1003,19 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     skipDay() {
-        if (this.currentTimer) {
-            this.currentTimer.remove();
+        console.log('Skipping day...');
+        
+        // Mark all customers as inactive
+        if (this.customerGroup) {
+            this.customerGroup.getChildren().forEach(customer => {
+                if (customer) customer.isActive = false;
+            });
         }
-        this.time.removeAllEvents();
-        this.customerGroup.clear(true, true);
+        
+        // Clean up everything
+        this.cleanupSimulation();
+        
+        // End simulation
         this.endSimulation();
     }
 
