@@ -24,8 +24,8 @@ class LemonadeStandScene extends Phaser.Scene {
         const grassCtx = grassTexture.getContext();
         
         const gradient = grassCtx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, '#8bc34a');
-        gradient.addColorStop(1, '#b0e57c');
+        gradient.addColorStop(0, '#b0e57c');
+        gradient.addColorStop(1, '#8bc34a');
         grassCtx.fillStyle = gradient;
         grassCtx.fillRect(0, 0, 800, 400);
         
@@ -493,10 +493,10 @@ class LemonadeStandScene extends Phaser.Scene {
 
 const phaserConfig = {
     type: Phaser.AUTO,
-    width: 400,
+    width: 800,
     height: 400,
     parent: 'phaser-container',
-    backgroundColor: '#6fba52',
+    backgroundColor: '#8bc34a',
     scene: LemonadeStandScene,
     scale: {
         mode: Phaser.Scale.FIT,
