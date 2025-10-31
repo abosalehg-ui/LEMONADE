@@ -1700,6 +1700,7 @@
             // ✅ تحديث Phaser
             window.updatePhaserStand(game.upgrades);
             // ✅ بدء المحاكاة في Phaser
+            document.getElementById('simDayDisplay').textContent = game.day;
             document.getElementById('startDayBtn').disabled = true;
             document.getElementById('liveSimulationModal').style.display = 'block';
             window.startPhaserSimulation(maxCups, satisfactionRate);
