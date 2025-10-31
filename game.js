@@ -574,7 +574,7 @@ class LemonadeStandScene extends Phaser.Scene {
         this.customerGroup = this.add.group();
 
         // Status text above vendor
-        this.statusText = this.add.text(200, 190, 'Ready to Start!', {
+        this.statusText = this.add.text(200, 170, 'Ready to Start!', {
             fontSize: '14px',
             color: '#fff',
             backgroundColor: '#000',
