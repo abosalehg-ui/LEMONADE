@@ -789,7 +789,18 @@
         .image-container.desc-open::before {
             background: rgba(0, 0, 0, 0.5);
             pointer-events: auto;
-        }  
+        }
+        @media (max-width: 768px) {
+    /* تحريك زر ⚙️ إلى أعلى قليلاً */
+    #settingsToggleBtn {
+        top: 40%;
+    }
+
+    /* تحريك زر ❔ إلى أسفل قليلاً */
+    #descriptionToggleBtn {
+        top: 60%;
+    }
+}
     </style>
 </head>
 <body>
