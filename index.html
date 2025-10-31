@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍋 Lemonade Tycoon</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
     <style>
         #startDayBtn {
             /* 1. تغيير لون التدرج لجذب الانتباه (مثلاً: لون برتقالي/ذهبي) */
@@ -632,55 +633,12 @@
             transform: scale(0.95);
         }
         
-        /* نمط الزبون المتحرك */
-        .customer-icon {
-            font-size: 1.8em; /* تم تصغير الأيقونة */
-            position: relative;
-            animation: walkIn 0.5s ease-out;
-            transition: transform 0.3s, opacity 0.3s;
-            cursor: default;
+        #phaser-container {
+        width: 800px;
+        height: 400px;
+        margin: 0 auto;
         }
-
-        .customer-icon.served {
-            opacity: 0.5;
-            transform: translateY(10px);
-        }
-
-        .feedback-bubble {
-            position: absolute;
-            top: -10px; /* تم تعديل الموضع */
-            right: -5px; /* تم تعديل الموضع */
-            background: white;
-            border-radius: 50%;
-            padding: 3px; /* تم تصغير الحجم */
-            font-size: 0.5em;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            animation: fadeInOut 2s ease-in-out forwards;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(10px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
-
-        @keyframes walkIn {
-            from { transform: translateX(-50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        /* أنماط المحاكاة المرئية المعدلة */
-        #liveSimulationModal .modal-content {
-            max-width: 250px; /* تصغير عرض النافذة */
-            margin: 10px auto; /* تعديل الهامش */
-            
-            /* **التصحيح 1: إزالة خلفية الإطار الأساسي** */
-            background: none !important; 
-            border: none !important; 
-            padding: 0;
-        }
-        
+   
         #standView {
             width: 100%; 
             height: 100px !important; 
@@ -834,7 +792,7 @@
     </div>
     
     <div class="image-container" id="imageContainer">
-        <img src="LEMONADE.jpg" alt="Lemonade Stand Image" class="lemonade-image">
+        <div id="phaser-container" style="border: 5px solid #FFD700; border-radius: 12px; overflow: hidden;"></div>
     <!-- ✅ GAME DESCRIPTION DRAWER (Right Side) -->
     <div class="description-drawer" id="descriptionDrawer">
         <div class="description-section">
@@ -985,18 +943,6 @@
             <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
                 <div class="modal-title" style="margin-bottom: 0;">LIVE - DAY <span id="simDayDisplay">1</span></div>
                 
-                <div id="standView" style="position: relative; width: 100%; height: 200px; background: linear-gradient(180deg, #b0e57c 0%, #8bc34a 100%); border-bottom: 3px solid #3d5e27; overflow: hidden;">
-                    
-                    <div id="standSetup" style="position: absolute; bottom: 0; right: 50%; transform: translateX(50%); display: flex; flex-direction: column; align-items: center; z-index: 10;">
-                        <div id="tableDisplay" style="font-size: 2em;">🪑</div>
-                        <div id="umbrellaDisplay" style="font-size: 2em; position: absolute; top: -20px; display: none;">☂️</div>
-                        <div id="vendor" style="font-size: 1.8em; position: absolute; top: -20px; left: 40px;">👨‍🍳</div>
-                    </div>
-
-                    <div id="customerQueue" style="position: absolute; bottom: 5px; left: 10px; display: flex; gap: 10px; align-items: flex-end; z-index: 5;">
-                        </div>
-
-                </div>
                 <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 5px 10px; background: #3d6520; border-top: 2px solid #1a3d0a;">
                     <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
                     <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 0.9em;">TIME: 0%</div>
@@ -1627,45 +1573,6 @@
             log.insertBefore(entry, log.firstChild);
             log.scrollTop = 0;
         }
-        
-        // دالة لعرض الزبائن والتفاعلات (لم تتغير)
-        function spawnCustomer(feedbackIcon = '⏳', isServed = false) {
-            const queue = document.getElementById('customerQueue');
-            
-            if (queue.children.length >= 7) return; 
-
-            const customer = document.createElement('div');
-            customer.className = 'customer-icon';
-            customer.textContent = customerIcons[Math.floor(Math.random() * customerIcons.length)];
-            
-            if (isServed) {
-                const bubble = document.createElement('span');
-                bubble.className = 'feedback-bubble';
-                bubble.textContent = feedbackIcon;
-                customer.appendChild(bubble);
-
-                setTimeout(() => {
-                    customer.remove();
-                }, 1800 / simSpeed);
-
-                setTimeout(() => {
-                    bubble.remove();
-                }, 2000 / simSpeed);
-            } else {
-                queue.appendChild(customer);
-            }
-        }
-        
-        // تحديث إعدادات المحل في نافذة المحاكاة (لم تتغير)
-        function updateStandVisuals() {
-            document.getElementById('simDayDisplay').textContent = game.day;
-            
-            const umbrella = document.getElementById('umbrellaDisplay');
-            umbrella.style.display = game.upgrades.umbrella ? 'block' : 'none';
-
-            const tableLevels = ['🪑', '🛋️', '👑'];
-            document.getElementById('tableDisplay').textContent = tableLevels[game.upgrades.table];
-        }
 
         // دالة لإنهاء المحاكاة وتطبيق النتائج (لم تتغير)
         function finalizeDay(totalMaxCups, actualDemand, recipeQuality, price, comfortBonus) {
@@ -1750,7 +1657,7 @@
             const price = parseInt(document.getElementById('priceSlider').value);
             
             if (game.lemons < lemons || game.sugar < sugar || game.ice < ice) {
-                addLog('❌ Not enough supplies for even one cup! Buy supplies.', 'error');
+                addLog('❌ Not enough supplies!', 'error');
                 return;
             }
 
@@ -1761,10 +1668,8 @@
             let baseDemand = Math.floor(10 + Math.random() * 20) + Math.floor(game.reputation / 10);
             let demandMultiplier = weather.demand;
             
-            if (game.weather === 'hot' && game.upgrades.umbrella) {
-                demandMultiplier *= 1.3;
-            }
-            if (game.upgrades.sign === 1) baseDemand += 5; 
+            if (game.weather === 'hot' && game.upgrades.umbrella) demandMultiplier *= 1.3;
+            if (game.upgrades.sign === 1) baseDemand += 5;
             else if (game.upgrades.sign === 2) baseDemand += 12;
             
             const comfortBonus = 1 + (game.upgrades.table * 0.15);
@@ -1792,81 +1697,21 @@
             );
             
             const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
-            const happyRatio = satisfactionRate > 2.0 ? 0.8 : (satisfactionRate > 1.5 ? 0.6 : (satisfactionRate >= 1 ? 0.4 : (satisfactionRate < 0.7 ? 0.3 : 0.3)));
-            const angryRatio = satisfactionRate < 0.7 ? 0.3 : 0;
-            const expensiveRatio = (price > 10) ? 0.2 : 0;
-            
+            // ✅ تحديث Phaser
+            window.updatePhaserStand(game.upgrades);
+            // ✅ بدء المحاكاة في Phaser
             document.getElementById('startDayBtn').disabled = true;
             document.getElementById('liveSimulationModal').style.display = 'block';
-            document.getElementById('customerQueue').innerHTML = '';
-            simTime = 0;
-            simSpeed = 1;
-            document.getElementById('speedToggleBtn').textContent = '⏩ x1';
-            updateStandVisuals();
-            
-            let currentCupsSold = 0;
-            const cupsToSell = maxCups;
-            const cupsToMiss = actualDemand - cupsToSell;
-            const totalEvents = cupsToSell + cupsToMiss;
-            const eventsPerSecond = totalEvents / simDuration;
-            const totalSteps = simDuration / (50 / 1000); // عدد الخطوات الإجمالي
-
-            function runSimulationStep() {
-                if (simTime >= totalSteps) {
-                    finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
-                    document.getElementById('startDayBtn').disabled = false;
-                    return;
-                }
-
-                simTime++;
-                const timeRatio = simTime / totalSteps;
-                // تم تصحيح عرض النسبة المئوية
-                document.getElementById('simTimer').textContent = `TIME: ${Math.min(100, Math.floor(timeRatio * 100))}%`; 
-
-                if (totalEvents > 0 && simTime % Math.max(1, Math.round(50 / eventsPerSecond)) === 0) {
-                    if (currentCupsSold < cupsToSell) {
-                        if (Math.random() < angryRatio) {
-                             spawnCustomer('😡', true);
-                             game.feedback.angry++;
-                             playSound('angry');
-                        } else if (Math.random() < happyRatio) {
-                            spawnCustomer('😊', true);
-                            game.feedback.happy++;
-                            playSound('happy');
-                        } else {
-                            spawnCustomer('👍', true);
-                        }
-                        
-                        currentCupsSold++;
-                        playSound('sell');
-                    } else if (cupsToMiss > 0 && Math.random() < 0.5) {
-                        if (Math.random() < expensiveRatio) {
-                            spawnCustomer('💵', true);
-                            game.feedback.expensive++;
-                        } else {
-                            spawnCustomer('⏳', true);
-                            game.feedback.waiting++;
-                        }
-                    }
-                }
-
-                if (Math.random() < 0.2) {
-                    spawnCustomer('⏳', false);
-                }
-            }
-
-            simulationInterval = setInterval(runSimulationStep, 50 / simSpeed);
-            
-            document.getElementById('speedToggleBtn').onclick = function() {
-                if (simulationInterval) {
-                    clearInterval(simulationInterval);
-                    simSpeed = simSpeed === 1 ? 10 : 1;
-                    this.textContent = simSpeed === 1 ? '⏩ x1' : '🚀 x10';
-                    simulationInterval = setInterval(runSimulationStep, 50 / simSpeed);
-                }
-            };
-            
+            window.startPhaserSimulation(maxCups, satisfactionRate);
+            // ⏱️ انتظار انتهاء المحاكاة (مدة تقريبية)
+            const simulationDuration = maxCups * 1500 + 3000; // 1.5 ثانية لكل زبون + 3 ثوان إضافية
+            setTimeout(() => {
+                finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
+                document.getElementById('startDayBtn').disabled = false;
+            }, simulationDuration);
+            // ✅ زر التخطي
             document.getElementById('skipDayBtn').onclick = function() {
+                window.skipPhaserDay();
                 finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
                 document.getElementById('startDayBtn').disabled = false;
             };
@@ -1980,5 +1825,7 @@ function toggleDescriptionDrawer() {
 document.getElementById('descriptionToggleBtn').addEventListener('click', toggleDescriptionDrawer);
 
     </script>
+    <script src="game.js"></script>
 </body>
 </html>
+
