@@ -55,7 +55,6 @@ class LemonadeStandScene extends Phaser.Scene {
     const height = type.height;
     ctx.clearRect(0, 0, width, height);
 
-    // حساب الحركة (تمايل الجسم والأطراف)
     const step = frame % 4;
     const walkCycle = Math.sin((step / 4) * Math.PI * 2);
     const bodySway = walkCycle * 1.2;
@@ -74,17 +73,47 @@ class LemonadeStandScene extends Phaser.Scene {
     const centerX = 10;
     const baseY = height / 2 + bodySway;
 
-    // ظل تحت القدمين
+    // ظل أسفل القدمين
     ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
     ctx.ellipse(centerX, height - 2, 6, 2, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // الجسد مع تدرج لوني
-    const gradient = ctx.createLinearGradient(centerX - 5, baseY, centerX + 5, baseY + 10);
-    gradient.addColorStop(0, type.colors[0]);
-    gradient.addColorStop(1, type.colors[1]);
-    ctx.fillStyle = gradient;
+    // ملابس وتفاصيل حسب النوع
+    let topColor = type.colors[0];
+    let bottomColor = type.colors[1];
+    let accessory = null;
+
+    if (type.name === 'man') {
+        topColor = '#3C6382';
+        bottomColor = '#0A3D62';
+        accessory = 'hat';
+    } else if (type.name === 'woman') {
+        topColor = '#F8A5C2';
+        bottomColor = '#FDA7DF';
+        accessory = 'dress';
+    } else if (type.name === 'child') {
+        topColor = '#55E6C1';
+        bottomColor = '#10AC84';
+        accessory = 'shorts';
+    } else if (type.name === 'elder') {
+        topColor = '#BDC581';
+        bottomColor = '#84817A';
+        accessory = 'glasses';
+    } else if (type.name === 'teen') {
+        topColor = '#9AECDB';
+        bottomColor = '#1B9CFC';
+        accessory = 'hoodie';
+    } else if (type.name === 'adult') {
+        topColor = '#F6B93B';
+        bottomColor = '#E58E26';
+    }
+
+    // الجسم مع تدرج لوني
+    const grad = ctx.createLinearGradient(centerX - 5, baseY, centerX + 5, baseY + 10);
+    grad.addColorStop(0, topColor);
+    grad.addColorStop(1, bottomColor);
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(centerX - 5 * flipX, baseY);
     ctx.lineTo(centerX + 5 * flipX, baseY);
@@ -93,50 +122,82 @@ class LemonadeStandScene extends Phaser.Scene {
     ctx.closePath();
     ctx.fill();
 
-    // الذراعان (متحركتان)
-    ctx.fillStyle = type.colors[1];
-    ctx.beginPath();
-    ctx.rect(centerX - 7 * flipX, baseY + 2 + armSwing * -0.6, 2, 6);
-    ctx.rect(centerX + 5 * flipX, baseY + 2 + armSwing * 0.6, 2, 6);
-    ctx.fill();
+    // الذراعين
+    ctx.fillStyle = bottomColor;
+    ctx.fillRect(centerX - 7 * flipX, baseY + 2 - armSwing * 0.5, 2, 6);
+    ctx.fillRect(centerX + 5 * flipX, baseY + 2 + armSwing * 0.5, 2, 6);
 
-    // الساقان (متعاكستان في الحركة)
+    // الساقين
     ctx.fillStyle = '#2C2C2C';
-    ctx.beginPath();
-    ctx.rect(centerX - 3, height - 4 - legSwing * 0.4, 2, 4 + legSwing * 0.3);
-    ctx.rect(centerX + 1, height - 4 + legSwing * 0.4, 2, 4 - legSwing * 0.3);
-    ctx.fill();
+    ctx.fillRect(centerX - 3, height - 4 - legSwing * 0.3, 2, 4 + legSwing * 0.3);
+    ctx.fillRect(centerX + 1, height - 4 + legSwing * 0.3, 2, 4 - legSwing * 0.3);
 
     // الرأس
     const headY = baseY - 6 + walkCycle * 0.5;
-    ctx.fillStyle = '#FFDBAC';
+    ctx.fillStyle = '#FFD9B3';
     ctx.beginPath();
     ctx.arc(centerX, headY, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // الشعر (مختلف حسب النوع)
-    ctx.fillStyle = type.colors[1];
+    // الشعر
     if (type.name === 'woman') {
+        ctx.fillStyle = '#6D214F';
         ctx.beginPath();
         ctx.arc(centerX, headY - 2, 5, 0, Math.PI, true);
         ctx.fill();
         ctx.fillRect(centerX - 3, headY - 1, 6, 5);
     } else if (type.name === 'child') {
+        ctx.fillStyle = '#82589F';
         ctx.fillRect(centerX - 4, headY - 4, 8, 2);
+    } else if (type.name === 'elder') {
+        ctx.fillStyle = '#CED6E0';
+        ctx.fillRect(centerX - 4, headY - 4, 8, 3);
     } else {
+        ctx.fillStyle = '#303952';
         ctx.fillRect(centerX - 4, headY - 4, 8, 3);
     }
 
-    // العيون + الفم (يتجهان حسب الاتجاه)
+    // العيون + الفم
     const eyeOffsetX = dirX * 1.2;
     const eyeOffsetY = dirY * 0.8;
     ctx.fillStyle = '#000';
     ctx.fillRect(centerX - 2 + eyeOffsetX, headY - 1 + eyeOffsetY, 1.2, 1.2);
     ctx.fillRect(centerX + 1 + eyeOffsetX, headY - 1 + eyeOffsetY, 1.2, 1.2);
-
-    // الفم
     ctx.fillStyle = '#A44';
     ctx.fillRect(centerX - 1 + eyeOffsetX, headY + 2 + eyeOffsetY, 2, 0.8);
+
+    // الإكسسوارات (حسب النوع)
+    if (accessory === 'hat') {
+        ctx.fillStyle = '#2C3A47';
+        ctx.fillRect(centerX - 5, headY - 6, 10, 2);
+        ctx.fillRect(centerX - 3, headY - 8, 6, 2);
+    } else if (accessory === 'dress') {
+        ctx.fillStyle = '#F8A5C2';
+        ctx.beginPath();
+        ctx.moveTo(centerX - 5, baseY + 2);
+        ctx.lineTo(centerX + 5, baseY + 2);
+        ctx.lineTo(centerX + 3, height - 3);
+        ctx.lineTo(centerX - 3, height - 3);
+        ctx.closePath();
+        ctx.fill();
+    } else if (accessory === 'shorts') {
+        ctx.fillStyle = '#0A3D62';
+        ctx.fillRect(centerX - 4, baseY + 4, 8, 3);
+    } else if (accessory === 'glasses') {
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(centerX - 4, headY - 1, 3, 2);
+        ctx.rect(centerX + 1, headY - 1, 3, 2);
+        ctx.moveTo(centerX - 1, headY);
+        ctx.lineTo(centerX + 1, headY);
+        ctx.stroke();
+    } else if (accessory === 'hoodie') {
+        ctx.fillStyle = '#1B9CFC';
+        ctx.beginPath();
+        ctx.arc(centerX, headY - 3, 5, Math.PI, 0);
+        ctx.fill();
+    }
 }
 
 
