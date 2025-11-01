@@ -72,7 +72,7 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     const centerX = 15 + bodySway; // إضافة الحركة الأفقية للجسم
-    const baseY = height * 0.55; // تعديل موضع الجسم
+    const baseY = height * 0.35; // موضع بداية الجسم (أعلى)
 
     // ظل أسفل القدمين
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
@@ -110,27 +110,8 @@ class LemonadeStandScene extends Phaser.Scene {
         bottomColor = '#E58E26';
     }
 
-    // الساقين مع حركة أفضل
-    const legLength = height * 0.35;
-    const legY = height - legLength - 4;
-    ctx.fillStyle = '#2C2C2C';
-    
-    // الساق اليسرى
-    ctx.save();
-    ctx.translate(centerX - 2.5, legY);
-    ctx.rotate(-legSwing * 0.15);
-    ctx.fillRect(-1.5, 0, 3, legLength);
-    ctx.restore();
-    
-    // الساق اليمنى
-    ctx.save();
-    ctx.translate(centerX + 2.5, legY);
-    ctx.rotate(legSwing * 0.15);
-    ctx.fillRect(-1.5, 0, 3, legLength);
-    ctx.restore();
-
-    // الجسم مع تدرج لوني
-    const bodyHeight = height * 0.4;
+    // الجسم مع تدرج لوني (رسم الجسم أولاً)
+    const bodyHeight = height * 0.3; // جسم أقصر لإظهار الساقين
     const grad = ctx.createLinearGradient(centerX - 6, baseY, centerX + 6, baseY + bodyHeight);
     grad.addColorStop(0, topColor);
     grad.addColorStop(1, bottomColor);
@@ -142,6 +123,32 @@ class LemonadeStandScene extends Phaser.Scene {
     ctx.lineTo(centerX - 5 * flipX, baseY + bodyHeight);
     ctx.closePath();
     ctx.fill();
+
+    // الساقين مع حركة أفضل (رسمها بعد الجسم)
+    const legLength = height * 0.38; // أرجل أطول قليلاً
+    const legY = baseY + bodyHeight - 2; // البداية من نهاية الجسم
+    
+    // الساق اليسرى
+    ctx.save();
+    ctx.translate(centerX - 2.5, legY);
+    ctx.rotate(-legSwing * 0.15);
+    ctx.fillStyle = '#2C2C2C';
+    ctx.fillRect(-2, 0, 4, legLength);
+    // القدم
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-2.5, legLength - 2, 5, 3);
+    ctx.restore();
+    
+    // الساق اليمنى
+    ctx.save();
+    ctx.translate(centerX + 2.5, legY);
+    ctx.rotate(legSwing * 0.15);
+    ctx.fillStyle = '#2C2C2C';
+    ctx.fillRect(-2, 0, 4, legLength);
+    // القدم
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-2.5, legLength - 2, 5, 3);
+    ctx.restore();
 
     // الذراعين مع حركة محسنة
     const armLength = 9;
@@ -218,23 +225,11 @@ class LemonadeStandScene extends Phaser.Scene {
     ctx.fillStyle = '#A44';
     ctx.fillRect(centerX - 1.5, headY + 3 + eyeOffsetY * 0.5, 3, 1);
 
-    // الإكسسوارات (حسب النوع)
+    // إكسسوارات الرأس
     if (accessory === 'hat') {
         ctx.fillStyle = '#2C3A47';
         ctx.fillRect(centerX - 6, headY - 8, 12, 3);
         ctx.fillRect(centerX - 4, headY - 11, 8, 3);
-    } else if (accessory === 'dress') {
-        ctx.fillStyle = '#F8A5C2';
-        ctx.beginPath();
-        ctx.moveTo(centerX - 6, baseY + 3);
-        ctx.lineTo(centerX + 6, baseY + 3);
-        ctx.lineTo(centerX + 8, baseY + bodyHeight);
-        ctx.lineTo(centerX - 8, baseY + bodyHeight);
-        ctx.closePath();
-        ctx.fill();
-    } else if (accessory === 'shorts') {
-        ctx.fillStyle = '#0A3D62';
-        ctx.fillRect(centerX - 5, baseY + bodyHeight - 6, 10, 6);
     } else if (accessory === 'glasses') {
         ctx.strokeStyle = '#555';
         ctx.lineWidth = 1.5;
@@ -249,6 +244,23 @@ class LemonadeStandScene extends Phaser.Scene {
         ctx.beginPath();
         ctx.arc(centerX, headY - 4, 7, Math.PI, 0);
         ctx.fill();
+    }
+
+    // الإكسسوارات (حسب النوع) - يجب رسمها قبل الساقين لتجنب التغطية
+    if (accessory === 'dress') {
+        // الفستان يمتد قليلاً فقط ولا يغطي الساقين بالكامل
+        ctx.fillStyle = '#F8A5C2';
+        ctx.beginPath();
+        ctx.moveTo(centerX - 6, baseY + 3);
+        ctx.lineTo(centerX + 6, baseY + 3);
+        ctx.lineTo(centerX + 7, baseY + bodyHeight + 3);
+        ctx.lineTo(centerX - 7, baseY + bodyHeight + 3);
+        ctx.closePath();
+        ctx.fill();
+    } else if (accessory === 'shorts') {
+        // الشورت عند نهاية الجسم
+        ctx.fillStyle = '#0A3D62';
+        ctx.fillRect(centerX - 5, baseY + bodyHeight - 3, 10, 5);
     }
 }
 
