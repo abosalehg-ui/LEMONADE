@@ -212,14 +212,14 @@ class LemonadeStandScene extends Phaser.Scene {
         // 4 نقاط ظهور من الجهات المختلفة
         this.spawnPoints = [
             { x: -30, y: 200, direction: 'right' },   // يسار
-            { x: 430, y: 200, direction: 'left' },    // يمين
+            { x: 230, y: 300, direction: 'left' },    // يمين
             { x: 200, y: 430, direction: 'up' }       // أسفل
         ];
 
         // 4 نقاط مغادرة (يمكن أن تكون مختلفة عن نقاط الظهور)
         this.exitPoints = [
             { x: -30, y: 300, direction: 'left' },    // يسار
-            { x: 430, y: 100, direction: 'right' },   // يمين
+            { x: 330, y: 420, direction: 'right' },   // يمين
             { x: 300, y: 430, direction: 'down' }     // أسفل
         ];
     }
