@@ -210,7 +210,7 @@ class LemonadeStandScene extends Phaser.Scene {
         this.customerGroup.add(customer);
 
         // الحركة إلى نقطة البيع (وسط الشاشة)
-        const targetX = 250;
+        const targetX = 200;
         const targetY = 100;
         
         this.tweens.add({
