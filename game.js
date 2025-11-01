@@ -51,78 +51,94 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     drawCustomerFrame(ctx, type, direction, frame) {
-        const width = 20;
-        const height = type.height;
-        
-        // تنظيف الخلفية بشفافية
-        ctx.clearRect(0, 0, width, height);
-        
-        // تحديد اتجاه الجسم والنظر
-        let bodyOffset = 0;
-        let lookDirection = 0;
-        
-        switch(direction) {
-            case 'left':
-                bodyOffset = -2;
-                lookDirection = -1;
-                break;
-            case 'right':
-                bodyOffset = 2;
-                lookDirection = 1;
-                break;
-            case 'up':
-                bodyOffset = 0;
-                lookDirection = 0;
-                break;
-            case 'down':
-                bodyOffset = 0;
-                lookDirection = 0;
-                break;
-        }
-        
-        // تأثير الحركة (تمايل الجسم)
-        const walkOffset = Math.sin(frame * 0.8) * 1.5;
-        
-        // الجسم (isometric مع تأثير الحركة)
-        ctx.fillStyle = type.colors[0];
-        ctx.beginPath();
-        ctx.moveTo(10 + bodyOffset, 5 + walkOffset);
-        ctx.lineTo(18 + bodyOffset, 15);
-        ctx.lineTo(10 + bodyOffset, height - 3);
-        ctx.lineTo(2 + bodyOffset, 15);
-        ctx.closePath();
-        ctx.fill();
-        
-        // الرأس
-        ctx.fillStyle = '#FFDBAC';
-        ctx.beginPath();
-        ctx.ellipse(10 + bodyOffset, 3 + walkOffset, 4, 3, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // الشعر (يختلف حسب نوع العميل)
-        ctx.fillStyle = type.colors[1];
-        if (type.name === 'child') {
-            ctx.fillRect(6 + bodyOffset, 2 + walkOffset, 8, 2);
-        } else if (type.name === 'woman') {
-            // شعر طويل
-            ctx.fillRect(5 + bodyOffset, 2 + walkOffset, 10, 4);
-            ctx.fillRect(8 + bodyOffset, 6 + walkOffset, 4, 6);
-        } else {
-            ctx.fillRect(6 + bodyOffset, 2 + walkOffset, 8, 2);
-        }
-        
-        // العيون (تتبع اتجاه النظر)
-        ctx.fillStyle = '#000000';
-        const eyeSpacing = 3 + lookDirection;
-        ctx.fillRect(7 + bodyOffset - lookDirection, 5 + walkOffset, 2, 1);
-        ctx.fillRect(11 + bodyOffset - lookDirection, 5 + walkOffset, 2, 1);
-        
-        // الأرجل المتحركة
-        ctx.fillStyle = type.colors[0];
-        const legOffset = Math.sin(frame * 1.5) * 2;
-        ctx.fillRect(6 + bodyOffset, height - 3, 3, 3 + legOffset);
-        ctx.fillRect(11 + bodyOffset, height - 3, 3, 3 - legOffset);
+    const width = 20;
+    const height = type.height;
+    ctx.clearRect(0, 0, width, height);
+
+    // حساب الحركة (تمايل الجسم والأطراف)
+    const step = frame % 4;
+    const walkCycle = Math.sin((step / 4) * Math.PI * 2);
+    const bodySway = walkCycle * 1.2;
+    const armSwing = walkCycle * 2.5;
+    const legSwing = walkCycle * 2.5;
+
+    // الاتجاه
+    let dirX = 0, dirY = 0, flipX = 1;
+    switch (direction) {
+        case 'left': flipX = -1; dirX = -1; break;
+        case 'right': flipX = 1; dirX = 1; break;
+        case 'up': dirY = -1; break;
+        case 'down': dirY = 1; break;
     }
+
+    const centerX = 10;
+    const baseY = height / 2 + bodySway;
+
+    // ظل تحت القدمين
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(centerX, height - 2, 6, 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // الجسد مع تدرج لوني
+    const gradient = ctx.createLinearGradient(centerX - 5, baseY, centerX + 5, baseY + 10);
+    gradient.addColorStop(0, type.colors[0]);
+    gradient.addColorStop(1, type.colors[1]);
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(centerX - 5 * flipX, baseY);
+    ctx.lineTo(centerX + 5 * flipX, baseY);
+    ctx.lineTo(centerX + 3 * flipX, height - 4);
+    ctx.lineTo(centerX - 3 * flipX, height - 4);
+    ctx.closePath();
+    ctx.fill();
+
+    // الذراعان (متحركتان)
+    ctx.fillStyle = type.colors[1];
+    ctx.beginPath();
+    ctx.rect(centerX - 7 * flipX, baseY + 2 + armSwing * -0.6, 2, 6);
+    ctx.rect(centerX + 5 * flipX, baseY + 2 + armSwing * 0.6, 2, 6);
+    ctx.fill();
+
+    // الساقان (متعاكستان في الحركة)
+    ctx.fillStyle = '#2C2C2C';
+    ctx.beginPath();
+    ctx.rect(centerX - 3, height - 4 - legSwing * 0.4, 2, 4 + legSwing * 0.3);
+    ctx.rect(centerX + 1, height - 4 + legSwing * 0.4, 2, 4 - legSwing * 0.3);
+    ctx.fill();
+
+    // الرأس
+    const headY = baseY - 6 + walkCycle * 0.5;
+    ctx.fillStyle = '#FFDBAC';
+    ctx.beginPath();
+    ctx.arc(centerX, headY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // الشعر (مختلف حسب النوع)
+    ctx.fillStyle = type.colors[1];
+    if (type.name === 'woman') {
+        ctx.beginPath();
+        ctx.arc(centerX, headY - 2, 5, 0, Math.PI, true);
+        ctx.fill();
+        ctx.fillRect(centerX - 3, headY - 1, 6, 5);
+    } else if (type.name === 'child') {
+        ctx.fillRect(centerX - 4, headY - 4, 8, 2);
+    } else {
+        ctx.fillRect(centerX - 4, headY - 4, 8, 3);
+    }
+
+    // العيون + الفم (يتجهان حسب الاتجاه)
+    const eyeOffsetX = dirX * 1.2;
+    const eyeOffsetY = dirY * 0.8;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(centerX - 2 + eyeOffsetX, headY - 1 + eyeOffsetY, 1.2, 1.2);
+    ctx.fillRect(centerX + 1 + eyeOffsetX, headY - 1 + eyeOffsetY, 1.2, 1.2);
+
+    // الفم
+    ctx.fillStyle = '#A44';
+    ctx.fillRect(centerX - 1 + eyeOffsetX, headY + 2 + eyeOffsetY, 2, 0.8);
+}
+
 
     createFeedbackIcons() {
         // Happy Icon
