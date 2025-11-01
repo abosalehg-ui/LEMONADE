@@ -132,7 +132,7 @@ class LemonadeStandScene extends Phaser.Scene {
         this.customerGroup = this.add.group();
 
         // النص التوضيحي
-        this.statusText = this.add.text(200, 30, 'جاهز للبدء!', {
+        this.statusText = this.add.text(200, 120, 'جاهز للبدء!', {
             fontSize: '14px',
             color: '#fff',
             backgroundColor: '#000000',
