@@ -1,175 +1,26 @@
 // ========================================
-// PHASER 3 LEMONADE STAND SIMULATION - ISOMETRIC
-// Enhanced with Isometric View & Animations
+// PHASER 3 LEMONADE STAND SIMULATION - BACKGROUND IMAGE
+// Using LEMONADE.jpg as background
 // ========================================
 
 class LemonadeStandScene extends Phaser.Scene {
     constructor() {
         super({ key: 'LemonadeStandScene' });
         this.customers = [];
-        this.vendor = null;
-        this.stand = null;
         this.isSimulating = false;
         this.simSpeed = 1;
-        this.isoGroup = null;
     }
 
     preload() {
-        this.createIsometricAssets();
-    }
-
-    createIsometricAssets() {
-        // === ISOMETRIC GRASS BACKGROUND ===
-        const bgTexture = this.textures.createCanvas('iso_bg', 400, 400);
-        const bgCtx = bgTexture.getContext();
+        // تحميل صورة الخلفية
+        this.load.image('background', 'assets/LEMONADE.jpg');
         
-        // السماء
-        const skyGradient = bgCtx.createLinearGradient(0, 0, 0, 150);
-        skyGradient.addColorStop(0, '#87CEEB');
-        skyGradient.addColorStop(1, '#E0F7FF');
-        bgCtx.fillStyle = skyGradient;
-        bgCtx.fillRect(0, 0, 400, 150);
-        
-        // العشب (منظور isometric)
-        const grassGradient = bgCtx.createLinearGradient(0, 150, 0, 400);
-        grassGradient.addColorStop(0, '#7EC850');
-        grassGradient.addColorStop(1, '#5A9E3A');
-        bgCtx.fillStyle = grassGradient;
-        
-        // رسم العشب بشكل ماسي (isometric)
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, 150);
-        bgCtx.lineTo(400, 150);
-        bgCtx.lineTo(400, 400);
-        bgCtx.lineTo(0, 400);
-        bgCtx.closePath();
-        bgCtx.fill();
-        
-        // الرصيف
-        bgCtx.fillStyle = '#888888';
-        bgCtx.beginPath();
-        bgCtx.moveTo(100, 250);
-        bgCtx.lineTo(300, 250);
-        bgCtx.lineTo(350, 400);
-        bgCtx.lineTo(150, 400);
-        bgCtx.closePath();
-        bgCtx.fill();
-        
-        // الشارع
-        bgCtx.fillStyle = '#555555';
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, 280);
-        bgCtx.lineTo(400, 280);
-        bgCtx.lineTo(400, 400);
-        bgCtx.lineTo(0, 400);
-        bgCtx.closePath();
-        bgCtx.fill();
-        
-        // خطوط الشارع
-        bgCtx.strokeStyle = '#FFFF00';
-        bgCtx.lineWidth = 2;
-        bgCtx.setLineDash([10, 10]);
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, 340);
-        bgCtx.lineTo(400, 340);
-        bgCtx.stroke();
-        
-        bgTexture.refresh();
-
-        // === ISOMETRIC STAND ===
-        this.createIsometricStand();
-
-        // === ISOMETRIC VENDOR ===
-        this.createIsometricVendor();
-
-        // === ISOMETRIC CUSTOMERS ===
-        this.createIsometricCustomers();
-
-        // === DECORATIONS ===
-        this.createIsometricDecorations();
-
-        // === FEEDBACK ICONS ===
+        // إنشاء رسومات العملاء فقط
+        this.createCustomerAssets();
         this.createFeedbackIcons();
     }
 
-    createIsometricStand() {
-        const standTexture = this.textures.createCanvas('iso_stand', 80, 60);
-        const ctx = standTexture.getContext();
-        
-        // تنظيف الخلفية بشفافية
-        ctx.clearRect(0, 0, 80, 60);
-        
-        // قاعدة الكشك (isometric)
-        ctx.fillStyle = '#8B4513';
-        ctx.beginPath();
-        ctx.moveTo(40, 10);
-        ctx.lineTo(70, 30);
-        ctx.lineTo(40, 50);
-        ctx.lineTo(10, 30);
-        ctx.closePath();
-        ctx.fill();
-        
-        // سطح الكشك
-        ctx.fillStyle = '#A0522D';
-        ctx.beginPath();
-        ctx.moveTo(40, 5);
-        ctx.lineTo(75, 28);
-        ctx.lineTo(40, 55);
-        ctx.lineTo(5, 28);
-        ctx.closePath();
-        ctx.fill();
-        
-        // لافتة
-        ctx.fillStyle = '#FF6B6B';
-        ctx.fillRect(35, 15, 10, 8);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 8px Arial';
-        ctx.fillText('LEMON', 28, 22);
-        
-        standTexture.refresh();
-    }
-
-    createIsometricVendor() {
-        const vendorTexture = this.textures.createCanvas('iso_vendor', 24, 32);
-        const ctx = vendorTexture.getContext();
-        
-        // تنظيف الخلفية بشفافية
-        ctx.clearRect(0, 0, 24, 32);
-        
-        // الرأس (isometric)
-        ctx.fillStyle = '#FFDBAC';
-        ctx.beginPath();
-        ctx.ellipse(12, 8, 6, 5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // الشعر
-        ctx.fillStyle = '#5C4033';
-        ctx.fillRect(6, 6, 12, 3);
-        
-        // الجسم
-        ctx.fillStyle = '#7AB84A';
-        ctx.beginPath();
-        ctx.moveTo(12, 12);
-        ctx.lineTo(18, 20);
-        ctx.lineTo(12, 28);
-        ctx.lineTo(6, 20);
-        ctx.closePath();
-        ctx.fill();
-        
-        // العيون
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(9, 10, 2, 2);
-        ctx.fillRect(13, 10, 2, 2);
-        
-        // الابتسامة
-        ctx.beginPath();
-        ctx.arc(12, 14, 3, 0, Math.PI);
-        ctx.stroke();
-        
-        vendorTexture.refresh();
-    }
-
-    createIsometricCustomers() {
+    createCustomerAssets() {
         const customerColors = [
             { body: '#FF6B6B', details: '#4ECDC4' },
             { body: '#95E1D3', details: '#F38181' },
@@ -211,27 +62,6 @@ class LemonadeStandScene extends Phaser.Scene {
             
             texture.refresh();
         });
-    }
-
-    createIsometricDecorations() {
-        // الأشجار
-        const treeTexture = this.textures.createCanvas('iso_tree', 30, 40);
-        const ctx = treeTexture.getContext();
-        
-        // تنظيف الخلفية بشفافية
-        ctx.clearRect(0, 0, 30, 40);
-        
-        // الجذع
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(13, 25, 4, 15);
-        
-        // الأوراق
-        ctx.fillStyle = '#228B22';
-        ctx.beginPath();
-        ctx.ellipse(15, 20, 10, 12, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        treeTexture.refresh();
     }
 
     createFeedbackIcons() {
@@ -295,61 +125,14 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     create() {
-        // الخلفية
-        this.add.image(200, 200, 'iso_bg');
+        // الخلفية - صورة LEMONADE.jpg
+        this.background = this.add.image(200, 200, 'background').setDisplaySize(400, 400);
 
-        // مجموعة العناصر Isometric
-        this.isoGroup = this.add.group();
-
-        // إضافة الأشجار
-        this.addTree(50, 300);
-        this.addTree(350, 320);
-
-        // الظل
-        this.standShadow = this.add.ellipse(200, 320, 60, 20, 0x000000, 0.3);
-
-        // الكشك
-        this.stand = this.add.image(200, 250, 'iso_stand');
-        this.isoGroup.add(this.stand);
-
-        // البائع
-        this.vendor = this.add.image(200, 240, 'iso_vendor');
-        this.isoGroup.add(this.vendor);
-
-        // الظل المتحرك للبائع
-        this.vendorShadow = this.add.ellipse(200, 255, 15, 5, 0x000000, 0.4);
-
-        // كوب الليموناضة
-        const cupTexture = this.textures.createCanvas('lemonade_cup', 12, 16);
-        const cupCtx = cupTexture.getContext();
-        cupCtx.clearRect(0, 0, 12, 16);
-        cupCtx.fillStyle = '#FFD700';
-        cupCtx.fillRect(3, 4, 6, 10);
-        cupCtx.fillRect(2, 14, 8, 2);
-        cupCtx.fillStyle = '#FFA500';
-        cupCtx.beginPath();
-        cupCtx.arc(6, 2, 2, 0, Math.PI * 2);
-        cupCtx.fill();
-        cupTexture.refresh();
-
-        this.cup = this.add.image(190, 235, 'lemonade_cup');
-        this.isoGroup.add(this.cup);
-
-        // ✅ حركة الكوب
-        this.tweens.add({
-            targets: this.cup,
-            y: 230,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-        });
-
-        // مجموعة العملاء
+        // مجموعة العملاء فقط
         this.customerGroup = this.add.group();
 
-        // النص - فوق البائع مباشرة
-        this.statusText = this.add.text(200, 210, 'جاهز للبدء!', {
+        // النص التوضيحي
+        this.statusText = this.add.text(200, 30, 'جاهز للبدء!', {
             fontSize: '14px',
             color: '#fff',
             backgroundColor: '#000000',
@@ -358,29 +141,22 @@ class LemonadeStandScene extends Phaser.Scene {
 
         // ✅ إطار النص لجعله أكثر وضوحاً
         this.statusText.setStroke('#000000', 3);
-        this.statusText.setDepth(1000); // التأكد من أنه فوق كل العناصر
-    }
-
-    addTree(x, y) {
-        const tree = this.add.image(x, y, 'iso_tree');
-        this.isoGroup.add(tree);
+        this.statusText.setDepth(1000);
     }
 
     updateStandVisuals(upgrades) {
-        // ✅ تأثير الترقية
-        this.tweens.add({
-            targets: this.stand,
-            scaleX: 1.1,
-            scaleY: 1.1,
-            duration: 200,
-            yoyo: true
-        });
-
-        // تحديث مظهر الكشك حسب الترقيات
+        // ✅ تأثير الترقية (يمكن إضافة تأثيرات بصرية أخرى إذا رغبت)
+        console.log('Upgrades updated:', upgrades);
+        
+        // يمكنك إضافة تأثيرات على الخلفية حسب الترقيات إذا أردت
         if (upgrades.table > 0) {
-            this.stand.setTint(0xFFD700); // تلوين ذهبي للترقية
-        } else {
-            this.stand.clearTint();
+            this.tweens.add({
+                targets: this.background,
+                scaleX: 1.02,
+                scaleY: 1.02,
+                duration: 200,
+                yoyo: true
+            });
         }
     }
 
@@ -420,19 +196,27 @@ class LemonadeStandScene extends Phaser.Scene {
 
     spawnCustomer(satisfactionRate) {
         const customerType = Phaser.Math.Between(1, 4);
-        const customer = this.add.image(-30, 350, `iso_customer${customerType}`);
+        
+        // نقطة البداية (خارج الشاشة على اليسار)
+        const startX = -30;
+        const startY = 320; // من الأسفل
+        
+        const customer = this.add.image(startX, startY, `iso_customer${customerType}`);
         
         // ظل العميل
-        const shadow = this.add.ellipse(-30, 360, 12, 4, 0x000000, 0.4);
+        const shadow = this.add.ellipse(startX, startY + 10, 12, 4, 0x000000, 0.4);
         customer.shadow = shadow;
         
         this.customerGroup.add(customer);
 
-        // الحركة إلى الكشك (مسار isometric)
+        // الحركة إلى نقطة البيع (وسط الشاشة)
+        const targetX = 200;
+        const targetY = 250;
+        
         this.tweens.add({
             targets: customer,
-            x: 150,
-            y: 280,
+            x: targetX,
+            y: targetY,
             duration: 3000 / this.simSpeed,
             ease: 'Linear',
             onUpdate: () => {
@@ -490,10 +274,11 @@ class LemonadeStandScene extends Phaser.Scene {
                 onComplete: () => icon.destroy()
             });
             
+            // الحركة للخروج من الشاشة (إلى اليمين)
             this.tweens.add({
                 targets: customer,
-                x: 400,
-                y: 350,
+                x: 430,
+                y: 280,
                 duration: 2500 / this.simSpeed,
                 ease: 'Linear',
                 onUpdate: () => {
@@ -529,9 +314,9 @@ class LemonadeStandScene extends Phaser.Scene {
         this.isSimulating = false;
         this.statusText.setText('انتهى اليوم!');
         
-        // ✅ احتفال
+        // ✅ احتفال بسيط
         this.tweens.add({
-            targets: [this.vendor, this.cup],
+            targets: this.statusText,
             y: '-=10',
             duration: 200,
             yoyo: true,
@@ -577,8 +362,8 @@ const phaserConfig = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    pixelArt: false, // تغيير إلى false للسماح بالرسوم الناعمة
-    transparent: true // لجعل الخلفية شفافة إذا لزم الأمر
+    pixelArt: false,
+    transparent: false
 };
 
 // تهيئة اللعبة
