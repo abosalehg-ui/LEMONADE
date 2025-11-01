@@ -9,59 +9,119 @@ class LemonadeStandScene extends Phaser.Scene {
         this.customers = [];
         this.isSimulating = false;
         this.simSpeed = 1;
+        this.spawnPoints = [];
+        this.exitPoints = [];
     }
 
     preload() {
         // تحميل صورة الخلفية
         this.load.image('background', 'assets/LEMONADE.jpg');
         
-        // إنشاء رسومات العملاء فقط
-        this.createCustomerAssets();
+        // إنشاء رسومات العملاء المتحركة
+        this.createAnimatedCustomerAssets();
         this.createFeedbackIcons();
     }
 
-    createCustomerAssets() {
-        const customerColors = [
-            { body: '#FF6B6B', details: '#4ECDC4' },
-            { body: '#95E1D3', details: '#F38181' },
-            { body: '#FFA502', details: '#2C3E50' },
-            { body: '#6C5CE7', details: '#FDCB6E' }
+    createAnimatedCustomerAssets() {
+        const customerTypes = [
+            { name: 'child', height: 18, colors: ['#FF6B6B', '#4ECDC4'] },
+            { name: 'teen', height: 22, colors: ['#95E1D3', '#F38181'] },
+            { name: 'adult', height: 26, colors: ['#FFA502', '#2C3E50'] },
+            { name: 'elder', height: 24, colors: ['#6C5CE7', '#FDCB6E'] },
+            { name: 'woman', height: 24, colors: ['#FF9FF3', '#F368E0'] },
+            { name: 'man', height: 26, colors: ['#54A0FF', '#5F27CD'] }
         ];
 
-        customerColors.forEach((colors, index) => {
-            const texture = this.textures.createCanvas(`iso_customer${index + 1}`, 20, 28);
-            const ctx = texture.getContext();
-            
-            // تنظيف الخلفية بشفافية
-            ctx.clearRect(0, 0, 20, 28);
-            
-            // الجسم (isometric)
-            ctx.fillStyle = colors.body;
-            ctx.beginPath();
-            ctx.moveTo(10, 5);
-            ctx.lineTo(18, 15);
-            ctx.lineTo(10, 25);
-            ctx.lineTo(2, 15);
-            ctx.closePath();
-            ctx.fill();
-            
-            // الرأس
-            ctx.fillStyle = '#FFDBAC';
-            ctx.beginPath();
-            ctx.ellipse(10, 3, 4, 3, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // الشعر
-            ctx.fillStyle = colors.details;
-            ctx.fillRect(6, 2, 8, 2);
-            
-            // العيون
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(7, 5, 2, 1);
-            ctx.fillRect(11, 5, 2, 1);
-            
-            texture.refresh();
+        // إنشاء 4 اتجاهات للحركة (يسار، يمين، أعلى، أسفل)
+        const directions = ['left', 'right', 'up', 'down'];
+        
+        customerTypes.forEach((type, typeIndex) => {
+            directions.forEach(direction => {
+                // إنشاء 4 إطارات للحركة
+                for (let frame = 0; frame < 4; frame++) {
+                    const textureKey = `customer_${type.name}_${direction}_${frame}`;
+                    const texture = this.textures.createCanvas(textureKey, 20, type.height);
+                    const ctx = texture.getContext();
+                    
+                    this.drawCustomerFrame(ctx, type, direction, frame);
+                    texture.refresh();
+                }
+            });
         });
+    }
+
+    drawCustomerFrame(ctx, type, direction, frame) {
+        const width = 20;
+        const height = type.height;
+        
+        // تنظيف الخلفية بشفافية
+        ctx.clearRect(0, 0, width, height);
+        
+        // تحديد اتجاه الجسم والنظر
+        let bodyOffset = 0;
+        let lookDirection = 0;
+        
+        switch(direction) {
+            case 'left':
+                bodyOffset = -2;
+                lookDirection = -1;
+                break;
+            case 'right':
+                bodyOffset = 2;
+                lookDirection = 1;
+                break;
+            case 'up':
+                bodyOffset = 0;
+                lookDirection = 0;
+                break;
+            case 'down':
+                bodyOffset = 0;
+                lookDirection = 0;
+                break;
+        }
+        
+        // تأثير الحركة (تمايل الجسم)
+        const walkOffset = Math.sin(frame * 0.8) * 1.5;
+        
+        // الجسم (isometric مع تأثير الحركة)
+        ctx.fillStyle = type.colors[0];
+        ctx.beginPath();
+        ctx.moveTo(10 + bodyOffset, 5 + walkOffset);
+        ctx.lineTo(18 + bodyOffset, 15);
+        ctx.lineTo(10 + bodyOffset, height - 3);
+        ctx.lineTo(2 + bodyOffset, 15);
+        ctx.closePath();
+        ctx.fill();
+        
+        // الرأس
+        ctx.fillStyle = '#FFDBAC';
+        ctx.beginPath();
+        ctx.ellipse(10 + bodyOffset, 3 + walkOffset, 4, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // الشعر (يختلف حسب نوع العميل)
+        ctx.fillStyle = type.colors[1];
+        if (type.name === 'child') {
+            ctx.fillRect(6 + bodyOffset, 2 + walkOffset, 8, 2);
+        } else if (type.name === 'woman') {
+            // شعر طويل
+            ctx.fillRect(5 + bodyOffset, 2 + walkOffset, 10, 4);
+            ctx.fillRect(8 + bodyOffset, 6 + walkOffset, 4, 6);
+        } else {
+            ctx.fillRect(6 + bodyOffset, 2 + walkOffset, 8, 2);
+        }
+        
+        // العيون (تتبع اتجاه النظر)
+        ctx.fillStyle = '#000000';
+        const eyeSpacing = 3 + lookDirection;
+        ctx.fillRect(7 + bodyOffset - lookDirection, 5 + walkOffset, 2, 1);
+        ctx.fillRect(11 + bodyOffset - lookDirection, 5 + walkOffset, 2, 1);
+        
+        // الأرجل المتحركة
+        ctx.fillStyle = type.colors[0];
+        const legOffset = Math.sin(frame * 1.5) * 2;
+        ctx.fillRect(6 + bodyOffset, height - 3, 3, 3 + legOffset);
+        ctx.fillRect(11 + bodyOffset, height - 3, 3, 3 - legOffset);
     }
 
     createFeedbackIcons() {
@@ -128,7 +188,10 @@ class LemonadeStandScene extends Phaser.Scene {
         // الخلفية - صورة LEMONADE.jpg
         this.background = this.add.image(200, 200, 'background').setDisplaySize(400, 400);
 
-        // مجموعة العملاء فقط
+        // تعريف نقاط الظهور والمغادرة من 4 جهات
+        this.setupSpawnAndExitPoints();
+
+        // مجموعة العملاء
         this.customerGroup = this.add.group();
 
         // النص التوضيحي
@@ -138,17 +201,55 @@ class LemonadeStandScene extends Phaser.Scene {
             backgroundColor: '#000000',
             padding: { x: 8, y: 4 }
         }).setOrigin(0.5);
-
-        // ✅ إطار النص لجعله أكثر وضوحاً
         this.statusText.setStroke('#000000', 3);
         this.statusText.setDepth(1000);
+
+        // إنشاء أنيميشن للعملاء
+        this.createCustomerAnimations();
+    }
+
+    setupSpawnAndExitPoints() {
+        // 4 نقاط ظهور من الجهات المختلفة
+        this.spawnPoints = [
+            { x: -30, y: 200, direction: 'right' },   // يسار
+            { x: 430, y: 200, direction: 'left' },    // يمين
+            { x: 200, y: -30, direction: 'down' },    // أعلى
+            { x: 200, y: 430, direction: 'up' }       // أسفل
+        ];
+
+        // 4 نقاط مغادرة (يمكن أن تكون مختلفة عن نقاط الظهور)
+        this.exitPoints = [
+            { x: -30, y: 300, direction: 'left' },    // يسار
+            { x: 430, y: 100, direction: 'right' },   // يمين
+            { x: 100, y: -30, direction: 'up' },      // أعلى
+            { x: 300, y: 430, direction: 'down' }     // أسفل
+        ];
+    }
+
+    createCustomerAnimations() {
+        const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
+        const directions = ['left', 'right', 'up', 'down'];
+        
+        customerTypes.forEach(type => {
+            directions.forEach(direction => {
+                const frames = [];
+                for (let i = 0; i < 4; i++) {
+                    frames.push({ key: `customer_${type}_${direction}_${i}` });
+                }
+                
+                this.anims.create({
+                    key: `walk_${type}_${direction}`,
+                    frames: frames,
+                    frameRate: 8,
+                    repeat: -1
+                });
+            });
+        });
     }
 
     updateStandVisuals(upgrades) {
-        // ✅ تأثير الترقية (يمكن إضافة تأثيرات بصرية أخرى إذا رغبت)
         console.log('Upgrades updated:', upgrades);
         
-        // يمكنك إضافة تأثيرات على الخلفية حسب الترقيات إذا أردت
         if (upgrades.table > 0) {
             this.tweens.add({
                 targets: this.background,
@@ -182,7 +283,6 @@ class LemonadeStandScene extends Phaser.Scene {
                 this.spawnCustomer(satisfactionRate);
                 cupsSold++;
                 
-                // تحديث المؤقت
                 const progress = Math.floor((cupsSold / maxCups) * 100);
                 if (document.getElementById('simTimer')) {
                     document.getElementById('simTimer').textContent = `الوقت: ${progress}%`;
@@ -195,23 +295,31 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     spawnCustomer(satisfactionRate) {
-        const customerType = Phaser.Math.Between(1, 4);
+        // اختيار عشوائي لنقطة الظهور والمغادرة
+        const spawnIndex = Phaser.Math.Between(0, this.spawnPoints.length - 1);
+        const exitIndex = Phaser.Math.Between(0, this.exitPoints.length - 1);
         
-        // نقطة البداية (خارج الشاشة على اليسار)
-        const startX = -30;
-        const startY = 320; // من الأسفل
+        const spawnPoint = this.spawnPoints[spawnIndex];
+        const exitPoint = this.exitPoints[exitIndex];
         
-        const customer = this.add.image(startX, startY, `iso_customer${customerType}`);
+        // اختيار عشوائي لنوع العميل
+        const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
+        const customerType = customerTypes[Phaser.Math.Between(0, customerTypes.length - 1)];
+        
+        const customer = this.add.sprite(spawnPoint.x, spawnPoint.y, `customer_${customerType}_${spawnPoint.direction}_0`);
+        
+        // بدء الأنيميشن
+        customer.play(`walk_${customerType}_${spawnPoint.direction}`);
         
         // ظل العميل
-        const shadow = this.add.ellipse(startX, startY + 10, 12, 4, 0x000000, 0.4);
+        const shadow = this.add.ellipse(spawnPoint.x, spawnPoint.y + 10, 12, 4, 0x000000, 0.4);
         customer.shadow = shadow;
         
         this.customerGroup.add(customer);
 
         // الحركة إلى نقطة البيع (وسط الشاشة)
-        const targetX = 160;
-        const targetY = 190;
+        const targetX = 200;
+        const targetY = 200;
         
         this.tweens.add({
             targets: customer,
@@ -224,12 +332,15 @@ class LemonadeStandScene extends Phaser.Scene {
                 shadow.y = customer.y + 10;
             },
             onComplete: () => {
-                this.serveCustomer(customer, satisfactionRate);
+                this.serveCustomer(customer, satisfactionRate, exitPoint);
             }
         });
     }
 
-    serveCustomer(customer, satisfactionRate) {
+    serveCustomer(customer, satisfactionRate, exitPoint) {
+        // إيقاف أنيميشن المشي مؤقتاً
+        customer.anims.pause();
+        
         let feedbackIcon = 'icon_happy';
         const rand = Math.random();
         
@@ -250,9 +361,8 @@ class LemonadeStandScene extends Phaser.Scene {
 
         // عرض أيقونة التغذية الراجعة
         const icon = this.add.image(customer.x, customer.y - 30, feedbackIcon);
-        
-        // ✅ حركة ظهور الأيقونة
         icon.setScale(0);
+        
         this.tweens.add({
             targets: icon,
             scale: 1,
@@ -274,11 +384,15 @@ class LemonadeStandScene extends Phaser.Scene {
                 onComplete: () => icon.destroy()
             });
             
-            // الحركة للخروج من الشاشة (إلى اليمين)
+            // استئناف الأنيميشن مع اتجاه المغادرة
+            customer.setTexture(`customer_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}_0`);
+            customer.play(`walk_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}`);
+            
+            // الحركة للخروج من الشاشة
             this.tweens.add({
                 targets: customer,
-                x: 430,
-                y: 280,
+                x: exitPoint.x,
+                y: exitPoint.y,
                 duration: 2500 / this.simSpeed,
                 ease: 'Linear',
                 onUpdate: () => {
@@ -314,7 +428,6 @@ class LemonadeStandScene extends Phaser.Scene {
         this.isSimulating = false;
         this.statusText.setText('انتهى اليوم!');
         
-        // ✅ احتفال بسيط
         this.tweens.add({
             targets: this.statusText,
             y: '-=10',
