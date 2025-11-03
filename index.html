@@ -74,6 +74,30 @@
             border: 1px solid #666;
         }
 
+        .language-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 80px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    z-index: 1500;
+    color: #000;
+}
+
+.language-toggle:active {
+    transform: scale(0.95);
+}
+
         .resource-value {
             color: white;
             font-weight: bold;
@@ -897,6 +921,9 @@
         </div>
     
     <div class="sound-toggle" id="soundToggle">🔊</div>
+    <div class="language-toggle" id="languageToggle" title="التبديل إلى العربية">
+    <span id="langIcon">EN</span>
+</div>
 
     <div class="achievement-notification" id="achievementNotif"></div>
 
@@ -1279,6 +1306,27 @@
         }
 
         // **دالة تحديث العرض المعدلة**
+        function updateEventBanner() {
+    const t = translations[currentLang];
+    const eventBanner = document.getElementById('eventBanner');
+
+    if (game.lastEvent) {
+        const eventTranslationKey = game.lastEvent.id;
+        
+        // البحث عن الترجمة في كائن اللغة النشطة
+        // يجب أن تتأكد أن key الحدث (مثل 'festival') موجود في كائن t.ar في الترجمة
+        const translatedName = t[eventTranslationKey]; 
+        
+        // استخدام الترجمة أو الاسم الإنجليزي الأصلي كاحتياطي
+        const displayText = translatedName || game.lastEvent.name; 
+
+        eventBanner.innerHTML = `${game.lastEvent.icon} ${displayText}`;
+        eventBanner.style.display = 'block';
+    } else {
+        eventBanner.style.display = 'none';
+    }
+}
+
         function updateDisplay() {
             // التحقق من التغيرات قبل التحديث
             const currentCupsSold = game.cupsSold;
@@ -1465,51 +1513,54 @@
         // **نهاية الدوال الجديدة لقائمة الشراء**
 
         function updateUpgradeDisplay() {
-            const pitcherLevels = ['Basic', 'Good', 'Excellent'];
-            const pitcherCosts = [50, 100];
-            document.getElementById('pitcherLevel').textContent = pitcherLevels[game.upgrades.pitcher];
-            const pitcherBtn = document.getElementById('pitcherUpgradeBtn');
-            if (game.upgrades.pitcher >= 2) {
-                pitcherBtn.textContent = '✅ MAX LEVEL';
-                pitcherBtn.disabled = true;
-            } else {
-                pitcherBtn.textContent = `Upgrade (${pitcherCosts[game.upgrades.pitcher]} $)`;
-                pitcherBtn.disabled = game.money < pitcherCosts[game.upgrades.pitcher];
-            }
+    const t = translations[currentLang];
+    
+    const pitcherLevels = [t.pitcherBasic, t.pitcherGood, t.pitcherExcellent];
+    const pitcherCosts = [50, 100];
+    document.getElementById('pitcherLevel').textContent = pitcherLevels[game.upgrades.pitcher];
+    const pitcherBtn = document.getElementById('pitcherUpgradeBtn');
+    if (game.upgrades.pitcher >= 2) {
+        pitcherBtn.textContent = t.maxLevel;
+        pitcherBtn.disabled = true;
+    } else {
+        pitcherBtn.textContent = `${t.upgrade} (${pitcherCosts[game.upgrades.pitcher]} $)`;
+        pitcherBtn.disabled = game.money < pitcherCosts[game.upgrades.pitcher];
+    }
 
-            const signLevels = ['None', 'Small', 'Large'];
-            const signCosts = [40, 80];
-            document.getElementById('signLevel').textContent = signLevels[game.upgrades.sign];
-            const signBtn = document.getElementById('signUpgradeBtn');
-            if (game.upgrades.sign >= 2) {
-                signBtn.textContent = '✅ MAX LEVEL';
-                signBtn.disabled = true;
-            } else {
-                signBtn.textContent = `Upgrade (${signCosts[game.upgrades.sign]} $)`;
-                signBtn.disabled = game.money < signCosts[game.upgrades.sign];
-            }
+    const signLevels = [t.signNone, t.signSmall, t.signLarge];
+    const signCosts = [40, 80];
+    document.getElementById('signLevel').textContent = signLevels[game.upgrades.sign];
+    const signBtn = document.getElementById('signUpgradeBtn');
+    if (game.upgrades.sign >= 2) {
+        signBtn.textContent = t.maxLevel;
+        signBtn.disabled = true;
+    } else {
+        signBtn.textContent = `${t.upgrade} (${signCosts[game.upgrades.sign]} $)`;
+        signBtn.disabled = game.money < signCosts[game.upgrades.sign];
+    }
 
-            const tableLevels = ['Basic', 'Good', 'Luxury'];
-            const tableCosts = [60, 120];
-            document.getElementById('tableLevel').textContent = tableLevels[game.upgrades.table];
-            const tableBtn = document.getElementById('tableUpgradeBtn');
-            if (game.upgrades.table >= 2) {
-                tableBtn.textContent = '✅ MAX LEVEL';
-                tableBtn.disabled = true;
-            } else {
-                tableBtn.textContent = `Upgrade (${tableCosts[game.upgrades.table]} $)`;
-                tableBtn.disabled = game.money < tableCosts[game.upgrades.table];
-            }
+    const tableLevels = [t.tableBasic, t.tableGood, t.tableLuxury];
+    const tableCosts = [60, 120];
+    document.getElementById('tableLevel').textContent = tableLevels[game.upgrades.table];
+    const tableBtn = document.getElementById('tableUpgradeBtn');
+    if (game.upgrades.table >= 2) {
+        tableBtn.textContent = t.maxLevel;
+        tableBtn.disabled = true;
+    } else {
+        tableBtn.textContent = `${t.upgrade} (${tableCosts[game.upgrades.table]} $)`;
+        tableBtn.disabled = game.money < tableCosts[game.upgrades.table];
+    }
 
-            document.getElementById('umbrellaStatus').textContent = game.upgrades.umbrella ? 'Owned ✅' : 'Not Owned';
-            const umbrellaBtn = document.getElementById('umbrellaUpgradeBtn');
-            if (game.upgrades.umbrella) {
-                umbrellaBtn.textContent = '✅ PURCHASED';
-                umbrellaBtn.disabled = true;
-            } else {
-                umbrellaBtn.disabled = game.money < 80;
-            }
-        }
+    document.getElementById('umbrellaStatus').textContent = game.upgrades.umbrella ? t.owned : t.notOwned;
+    const umbrellaBtn = document.getElementById('umbrellaUpgradeBtn');
+    if (game.upgrades.umbrella) {
+        umbrellaBtn.textContent = t.purchased;
+        umbrellaBtn.disabled = true;
+    } else {
+        umbrellaBtn.textContent = `${t.buy} (80 $)`;
+        umbrellaBtn.disabled = game.money < 80;
+    }
+}
 
         function buyUpgrade(type) {
             const costs = {
@@ -1552,19 +1603,38 @@
         }
 
         function triggerEvent() {
-            const event = events[Math.floor(Math.random() * events.length)];
-            game.lastEvent = event;
-            
-            const banner = document.getElementById('eventBanner');
-            if (event) {
-                banner.style.display = 'block';
-                banner.textContent = `${event.icon} Event: ${event.name}`;
-            } else {
-                banner.style.display = 'none';
-            }
-            
-            return event;
+    const event = events[Math.floor(Math.random() * events.length)];
+    game.lastEvent = event;
+    
+    updateEventBanner(); // استدعاء دالة جديدة لتحديث البانر
+    
+    return event;
+}
+
+// دالة جديدة لتحديث بانر الأحداث
+function updateEventBanner() {
+    const banner = document.getElementById('eventBanner');
+    const event = game.lastEvent;
+    
+    if (event) {
+        const t = translations[currentLang];
+        let eventName;
+        
+        // اختيار الترجمة المناسبة حسب نوع الحدث
+        switch(event.type) {
+            case 'festival': eventName = t.eventFestival; break;
+            case 'competition': eventName = t.eventCompetition; break;
+            case 'celebrity': eventName = t.eventCelebrity; break;
+            case 'roadwork': eventName = t.eventRoadwork; break;
+            default: eventName = event.name;
         }
+        
+        banner.style.display = 'block';
+        banner.textContent = `${event.icon} ${t.eventLabel} ${eventName}`;
+    } else {
+        banner.style.display = 'none';
+    }
+}
 
         function addLog(message, type = '') {
             const log = document.getElementById('logContent');
@@ -1825,7 +1895,421 @@ function toggleDescriptionDrawer() {
 
 
 document.getElementById('descriptionToggleBtn').addEventListener('click', toggleDescriptionDrawer);
+// ربط زر التسريع
+document.getElementById('speedToggleBtn').onclick = function() {
+    playSound('click');
+    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
+    if (scene && scene.isSimulating) {
+        scene.toggleSpeed();
+        // تحديث نص الزر
+        this.textContent = scene.simSpeed === 1 ? '⏩ x1' : '⏩ x10';
+    }
+};
+let currentLang = 'en'; // اللغة الافتراضية
 
+const translations = {
+    en: {
+        // Top Bar Resources
+        lemonsTitle: "Lemons",
+        sugarTitle: "Sugar",
+        iceTitle: "Ice",
+        moneyTitle: "Money",
+        qualityTitle: "Quality",
+        weatherTitle: "Weather",
+        
+        // Main Buttons
+        startDay: "🚀 START DAY",
+        buySupplies: "🛒 BUY SUPPLIES (Quick)",
+        
+        // Menu Buttons
+        upgrades: "upgrades",
+        supplies: "supplies",
+        recipe: "recipe",
+        achievements: "achievements",
+        
+        // Activity Log
+        logTitle: "📋 Activity Log",
+        welcomeMsg: "🎮 Welcome to Lemonade! Set your recipe and start selling.",
+        
+        // Settings Drawer
+        settingsTitle: "TODAY'S SETTING",
+        lemonsPerCup: "🍋 Lemons per cup:",
+        sugarPerCup: "🍯 Sugar per cup:",
+        icePerCup: "🧊 Ice per cup:",
+        cupPrice: "💵 Cup Price:",
+        
+        // Game Description
+        descTitle: "🍋 Game Description",
+        descText: "Lemonade is a business management game where you run your own lemonade stand. Each day, you decide how much lemon, sugar, and ice to use in your recipe – and set the perfect price per cup. Make sure you buy enough ingredients for the next day. Adjust your recipe carefully: too much lemon makes it sour, too much sugar makes it too sweet, and ice is essential on hot days! Your success depends on weather conditions, customer satisfaction, and smart upgrades. A reasonable price attracts customers, but a high price will drive them away. Buy supplies, improve your equipment, and build your reputation to attract more customers and increase profits. Face random events, deal with competitors, and try to become the ultimate Lemonade! 🏆",
+        createdBy: "Created by",
+        
+        // Icon Bar Tooltips
+        angry: "Angry",
+        happy: "Happy",
+        waiting: "Waiting",
+        expensive: "Too Expensive",
+        cupsSold: "Cups Sold",
+        profit: "Profit",
+        day: "Day",
+        reputation: "Reputation",
+        
+        // Live Simulation
+        liveDay: "LIVE - DAY",
+        time: "TIME:",
+        skip: "⏭️ SKIP",
+        
+        // Upgrades Modal
+        upgradesTitle: "🪙 UPGRADES",
+        pitcherQuality: "🥤 Pitcher Quality",
+        sign: "🪧 Sign",
+        table: "🪑 Table",
+        umbrella: "☂️ Umbrella",
+        level: "Level:",
+        status: "Status:",
+        upgrade: "Upgrade",
+        buy: "Buy",
+        maxLevel: "✅ MAX LEVEL",
+        purchased: "✅ PURCHASED",
+        notOwned: "Not Owned",
+        owned: "Owned ✅",
+        close: "❌ CLOSE",
+        
+        // Pitcher Levels
+        pitcherBasic: "Basic",
+        pitcherGood: "Good",
+        pitcherExcellent: "Excellent",
+        
+        // Sign Levels
+        signNone: "None",
+        signSmall: "Small",
+        signLarge: "Large",
+        
+        // Table Levels
+        tableBasic: "Basic",
+        tableGood: "Good",
+        tableLuxury: "Luxury",
+        
+        // Supplies Modal
+        suppliesTitle: "📦 BUY SUPPLIES",
+        lemons: "🍋 Lemons",
+        sugar: "🍯 Sugar",
+        ice: "🧊 Ice",
+        buyBtn: "Buy",
+        
+        // Achievements Modal
+        achievementsTitle: "🏆 ACHIEVEMENTS",
+        unlocked: "✅ UNLOCKED",
+        locked: "🔒 LOCKED",
+        
+        // Achievement Names
+        firstSale: "First Sale",
+        firstSaleDesc: "Sell your first cup",
+        bigDay: "Big Day",
+        bigDayDesc: "Sell 50 cups in one day",
+        rich: "Getting Rich",
+        richDesc: "Earn 500$",
+        tycoon: "Lemonade Tycoon",
+        tycoonDesc: "Earn 1000$",
+        week: "One Week",
+        weekDesc: "Survive 7 days",
+        month: "One Month",
+        monthDesc: "Survive 30 days",
+        popular: "Popular Stand",
+        popularDesc: "Reach 90% reputation",
+        perfect: "Perfect Recipe",
+        perfectDesc: "Get 50 happy customers in one day",
+        monopoly: "Monopoly",
+        monopolyDesc: "Eliminate all competitors",
+        upgraded: "Fully Upgraded",
+        upgradedDesc: "Max all upgrades",
+        
+        // Weather Types
+        sunny: "Sunny",
+        hot: "Very Hot",
+        cloudy: "Cloudy",
+        rainy: "Rainy",
+        
+        // Events
+        eventFestival: "Festival in the Park",
+        eventCompetition: "New Competitor Nearby",
+        eventCelebrity: "Celebrity Visit",
+        eventRoadwork: "Road Construction",
+        eventLabel: "Event:",
+        
+        // Log Messages
+        notEnoughSupplies: "❌ Not enough supplies!",
+        notEnoughMoney: "❌ Not enough money!",
+        bought: "🛒 Bought",
+        for: "for",
+        quickBuy: "🛒 QUICK BUY:",
+        earned: "💰 Earned",
+        selling: "selling",
+        cups: "cups",
+        demandExists: "⚠️ Demand exists, but no supplies!",
+        noCustomers: "📉 No customers today.",
+        customersLove: "⭐⭐⭐ Customers love it! Sold",
+        repPlus: "Rep +",
+        veryHappy: "⭐⭐ Very happy! Sold",
+        satisfied: "⭐ Satisfied. Sold",
+        customersUnhappy: "😞 Customers unhappy. Rep -5",
+        goodDay: "✅ Good day! Sold",
+        onlyStand: "🏆 You are the only stand!",
+        competitorClosed: "👋 A competitor closed!",
+        newCompetitor: "🪙 New competitor opened!",
+        upgradedTo: "⬆️ Upgraded",
+        to: "to level",
+        purchased: "☂️ Purchased umbrella! Better sales in hot weather.",
+        recipeLog: "📋 Recipe:",
+        achievementUnlocked: "🏆",
+        unlocked: "Unlocked!",
+        need: "Need"
+    },
+    ar: {
+        // شريط الموارد العلوي
+        lemonsTitle: "ليمون",
+        sugarTitle: "سكر",
+        iceTitle: "ثلج",
+        moneyTitle: "نقود",
+        qualityTitle: "الجودة",
+        weatherTitle: "الطقس",
+        
+        // الأزرار الرئيسية
+        startDay: "🚀 ابدأ اليوم",
+        buySupplies: "🛒 شراء الإمدادات (سريع)",
+        
+        // أزرار القائمة
+        upgrades: "ترقيات",
+        supplies: "إمدادات",
+        recipe: "وصفة",
+        achievements: "إنجازات",
+        
+        // سجل النشاط
+        logTitle: "📋 سجل النشاط",
+        welcomeMsg: "🎮 مرحبًا بك في Lemonade! اضبط وصفتك وابدأ البيع.",
+        
+        // قائمة الإعدادات
+        settingsTitle: "إعدادات اليوم",
+        lemonsPerCup: "🍋 ليمون لكل كوب:",
+        sugarPerCup: "🍯 سكر لكل كوب:",
+        icePerCup: "🧊 ثلج لكل كوب:",
+        cupPrice: "💵 سعر الكوب:",
+        
+        // وصف اللعبة
+        descTitle: "🍋 وصف اللعبة",
+        descText: "Lemonade هي لعبة إدارة أعمال حيث تدير كشك الليموناضة الخاص بك. كل يوم، تقرر كم من الليمون والسكر والثلج تستخدم في وصفتك – وتحدد السعر المثالي لكل كوب. تأكد من شراء مكونات كافية لليوم التالي. اضبط وصفتك بعناية: الكثير من الليمون يجعلها حامضة، والكثير من السكر يجعلها حلوة جدًا، والثلج ضروري في الأيام الحارة! نجاحك يعتمد على الظروف الجوية ورضا العملاء والترقيات الذكية. السعر المعقول يجذب العملاء، لكن السعر المرتفع سيطردهم. اشترِ الإمدادات، وحسّن معداتك، وابنِ سمعتك لجذب المزيد من العملاء وزيادة الأرباح. واجه الأحداث العشوائية، وتعامل مع المنافسين، وحاول أن تصبح ملك الليموناضة! 🏆",
+        createdBy: "تم الإنشاء بواسطة",
+        
+        // تلميحات شريط الأيقونات
+        angry: "غاضب",
+        happy: "سعيد",
+        waiting: "منتظر",
+        expensive: "غالي جدًا",
+        cupsSold: "أكواب مباعة",
+        profit: "الربح",
+        day: "يوم",
+        reputation: "السمعة",
+        
+        // المحاكاة المباشرة
+        liveDay: "مباشر - اليوم",
+        time: "الوقت:",
+        skip: "⏭️ تخطي",
+        
+        // نافذة الترقيات
+        upgradesTitle: "🪙 الترقيات",
+        pitcherQuality: "🥤 جودة الإبريق",
+        sign: "🪧 اللافتة",
+        table: "🪑 الطاولة",
+        umbrella: "☂️ المظلة",
+        level: "المستوى:",
+        status: "الحالة:",
+        upgrade: "ترقية",
+        buy: "شراء",
+        maxLevel: "✅ أقصى مستوى",
+        purchased: "✅ تم الشراء",
+        notOwned: "غير مملوك",
+        owned: "مملوك ✅",
+        close: "❌ إغلاق",
+        
+        // مستويات الإبريق
+        pitcherBasic: "عادي",
+        pitcherGood: "جيد",
+        pitcherExcellent: "ممتاز",
+        
+        // مستويات اللافتة
+        signNone: "بدون",
+        signSmall: "صغيرة",
+        signLarge: "كبيرة",
+        
+        // مستويات الطاولة
+        tableBasic: "عادية",
+        tableGood: "جيدة",
+        tableLuxury: "فاخرة",
+        
+        // نافذة الإمدادات
+        suppliesTitle: "📦 شراء الإمدادات",
+        lemons: "🍋 ليمون",
+        sugar: "🍯 سكر",
+        ice: "🧊 ثلج",
+        buyBtn: "شراء",
+        
+        // نافذة الإنجازات
+        achievementsTitle: "🏆 الإنجازات",
+        unlocked: "✅ مفتوح",
+        locked: "🔒 مقفل",
+        
+        // أسماء الإنجازات
+        firstSale: "أول بيعة",
+        firstSaleDesc: "بع كوبك الأول",
+        bigDay: "يوم كبير",
+        bigDayDesc: "بع 50 كوبًا في يوم واحد",
+        rich: "نحو الثراء",
+        richDesc: "اكسب 500$",
+        tycoon: "قطب الليموناضة",
+        tycoonDesc: "اكسب 1000$",
+        week: "أسبوع واحد",
+        weekDesc: "اصمد 7 أيام",
+        month: "شهر واحد",
+        monthDesc: "اصمد 30 يومًا",
+        popular: "كشك مشهور",
+        popularDesc: "حقق سمعة 90%",
+        perfect: "وصفة مثالية",
+        perfectDesc: "احصل على 50 زبونًا سعيدًا في يوم واحد",
+        monopoly: "احتكار",
+        monopolyDesc: "تخلص من جميع المنافسين",
+        upgraded: "ترقية كاملة",
+        upgradedDesc: "ارفع جميع الترقيات للحد الأقصى",
+        
+        // أنواع الطقس
+        sunny: "مشمس",
+        hot: "حار جدًا",
+        cloudy: "غائم",
+        rainy: "ممطر",
+        
+        // الأحداث
+        eventFestival: "مهرجان في الحديقة",
+        eventCompetition: "منافس جديد قريب",
+        eventCelebrity: "زيارة مشهور",
+        eventRoadwork: "أعمال طرق",
+        eventLabel: "حدث:",
+        
+        // رسائل السجل
+        notEnoughSupplies: "❌ لا توجد إمدادات كافية!",
+        notEnoughMoney: "❌ لا توجد أموال كافية!",
+        bought: "🛒 تم شراء",
+        for: "مقابل",
+        quickBuy: "🛒 شراء سريع:",
+        earned: "💰 ربحت",
+        selling: "ببيع",
+        cups: "كوب",
+        demandExists: "⚠️ يوجد طلب، لكن لا توجد إمدادات!",
+        noCustomers: "📉 لا زبائن اليوم.",
+        customersLove: "⭐⭐⭐ الزبائن يحبونها! بيع",
+        repPlus: "سمعة +",
+        veryHappy: "⭐⭐ سعداء جدًا! بيع",
+        satisfied: "⭐ راضون. بيع",
+        customersUnhappy: "😞 الزبائن غير راضين. سمعة -5",
+        goodDay: "✅ يوم جيد! بيع",
+        onlyStand: "🏆 أنت الكشك الوحيد!",
+        competitorClosed: "👋 منافس أغلق!",
+        newCompetitor: "🪙 منافس جديد افتتح!",
+        upgradedTo: "⬆️ تمت ترقية",
+        to: "إلى مستوى",
+        purchased: "☂️ تم شراء المظلة! مبيعات أفضل في الطقس الحار.",
+        recipeLog: "📋 الوصفة:",
+        achievementUnlocked: "🏆",
+        unlocked: "إنجاز مفتوح!",
+        need: "تحتاج"
+    }
+};
+
+function toggleLanguage() {
+    playSound('click');
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    
+    // تغيير اتجاه الصفحة
+    document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', currentLang === 'ar' ? 'ar' : 'en');
+    
+    // تحديث النصوص
+    updateTexts();
+    
+    // تحديث أيقونة الزر
+    document.getElementById('langIcon').textContent = currentLang === 'ar' ? 'AR' : 'EN';
+}
+
+function updateTexts() {
+    const t = translations[currentLang];
+    
+    // Main Buttons
+    document.getElementById('startDayBtn').innerHTML = t.startDay;
+    document.getElementById('buySuppliesBtn').innerHTML = t.buySupplies;
+    
+    // Menu Buttons
+    document.querySelectorAll('.menu-btn-text')[0].textContent = t.upgrades;
+    document.querySelectorAll('.menu-btn-text')[1].textContent = t.supplies;
+    document.querySelectorAll('.menu-btn-text')[2].textContent = t.recipe;
+    document.querySelectorAll('.menu-btn-text')[3].textContent = t.achievements;
+    
+    // Activity Log
+    document.querySelector('.log-title').textContent = t.logTitle;
+    
+    // Settings Title
+    document.querySelector('.settings-title').textContent = t.settingsTitle;
+    document.querySelectorAll('.setting-label')[0].textContent = t.lemonsPerCup;
+    document.querySelectorAll('.setting-label')[1].textContent = t.sugarPerCup;
+    document.querySelectorAll('.setting-label')[2].textContent = t.icePerCup;
+    document.querySelectorAll('.setting-label')[3].textContent = t.cupPrice;
+    
+    // Game Description
+    document.querySelector('.description-title').textContent = t.descTitle;
+    document.querySelector('.description-section p').textContent = t.descText;
+    
+    // Tooltips
+    document.getElementById('angryDisplay').setAttribute('title', t.angry);
+    document.getElementById('happyDisplay').setAttribute('title', t.happy);
+    document.getElementById('waitingDisplay').setAttribute('title', t.waiting);
+    document.getElementById('expensiveDisplay').setAttribute('title', t.expensive);
+    document.getElementById('cupsSoldDisplay').setAttribute('title', t.cupsSold);
+    document.getElementById('profitDisplay').setAttribute('title', t.profit);
+    document.getElementById('dayDisplay').setAttribute('title', t.day);
+    document.getElementById('reputationDisplay').setAttribute('title', t.reputation);
+    
+    // Upgrades Modal
+    const upgradesModal = document.getElementById('upgradesModal');
+    upgradesModal.querySelector('.modal-title').textContent = t.upgradesTitle;
+    upgradesModal.querySelectorAll('.upgrade-header')[0].textContent = t.pitcherQuality;
+    upgradesModal.querySelectorAll('.upgrade-header')[1].textContent = t.sign;
+    upgradesModal.querySelectorAll('.upgrade-header')[2].textContent = t.table;
+    upgradesModal.querySelectorAll('.upgrade-header')[3].textContent = t.umbrella;
+    document.getElementById('closeUpgradesBtn').textContent = t.close;
+    
+    // Supplies Modal
+    const suppliesModal = document.getElementById('suppliesModal');
+    suppliesModal.querySelector('.modal-title').textContent = t.suppliesTitle;
+    suppliesModal.querySelectorAll('.supply-header')[0].textContent = t.lemons;
+    suppliesModal.querySelectorAll('.supply-header')[1].textContent = t.sugar;
+    suppliesModal.querySelectorAll('.supply-header')[2].textContent = t.ice;
+    document.querySelectorAll('.supply-buy-btn').forEach(btn => {
+        btn.textContent = t.buyBtn;
+    });
+    document.getElementById('closeSuppliesBtn').textContent = t.close;
+    
+    // Achievements Modal
+    document.getElementById('achievementsModal').querySelector('.modal-title').textContent = t.achievementsTitle;
+    document.getElementById('closeAchievementsBtn').textContent = t.close;
+    
+    // Update upgrade display texts
+    updateUpgradeDisplay();
+    
+    // Update achievement list if modal is open
+    if (document.getElementById('achievementsModal').style.display === 'block') {
+        updateAchievementsList();
+    }
+    updateEventBanner();
+}
+
+// ربط الزر
+document.getElementById('languageToggle').onclick = toggleLanguage;
     </script>
     <script src="game.js"></script>
 </body>
