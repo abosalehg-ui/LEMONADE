@@ -922,7 +922,7 @@
     
     <div class="sound-toggle" id="soundToggle">🔊</div>
     <div class="language-toggle" id="languageToggle" title="التبديل إلى العربية">
-    <span id="langIcon">🌐</span>
+    <span id="langIcon">EN</span>
 </div>
 
     <div class="achievement-notification" id="achievementNotif"></div>
@@ -1306,27 +1306,6 @@
         }
 
         // **دالة تحديث العرض المعدلة**
-        function updateEventBanner() {
-    const t = translations[currentLang];
-    const eventBanner = document.getElementById('eventBanner');
-
-    if (game.lastEvent) {
-        const eventTranslationKey = game.lastEvent.id;
-        
-        // البحث عن الترجمة في كائن اللغة النشطة
-        // يجب أن تتأكد أن key الحدث (مثل 'festival') موجود في كائن t.ar في الترجمة
-        const translatedName = t[eventTranslationKey]; 
-        
-        // استخدام الترجمة أو الاسم الإنجليزي الأصلي كاحتياطي
-        const displayText = translatedName || game.lastEvent.name; 
-
-        eventBanner.innerHTML = `${game.lastEvent.icon} ${displayText}`;
-        eventBanner.style.display = 'block';
-    } else {
-        eventBanner.style.display = 'none';
-    }
-}
-
         function updateDisplay() {
             // التحقق من التغيرات قبل التحديث
             const currentCupsSold = game.cupsSold;
@@ -1603,38 +1582,19 @@
         }
 
         function triggerEvent() {
-    const event = events[Math.floor(Math.random() * events.length)];
-    game.lastEvent = event;
-    
-    updateEventBanner(); // استدعاء دالة جديدة لتحديث البانر
-    
-    return event;
-}
-
-// دالة جديدة لتحديث بانر الأحداث
-function updateEventBanner() {
-    const banner = document.getElementById('eventBanner');
-    const event = game.lastEvent;
-    
-    if (event) {
-        const t = translations[currentLang];
-        let eventName;
-        
-        // اختيار الترجمة المناسبة حسب نوع الحدث
-        switch(event.type) {
-            case 'festival': eventName = t.eventFestival; break;
-            case 'competition': eventName = t.eventCompetition; break;
-            case 'celebrity': eventName = t.eventCelebrity; break;
-            case 'roadwork': eventName = t.eventRoadwork; break;
-            default: eventName = event.name;
+            const event = events[Math.floor(Math.random() * events.length)];
+            game.lastEvent = event;
+            
+            const banner = document.getElementById('eventBanner');
+            if (event) {
+                banner.style.display = 'block';
+                banner.textContent = `${event.icon} Event: ${event.name}`;
+            } else {
+                banner.style.display = 'none';
+            }
+            
+            return event;
         }
-        
-        banner.style.display = 'block';
-        banner.textContent = `${event.icon} ${t.eventLabel} ${eventName}`;
-    } else {
-        banner.style.display = 'none';
-    }
-}
 
         function addLog(message, type = '') {
             const log = document.getElementById('logContent');
@@ -2030,11 +1990,10 @@ const translations = {
         rainy: "Rainy",
         
         // Events
-        eventFestival: "Festival in the Park",
-        eventCompetition: "New Competitor Nearby",
-        eventCelebrity: "Celebrity Visit",
-        eventRoadwork: "Road Construction",
-        eventLabel: "Event:",
+        festival: "Festival in the Park",
+        competition: "New Competitor Nearby",
+        celebrity: "Celebrity Visit",
+        roadwork: "Road Construction",
         
         // Log Messages
         notEnoughSupplies: "❌ Not enough supplies!",
@@ -2186,11 +2145,10 @@ const translations = {
         rainy: "ممطر",
         
         // الأحداث
-        eventFestival: "مهرجان في الحديقة",
-        eventCompetition: "منافس جديد قريب",
-        eventCelebrity: "زيارة مشهور",
-        eventRoadwork: "أعمال طرق",
-        eventLabel: "حدث:",
+        festival: "مهرجان في الحديقة",
+        competition: "منافس جديد قريب",
+        celebrity: "زيارة مشهور",
+        roadwork: "أعمال طرق",
         
         // رسائل السجل
         notEnoughSupplies: "❌ لا توجد إمدادات كافية!",
@@ -2234,7 +2192,7 @@ function toggleLanguage() {
     updateTexts();
     
     // تحديث أيقونة الزر
-    document.getElementById('langIcon').textContent = '🌐';
+    document.getElementById('langIcon').textContent = currentLang === 'ar' ? 'AR' : 'EN';
 }
 
 function updateTexts() {
@@ -2305,7 +2263,6 @@ function updateTexts() {
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
     }
-    updateEventBanner();
 }
 
 // ربط الزر
