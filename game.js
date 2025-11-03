@@ -1,2316 +1,771 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍋 Lemonade</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
-    <style>
-        #startDayBtn {
-            /* 1. تغيير لون التدرج لجذب الانتباه (مثلاً: لون برتقالي/ذهبي) */
-           background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
-    
-            /* 2. جعل الحد سميكاً بلون مختلف (مثلاً: الأحمر الداكن) */
-            /border: 3px solid #CC0000;/
-    
-            /* 3. إضافة ظل قوي للخارج (لإعطائه بروز) */
-            box-shadow: 0 4px 0 #CD8500, 0 4px 12px rgba(255, 165, 0, 0.7);
-    
-            /* 4. تغيير لون النص إلى الأسود ليبرز على الخلفية الجديدة */
-            color: #000 !important;
-        }
+// ========================================
+// PHASER 3 LEMONADE STAND SIMULATION - BACKGROUND IMAGE
+// Using LEMONADE.jpg as background
+// ========================================
 
-        /* تعديل حالة الضغط لجعلها متناسقة مع الألوان الجديدة */
-        #startDayBtn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #CD8500, 0 2px 8px rgba(255, 165, 0, 0.5);
-        }
-        /* أنماط CSS الأساسية (لم تتغير) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(180deg, #6fba52 0%, #8BC34A 100%);
-            min-height: 10vh;
-            padding-top: 60px;
-        }
-
-        .resources-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(74, 124, 44, 0.9);
-            border-bottom: 3px solid #000;
-            padding: 5px 8px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-
-        .resource-item {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .resource-icon {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: 1px solid #FF8C00;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
-            border: 1px solid #666;
-        }
-
-        .language-toggle {
-    position: fixed;
-    bottom: 20px;
-    left: 80px;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 2px solid #FF8C00;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-    z-index: 1500;
-    color: #000;
-}
-
-.language-toggle:active {
-    transform: scale(0.95);
-}
-
-        .resource-value {
-            color: white;
-            font-weight: bold;
-            font-size: 0.85em;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-
-        .menu-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .menu-btn {
-            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
-            border: 2px solid #3d5e27;
-            border-radius: 8px;
-            padding: 8px 6px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 0 #2d4a1d, 0 2px 6px rgba(0,0,0,0.3);
-        }
-
-        .menu-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 0px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
-        }
-
-        .menu-btn-icon {
-            font-size: 1.5em;
-            margin-bottom: 2px;
-        }
-
-        .menu-btn-text {
-            color: white;
-            font-weight: bold;
-            font-size: 0.7em;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            text-transform: lowercase;
-        }
-
-        /* حجب قسم الأداء القديم */
-        .performance-section, .feedback-icons {
-            display: none !important; 
-        }
-
-        /* تنسيقات الصورة وحاوياتها الجديدة والمصححة */
-        .image-container {
-            position: relative;
-            max-width: 900px;
-            margin: 0 auto;
-            /* **التصحيح: إخفاء أي محتوى يخرج عن حدود الحاوية (القائمة المخفية)** */
-            overflow: hidden; 
-        }
-
-        .lemonade-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            border: 5px solid #FFD700;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        /* أنماط الأيقونات الجديدة (العلوية والسفلية) */
-        .icon-bar {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            padding: 5px;
-            z-index: 500;
-        }
-
-        .icon-bar.top-bar {
-            top: 6px;
-        }
-
-        .icon-bar.bottom-bar {
-            bottom: 6px;
-        }
-
-        .icon-display-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 3px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 45px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .icon-display-icon {
-            font-size: 1.2em; /* حجم الأيقونة */
-            line-height: 1;
-        }
-
-        .icon-display-value {
-            color: white;
-            font-weight: 900;
-            font-size: 0.7em;
-            text-shadow: 1px 1px 2px #000;
-            margin-top: 2px;
-        }
-
-        /* --- تأثير التطاير --- */
-        .particle {
-            position: absolute;
-            font-size: 1.2em;
-            color: yellow; /* لون الأيقونة المتطايرة */
-            pointer-events: none;
-            user-select: none;
-            z-index: 10000;
-            animation: fadeAndFly 1.5s forwards;
-            font-weight: bold;
-        }
-        
-        /* بانر الأحداث */
-        .event-banner {
-            background: linear-gradient(135deg, #DC143C 0%, #FF4AFE 100%);
-            border: 2px solid #000;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            margin-bottom: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes fadeAndFly {
-            0% { transform: translate(0, 0); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
-        }
-
-        /* باقي الأنماط (لم تتغير) */
-        .weather-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .weather-icon-display {
-            font-size: 1.5em;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: none;
-            border: none;
-            border-radius: 0;
-            padding: 0;
-        }
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .action-btn {
-            background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
-            border: 2px solid #3d5e27;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 0 3px 0 #2d4a1d, 0 3px 8px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-        .action-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
-        }
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-        .log-section {
-            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-            border: 2px solid #1a3d0a;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-        }
-        .log-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-        .log-content {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 8px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        .log-entry {
-            padding: 6px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .log-entry.success {
-            background: rgba(34, 139, 34, 0.3);
-            border-right: 3px solid #32CD32;
-        }
-
-        .log-entry.warning {
-            background: rgba(255, 165, 0, 0.3);
-            border-right: 3px solid #FFA500;
-        }
-
-        .log-entry.error {
-            background: rgba(220, 20, 60, 0.3);
-            border-right: 3px solid #DC143C;
-        }
-
-        .log-entry.info {
-            background: rgba(100, 149, 237, 0.3);
-            border-right: 3px solid #6495ED;
-        }
-        
-        /* أنماط القائمة المنزلقة الجديدة */
-        .settings-drawer {
-            position: absolute;
-            top: 0;
-            left: -320px; /* إخفاء القائمة خارج الشاشة لليسار */
-            height: 100%; 
-            width: 300px;
-            z-index: 600; 
-            transition: left 0.3s ease-in-out;
-            padding: 10px 0; 
-        }
-        
-        /* إضافة طبقة تظليل عند فتح القائمة لجعل باقي المحتوى أقل وضوحًا */
-        .image-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0);
-            z-index: 550;
-            transition: background 0.3s ease-in-out;
-            pointer-events: none; /* للسماح بالنقر على الزر أثناء إغلاق القائمة */
-        }
-
-        .settings-drawer.open {
-            left: 0; /* إظهار القائمة */
-        }
-        
-        /* عند فتح القائمة، تظهر طبقة التظليل */
-        .image-container.drawer-open::before {
-            background: rgba(0, 0, 0, 0.5);
-            pointer-events: auto; /* لحجب النقر على باقي محتوى الصورة */
-        }
-        
-        .settings-toggle-btn {
-            position: absolute;
-            top: 50%;
-            left: 5px; /* موضع الزر الأولي */
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: 2px solid #FF8C00;
-            border-radius: 0 8px 8px 0; /* شكل نصف دائري من اليمين */
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-            cursor: pointer;
-            font-size: 1.2em;
-            line-height: 1;
-            z-index: 700;
-            transition: left 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .settings-drawer.open + .settings-toggle-btn {
-            left: 300px; /* تحريك الزر ليظهر بجانب القائمة المفتوحة */
-        }
-        
-        .settings-section {
-            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-            border: 2px solid #1a3d0a;
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-            /* يجب إزالة الهامش ليعمل داخل القائمة المنزلقة */
-            margin-bottom: 0; 
-            height: 100%;
-            overflow-y: auto; /* للسماح بالتمرير داخل القائمة */
-        }
-
-        .settings-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .setting-row {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 3px;
-            margin-bottom: 3px;
-        }
-        .setting-label {
-            font-weight: bold;
-            margin-bottom: 6px;
-            font-size: 0.85em;
-        }
-
-        .setting-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .slider {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(0,0,0,0.3);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .slider-value {
-            min-width: 40px;
-            text-align: center;
-            font-weight: bold;
-            background: rgba(0,0,0,0.3);
-            padding: 2px 6px;
-            border-radius: 5px;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #7ab84a;
-            font-size: 0.7em;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: transparent;
-            z-index: 2000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .modal-content {
-            background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-            border: 3px solid #1a3d0a;
-            border-radius: 12px;
-            max-width: 450px;
-            margin: 20px auto;
-            padding: 15px;
-            color: white;
-        }
-        .modal-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
-        }
-        
-        .upgrade-item, .achievement-item, .supply-item {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .upgrade-header, .achievement-header, .supply-header {
-            font-size: 1em;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        
-        .supply-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 5px;
-            font-size: 0.9em;
-        }
-        
-        .supply-buy-btn {
-            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
-            border: 2px solid #FF8C00;
-            border-radius: 6px;
-            padding: 5px 10px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
-            font-size: 0.8em;
-        }
-        
-        .supply-buy-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 0px 0 #CD8500;
-        }
-        
-        .supply-buy-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .upgrade-status, .achievement-progress {
-            margin-bottom: 8px;
-            color: #7ab84a;
-            font-size: 0.9em;
-        }
-
-        .upgrade-btn {
-            width: 100%;
-            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
-            border: 2px solid #FF8C00;
-            border-radius: 6px;
-            padding: 8px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
-            font-size: 0.85em;
-        }
-
-        .upgrade-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 0px 0 #CD8500;
-        }
-
-        .upgrade-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .close-modal-btn {
-            width: 100%;
-            margin-top: 12px;
-            background: linear-gradient(180deg, #666 0%, #444 100%);
-            border: 2px solid #333;
-            border-radius: 6px;
-            padding: 10px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .achievement-unlocked {
-            border: 2px solid #FFD700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .achievement-locked {
-            opacity: 0.6;
-        }
-
-        /* إشعار الإنجاز */
-        .achievement-notification {
-            position: fixed;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: 3px solid #FF8C00;
-            border-radius: 12px;
-            padding: 15px 25px;
-            color: #000;
-            font-weight: bold;
-            font-size: 1.1em;
-            z-index: 3000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            animation: achievementPop 3s ease-out;
-            display: none;
-        }
-
-        @keyframes achievementPop {
-            0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
-            10% { transform: translateX(-50%) translateY(0); opacity: 1; }
-            90% { transform: translateX(-50%) translateY(0); opacity: 1; }
-            100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
-        }
-
-        /* زر الصوت */
-        .sound-toggle {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: 2px solid #FF8C00;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-            z-index: 1500;
-        }
-
-        .sound-toggle:active {
-            transform: scale(0.95);
-        }
-        
-        #phaser-container {
-            width: 100%;
-            max-width: 400px;
-            height: 400px;
-            margin: 0 auto;
-        }
-   
-        #standView {
-            width: 100%; 
-            height: 100px !important; 
-            position: relative; 
-            
-            /* **التصحيح 2: جعل منطقة المحاكاة شفافة** */
-            background: none !important; 
-            border-bottom: none !important; 
-            overflow: hidden;
-        }
-        
-        #standSetup {
-            right: 50%; 
-            transform: translateX(50%);
-        }
-        
-        #standSetup #tableDisplay {
-            font-size: 2em; /* تصغير أيقونة الطاولة */
-        }
-        
-        #standSetup #umbrellaDisplay {
-            font-size: 2em; /* تصغير أيقونة المظلة */
-            top: -20px !important; /* تعديل موضع المظلة */
-        }
-        
-        #standSetup #vendor {
-            font-size: 1.8em; /* تصغير أيقونة البائع */
-            top: -20px !important; /* تعديل موضع البائع */
-            left: 40px !important;
-        }
-
-        #customerQueue {
-            gap: 10px !important; /* تقليل المسافة بين الزبائن */
-            bottom: 5px !important;
-        }
-        
-        #simulationControls {
-            padding: 5px 10px !important; /* تقليل حشوة التحكم */
-            
-            /* **التصحيح 3: جعل شريط التحكم السفلي شفافاً** */
-            background: none !important; 
-            border-top: none !important;
-        }
-        
-        #simTimer {
-             font-size: 0.9em !important; /* تصغير خط المؤقت */
-        }
-     /* ===== GAME DESCRIPTION DRAWER (Right Side) ===== */
-.description-drawer {
-    position: absolute;
-    top: 0;
-    right: -320px; /* Hidden by default */
-    height: 100%;
-    width: 300px;
-    z-index: 600;
-    transition: right 0.3s ease-in-out;
-    padding: 10px 0;
-}
-
-.description-drawer.open {
-    right: 0; /* Slide into view */
-}
-
-.description-section {
-    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
-    border: 2px solid #1a3d0a;
-    border-radius: 8px;
-    padding: 12px;
-    color: white;
-    height: 100%;
-    overflow-y: auto;
-}
-
-.description-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-/* Toggle button (❔) */
-.description-toggle-btn {
-    position: absolute;
-    top: 50%;
-    right: 5px;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: 2px solid #FF8C00;
-    border-radius: 8px 0 0 8px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-    cursor: pointer;
-    font-size: 1.2em;
-    z-index: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: right 0.3s ease-in-out;
-}
-
-.description-drawer.open + .description-toggle-btn {
-    right: 300px; /* Move button beside open drawer */
-}
-        /* === تأثير التظليل عند فتح قائمة الوصف === */
-        .image-container.desc-open::before {
-            background: rgba(0, 0, 0, 0.5);
-            pointer-events: auto;
-        }
-        @media (max-width: 768px) {
-    /* تحريك زر ⚙️ إلى أعلى قليلاً */
-    #settingsToggleBtn {
-        top: 40%;
+class LemonadeStandScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'LemonadeStandScene' });
+        this.customers = [];
+        this.isSimulating = false;
+        this.simSpeed = 1;
+        this.spawnPoints = [];
+        this.exitPoints = [];
+        this.isRaining = false;
+        this.rainParticles = null;
     }
 
-    /* تحريك زر ❔ إلى أسفل قليلاً */
-    #descriptionToggleBtn {
-        top: 60%;
+    preload() {
+        // تحميل صورة الخلفية
+        this.load.image('background', 'assets/LEMONADE.jpg');
+        
+        // إنشاء رسومات العملاء المتحركة
+        this.createAnimatedCustomerAssets();
+        this.createFeedbackIcons();
+        this.createRainAssets();
     }
-}
-    </style>
-</head>
-<body>
-    <div class="resources-bar">
-        <div class="resource-item" title="Lemons">
-            <div class="resource-icon">🍋</div>
-            <div class="resource-value" id="lemons">20</div>
-        </div>
-        <div class="resource-item" title="Sugar">
-            <div class="resource-icon">🍯</div>
-            <div class="resource-value" id="sugar">20</div>
-        </div>
-        <div class="resource-item" title="Ice">
-            <div class="resource-icon">🧊</div>
-            <div class="resource-value" id="ice">20</div>
-        </div>
-        <div class="resource-item" title="Money">
-            <div class="resource-icon">💰</div>
-            <div class="resource-value" id="money">100</div>
-        </div>
-        <div class="resource-item" title="Quality">
-            <div class="resource-icon">🥤</div>
-            <div class="resource-value" id="pitcher-display">N</div>
-        </div>
-        <div class="resource-item" title="Weather">
-            <div class="weather-group">
-                 <div class="weather-icon-display" id="weatherIcon"></div>
-                 <div class="weather-icon-display">🌡️</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="image-container" id="imageContainer">
-        <div id="phaser-container" style="border: 5px solid #FFD700; border-radius: 12px; overflow: hidden;"></div>
-    <!-- ✅ GAME DESCRIPTION DRAWER (Right Side) -->
-    <div class="description-drawer" id="descriptionDrawer">
-        <div class="description-section">
-            <div class="description-title">🍋 Game Description</div>
-            <p>
-                Lemonade is a business management game where you run your own lemonade stand.<br>
-                Each day, you decide how much lemon, sugar, and ice to use in your recipe — and set the perfect price per cup.<br>
-                Make sure you buy enough ingredients for the next day. Adjust your recipe carefully: too much lemon makes it sour, too much sugar makes it too sweet, and ice is essential on hot days!<br>
-                Your success depends on weather conditions, customer satisfaction, and smart upgrades.<br>
-                A reasonable price attracts customers, but a high price will drive them away.<br>
-                Buy supplies, improve your equipment, and build your reputation to attract more customers and increase profits.<br>
-                Face random events, deal with competitors, and try to become the ultimate Lemonade! 🏆
-           </p>
-           <hr style="border: 1px solid rgba(255,255,255,0.2); margin: 10px 0;">
-           <p style="font-size: 0.8em; color: #ccc; text-align:center;">
-               Created by <b>ABDULKARIM ALOBUD</b><br>
-               <a href="mailto:abo.saleh.g@gmail.com" style="color:#7ab84a;">abo.saleh.g@gmail.com</a>
-           </p>
-       </div>
-   </div>
 
-   <!-- ❔ Toggle Button -->
-   <button class="description-toggle-btn" id="descriptionToggleBtn" title="Game Info">❔</button>
+    createAnimatedCustomerAssets() {
+        const customerTypes = [
+            { name: 'child', height: 24, colors: ['#FF6B6B', '#4ECDC4'] },
+            { name: 'teen', height: 30, colors: ['#95E1D3', '#F38181'] },
+            { name: 'adult', height: 36, colors: ['#FFA502', '#2C3E50'] },
+            { name: 'elder', height: 34, colors: ['#6C5CE7', '#FDCB6E'] },
+            { name: 'woman', height: 34, colors: ['#FF9FF3', '#F368E0'] },
+            { name: 'man', height: 36, colors: ['#54A0FF', '#5F27CD'] }
+        ];
 
-        <div class="icon-bar top-bar" id="topIconBar">
-            <div class="icon-display-item" id="angryDisplay" title="Angry">
-                <span class="icon-display-icon">😡</span>
-                <span class="icon-display-value">0</span>
-            </div>
-            <div class="icon-display-item" id="happyDisplay" title="Happy">
-                <span class="icon-display-icon">😊</span>
-                <span class="icon-display-value">0</span>
-            </div>
-            <div class="icon-display-item" id="waitingDisplay" title="Waiting">
-                <span class="icon-display-icon">⏳</span>
-                <span class="icon-display-value">0</span>
-            </div>
-            <div class="icon-display-item" id="expensiveDisplay" title="Too Expensive">
-                <span class="icon-display-icon">🫰</span>
-                <span class="icon-display-value">0</span>
-            </div>
-        </div>
-
-        <div class="icon-bar bottom-bar" id="bottomIconBar">
-            <div class="icon-display-item" id="cupsSoldDisplay" title="Cups Sold">
-                <span class="icon-display-value">0</span>
-                <span class="icon-display-icon">🥤</span>
-            </div>
-            <div class="icon-display-item" id="profitDisplay" title="Profit">
-                <span class="icon-display-value">0.00 $</span>
-                <span class="icon-display-icon">🪙</span>
-            </div>
-            <div class="icon-display-item" id="dayDisplay" title="Day">
-                <span class="icon-display-value">1</span>
-                <span class="icon-display-icon">📅</span>
-            </div>
-            <div class="icon-display-item" id="reputationDisplay" title="Reputation">
-                <span class="icon-display-value">50%</span>
-                <span class="icon-display-icon">👍</span>
-            </div>
-        </div>
+        // إنشاء 6 اتجاهات للنظر: left, right, up, down, up-left, up-right
+        const directions = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
         
-        <div class="settings-drawer" id="settingsDrawer">
-            <div class="settings-section">
-                <div class="settings-title">TODAY'S SETTING</div>
-                
-                <div class="setting-row">
-                    <div class="setting-label">🍋 Lemons per cup:</div>
-                    <div class="setting-controls">
-                        <input type="range" class="slider" id="lemonSlider" min="1" max="10" value="3">
-                        <div class="slider-value" id="lemonValue">3</div>
-                    </div>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-label">🍯 Sugar per cup:</div>
-                    <div class="setting-controls">
-                        <input type="range" class="slider" id="sugarSlider" min="1" max="10" value="3">
-                        <div class="slider-value" id="sugarValue">3</div>
-                    </div>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-label">🧊 Ice per cup:</div>
-                    <div class="setting-controls">
-                        <input type="range" class="slider" id="iceSlider" min="1" max="10" value="3">
-                        <div class="slider-value" id="iceValue">3</div>
-                    </div>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-label">💵 Cup Price:</div>
-                    <div class="setting-controls">
-                        <input type="range" class="slider" id="priceSlider" min="1" max="20" value="5">
-                        <div class="slider-value" id="priceValue">5 $</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button class="settings-toggle-btn" id="settingsToggleBtn" title="SETTING" aria-label="Toggle Settings Menu">⚙️</button>
-        </div>
-    
-    <div class="sound-toggle" id="soundToggle">🔊</div>
-    <div class="language-toggle" id="languageToggle" title="التبديل إلى العربية">
-    <span id="langIcon">EN</span>
-</div>
-
-    <div class="achievement-notification" id="achievementNotif"></div>
-
-    <div class="container">
-
-        <div class="weather-banner" style="display: none;">
-            <span id="weatherText">الطقس اليوم</span>
-        </div>
-
-        <div id="eventBanner" class="event-banner" style="display: none;"></div>
-
-
-        <div class="action-buttons">
-            <button class="action-btn" id="startDayBtn">🚀 START DAY</button>
-            <button class="action-btn" id="buySuppliesBtn">🛒 BUY SUPPLIES (Quick)</button>
-        </div>
-        
-        <div class="menu-buttons">
-            <button class="menu-btn" id="upgradesBtn">
-                <div class="menu-btn-icon">⬆️</div>
-                <div class="menu-btn-text">upgrades</div>
-            </button>
-            <button class="menu-btn" id="suppliesBtn">
-                <div class="menu-btn-icon">📦</div>
-                <div class="menu-btn-text">supplies</div>
-            </button>
-            <button class="menu-btn" id="recipeBtn">
-                <div class="menu-btn-icon">📋</div>
-                <div class="menu-btn-text">recipe</div>
-            </button>
-            <button class="menu-btn" id="achievementsBtn">
-                <div class="menu-btn-icon">🏆</div>
-                <div class="menu-btn-text">achievements</div>
-            </button>
-        </div>
-
-        <div class="log-section">
-            <div class="log-title">📋 Activity Log</div>
-            <div class="log-content" id="logContent">
-                <div class="log-entry info">🎮 Welcome to Lemonade! Set your recipe and start selling.</div>
-            </div>
-        </div>
-        
-        <div class="modal" id="liveSimulationModal">
-            <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
-                <div class="modal-title" style="margin-bottom: 0;">LIVE - DAY <span id="simDayDisplay">1</span></div>
-                
-                <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 5px 10px; background: #3d6520; border-top: 2px solid #1a3d0a;">
-                    <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
-                    <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 0.9em;">TIME: 0%</div>
-                    <button id="skipDayBtn" class="action-btn" style="width: 30%; padding: 8px 10px; background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border-color: #990000;">⏭️ SKIP</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="upgradesModal">
-            <div class="modal-content">
-                <div class="modal-title">🏪 UPGRADES</div>
-                
-                <div class="upgrade-item">
-                    <div class="upgrade-header">🥤 Pitcher Quality</div>
-                    <div class="upgrade-status">Level: <span id="pitcherLevel">Basic</span></div>
-                    <button class="upgrade-btn" id="pitcherUpgradeBtn">Upgrade (50 $)</button>
-                </div>
-
-                <div class="upgrade-item">
-                    <div class="upgrade-header">🪧 Sign</div>
-                    <div class="upgrade-status">Level: <span id="signLevel">None</span></div>
-                    <button class="upgrade-btn" id="signUpgradeBtn">Upgrade (40 $)</button>
-                </div>
-
-                <div class="upgrade-item">
-                    <div class="upgrade-header">🪑 Table</div>
-                    <div class="upgrade-status">Level: <span id="tableLevel">Basic</span></div>
-                    <button class="upgrade-btn" id="tableUpgradeBtn">Upgrade (60 $)</button>
-                </div>
-
-                <div class="upgrade-item">
-                    <div class="upgrade-header">☂️ Umbrella</div>
-                    <div class="upgrade-status">Status: <span id="umbrellaStatus">Not Owned</span></div>
-                    <button class="upgrade-btn" id="umbrellaUpgradeBtn">Buy (80 $)</button>
-                </div>
-
-                <button class="close-modal-btn" id="closeUpgradesBtn">❌ CLOSE</button>
-            </div>
-        </div>
-        
-        <div class="modal" id="suppliesModal">
-            <div class="modal-content">
-                <div class="modal-title">📦 BUY SUPPLIES</div>
-                <div id="supplyList">
-                    <div class="supply-item">
-                        <div class="supply-header">🍋 Lemons</div>
-                        <div id="lemonPacks">
-                            <div class="supply-item-row">
-                                <span>20 Lemons: <span id="lemonPrice1">4</span> $</span>
-                                <button class="supply-buy-btn" data-type="lemons" data-amount="20" data-cost-id="lemonPrice1">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>50 Lemons: <span id="lemonPrice2">10</span> $</span>
-                                <button class="supply-buy-btn" data-type="lemons" data-amount="50" data-cost-id="lemonPrice2">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>100 Lemons: <span id="lemonPrice3">18</span> $</span>
-                                <button class="supply-buy-btn" data-type="lemons" data-amount="100" data-cost-id="lemonPrice3">Buy</button>
-                            </div>
-                        </div>
-                    </div>
+        customerTypes.forEach((type, typeIndex) => {
+            directions.forEach(direction => {
+                // إنشاء 6 إطارات للحركة (زيادة عدد الإطارات للأنيميشن الأوضح)
+                for (let frame = 0; frame < 6; frame++) {
+                    const textureKey = `customer_${type.name}_${direction}_${frame}`;
+                    const texture = this.textures.createCanvas(textureKey, 24, type.height);
+                    const ctx = texture.getContext();
                     
-                    <div class="supply-item">
-                        <div class="supply-header">🍯 Sugar</div>
-                        <div id="sugarPacks">
-                            <div class="supply-item-row">
-                                <span>20 Sugar: <span id="sugarPrice1">3</span> $</span>
-                                <button class="supply-buy-btn" data-type="sugar" data-amount="20" data-cost-id="sugarPrice1">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>50 Sugar: <span id="sugarPrice2">7</span> $</span>
-                                <button class="supply-buy-btn" data-type="sugar" data-amount="50" data-cost-id="sugarPrice2">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>100 Sugar: <span id="sugarPrice3">13</span> $</span>
-                                <button class="supply-buy-btn" data-type="sugar" data-amount="100" data-cost-id="sugarPrice3">Buy</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="supply-item">
-                        <div class="supply-header">🧊 Ice</div>
-                        <div id="icePacks">
-                            <div class="supply-item-row">
-                                <span>20 Ice: <span id="icePrice1">2</span> $</span>
-                                <button class="supply-buy-btn" data-type="ice" data-amount="20" data-cost-id="icePrice1">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>50 Ice: <span id="icePrice2">4</span> $</span>
-                                <button class="supply-buy-btn" data-type="ice" data-amount="50" data-cost-id="icePrice2">Buy</button>
-                            </div>
-                            <div class="supply-item-row">
-                                <span>100 Ice: <span id="icePrice3">7</span> $</span>
-                                <button class="supply-buy-btn" data-type="ice" data-amount="100" data-cost-id="icePrice3">Buy</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="close-modal-btn" id="closeSuppliesBtn">❌ CLOSE</button>
-            </div>
-        </div>
+                    this.drawCustomerFrame(ctx, type, direction, frame);
+                    texture.refresh();
+                }
+            });
+        });
+    }
 
-        <div class="modal" id="achievementsModal">
-            <div class="modal-content">
-                <div class="modal-title">🏆 ACHIEVEMENTS</div>
-                <div id="achievementsList"></div>
-                <button class="close-modal-btn" id="closeAchievementsBtn">❌ CLOSE</button>
-            </div>
-        </div>
-    </div>
+    drawCustomerFrame(ctx, type, direction, frame) {
+        const width = 24;
+        const height = type.height;
+        ctx.clearRect(0, 0, width, height);
 
-    <script>
-        // نظام الأصوات
-        const sounds = {
-            bgMusic: 'background-music.mp3',
-            click: 'button-click.mp3',
-            sell: 'cash-register.mp3',
-            upgrade: 'upgrade-sound.mp3',
-            achievement: 'achievement.mp3',
-            happy: 'happy-customer.mp3',
-            angry: 'angry-customer.mp3'
-        };
+        const step = frame % 6;
+        const walkCycle = Math.sin((step / 6) * Math.PI * 2);
+        const bodySway = walkCycle * 1.5;
+        const armSwing = walkCycle * 3;
+        const legSwing = walkCycle * 3.5;
+        const headBob = Math.sin((step / 6) * Math.PI * 4) * 0.8;
 
-        let soundEnabled = true;
-        let audioElements = {};
+        // الاتجاه
+        let dirX = 0, dirY = 0, flipX = 1, lookDirection = direction;
         
-        // المتغيرات السابقة لتتبع التغيرات وتشغيل تأثير التطاير
-        let prevCupsSold = 0;
-        let prevProfit = 0;
-        let prevDay = 0;
-        let prevReputation = 0;
-        let prevAngry = 0;
-        let prevHappy = 0;
-        let prevWaiting = 0;
-        let prevExpensive = 0;
-
-
-        // تحميل الأصوات (لم يتغير)
-        function initSounds() {
-            for (let key in sounds) {
-                const audio = new Audio(sounds[key]);
-                audio.onerror = function() {
-                    console.log(`Sound file not found: ${sounds[key]}`);
-                };
-                audioElements[key] = audio;
-            }
-            
-            if (audioElements.bgMusic) {
-                audioElements.bgMusic.loop = true;
-                audioElements.bgMusic.volume = 0.3;
-            }
+        // تحديد اتجاه النظر والحركة
+        switch (direction) {
+            case 'left': 
+                flipX = -1; 
+                dirX = -1; 
+                break;
+            case 'right': 
+                flipX = 1; 
+                dirX = 1; 
+                break;
+            case 'up': 
+                dirY = -1; 
+                break;
+            case 'down': 
+                dirY = 1; 
+                break;
+            case 'up-left': 
+                flipX = -1; 
+                dirX = -0.7; 
+                dirY = -0.7; 
+                break;
+            case 'up-right': 
+                flipX = 1; 
+                dirX = 0.7; 
+                dirY = -0.7; 
+                break;
         }
 
-        function playSound(soundName) {
-            if (!soundEnabled || !audioElements[soundName]) return;
-            try {
-                audioElements[soundName].currentTime = 0;
-                audioElements[soundName].play().catch(e => console.log('Audio play failed:', e));
-            } catch(e) {
-                console.log('Error playing sound:', e);
-            }
+        const centerX = 12;
+        const baseY = height / 2 + bodySway;
+
+        // ظل أسفل القدمين (أكثر واقعية)
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.ellipse(centerX, height - 1, 7, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // ملابس وتفاصيل حسب النوع (ألوان محسنة)
+        let topColor = type.colors[0];
+        let bottomColor = type.colors[1];
+        let accessory = null;
+        let skinColor = '#FFDBAC';
+        let hairColor = '#3C2415';
+
+        if (type.name === 'man') {
+            topColor = '#2C3A47';
+            bottomColor = '#1B9CFC';
+            accessory = 'hat';
+            skinColor = '#D4A574';
+            hairColor = '#654321';
+        } else if (type.name === 'woman') {
+            topColor = '#FD79A8';
+            bottomColor = '#E84393';
+            accessory = 'dress';
+            hairColor = '#8B4513';
+        } else if (type.name === 'child') {
+            topColor = '#00B894';
+            bottomColor = '#00A085';
+            accessory = 'shorts';
+            skinColor = '#FFDBAC';
+            hairColor = '#654321';
+        } else if (type.name === 'elder') {
+            topColor = '#BDC581';
+            bottomColor = '#6C7CE0';
+            accessory = 'glasses';
+            skinColor = '#D2B48C';
+            hairColor = '#C0C0C0';
+        } else if (type.name === 'teen') {
+            topColor = '#74B9FF';
+            bottomColor = '#0984E3';
+            accessory = 'hoodie';
+            skinColor = '#FFDBAC';
+            hairColor = '#8B4513';
+        } else if (type.name === 'adult') {
+            topColor = '#FDCB6E';
+            bottomColor = '#E17055';
+            skinColor = '#D4A574';
+            hairColor = '#654321';
         }
 
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
-            
-            if (soundEnabled) {
-                playSound('bgMusic');
-            } else {
-                if (audioElements.bgMusic) audioElements.bgMusic.pause();
-            }
-        }
+        // الجسم المحسن مع تدرج لوني أفضل
+        const grad = ctx.createLinearGradient(centerX - 6, baseY, centerX + 6, baseY + 12);
+        grad.addColorStop(0, this.lightenColor(topColor, 20));
+        grad.addColorStop(0.5, topColor);
+        grad.addColorStop(1, bottomColor);
+        ctx.fillStyle = grad;
         
-        // **الدالة الجديدة لتأثير التطاير (Particle Effect)**
-        function createParticleEffect(elementId, icon) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 6 * flipX, baseY);
+        ctx.lineTo(centerX + 6 * flipX, baseY);
+        ctx.lineTo(centerX + 4 * flipX, height - 6);
+        ctx.lineTo(centerX - 4 * flipX, height - 6);
+        ctx.closePath();
+        ctx.fill();
 
-            // تحديد موقع العنصر بالنسبة للنافذة
-            const rect = container.getBoundingClientRect();
-            
-            // إنشاء 10 جزيئات
-            for (let i = 0; i < 10; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.textContent = icon; // استخدام الأيقونة المطلوبة (مثل 🪙 أو 🥤)
-                
-                // تحديد موضع البداية (داخل العنصر الأب)
-                const startX = rect.left + rect.width / 2;
-                const startY = rect.top + rect.height / 2;
-                
-                particle.style.left = `${startX}px`;
-                particle.style.top = `${startY}px`;
-                
-                // تحديد موضع النهاية العشوائي
-                const endX = (Math.random() - 0.5) * 80; // من -40 إلى 40
-                const endY = (Math.random() - 0.5) * 80 - 40; // من -80 إلى 0 (للأعلى)
-                
-                particle.style.setProperty('--x', `${endX}px`);
-                particle.style.setProperty('--y', `${endY}px`);
+        // إضافة ظل للجسم
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-                document.body.appendChild(particle);
+        // الذراعين المحسنة
+        ctx.fillStyle = this.lightenColor(skinColor, -10);
+        ctx.fillRect(centerX - 8 * flipX, baseY + 3 - armSwing * 0.5, 2.5, 7);
+        ctx.fillRect(centerX + 6 * flipX, baseY + 3 + armSwing * 0.5, 2.5, 7);
 
-                // إزالة الجسيم بعد انتهاء الأنميشن
-                setTimeout(() => {
-                    particle.remove();
-                }, 1500);
+        // الساقين المحسنة
+        ctx.fillStyle = '#2D3436';
+        ctx.fillRect(centerX - 3.5, height - 6 - legSwing * 0.3, 2.5, 6 + legSwing * 0.3);
+        ctx.fillRect(centerX + 1, height - 6 + legSwing * 0.3, 2.5, 6 - legSwing * 0.3);
+
+        // الرأس مع حركته الطبيعية
+        const headY = baseY - 8 + headBob;
+        const headSize = 5;
+        
+        ctx.fillStyle = skinColor;
+        ctx.beginPath();
+        ctx.arc(centerX, headY, headSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        // إضافة ظل للرأس
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+
+        // الشعر المحسن حسب النوع
+        if (type.name === 'woman') {
+            // شعر طويل للمرأة
+            ctx.fillStyle = hairColor;
+            ctx.beginPath();
+            ctx.arc(centerX, headY - 3, headSize + 1, 0, Math.PI * 2);
+            ctx.fill();
+            // طبقات الشعر
+            ctx.fillRect(centerX - (headSize + 1), headY - 2, (headSize + 1) * 2, 8);
+        } else if (type.name === 'child') {
+            // شعر مجعد للأطفال
+            ctx.fillStyle = hairColor;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.arc(centerX - 4 + i * 2, headY - 5, 1.5, 0, Math.PI * 2);
+                ctx.fill();
             }
+        } else if (type.name === 'elder') {
+            // شعر رمادي للقضاء
+            ctx.fillStyle = hairColor;
+            ctx.fillRect(centerX - headSize, headY - headSize - 1, headSize * 2, 3);
+            // شارب
+            ctx.fillRect(centerX - 2, headY + 2, 4, 1);
+        } else {
+            // شعر عادي للرجال والبالغين
+            ctx.fillStyle = hairColor;
+            ctx.beginPath();
+            ctx.arc(centerX, headY - 1, headSize + 1, Math.PI, 0);
+            ctx.fill();
+            ctx.fillRect(centerX - headSize, headY - headSize, headSize * 2, 3);
         }
 
-        // نظام المحاكاة المرئية (لم يتغير)
-        let simulationInterval = null;
-        let simTime = 0;
-        let simDuration = 20;
-        let simSpeed = 1;
+        // العيون المحسنة مع اتجاه النظر
+        const eyeOffsetX = dirX * 1.5;
+        const eyeOffsetY = dirY * 1;
+        const eyeSize = 1.5;
+        
+        ctx.fillStyle = '#000';
+        ctx.fillRect(centerX - 3 + eyeOffsetX, headY - 1 + eyeOffsetY, eyeSize, eyeSize);
+        ctx.fillRect(centerX + 1.5 + eyeOffsetX, headY - 1 + eyeOffsetY, eyeSize, eyeSize);
 
-        // قائمة أيقونات الزبائن (لم تتغير)
-        const customerIcons = ['🚶', '🚶‍♂️', '🚶‍♀️', '🧍', '🧍‍♂️', '🧍‍♀️'];
+        // بريق في العيون
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(centerX - 2.5 + eyeOffsetX, headY - 0.5 + eyeOffsetY, 0.5, 0.5);
+        ctx.fillRect(centerX + 2 + eyeOffsetX, headY - 0.5 + eyeOffsetY, 0.5, 0.5);
 
-        // نظام الإنجازات (لم يتغير)
-        const achievements = [
-            { id: 'first_sale', name: 'First Sale', desc: 'Sell your first cup', icon: '🎉', req: () => game.cupsSold >= 1 },
-            { id: 'big_day', name: 'Big Day', desc: 'Sell 50 cups in one day', icon: '📈', req: () => game.dailyCups >= 50 },
-            { id: 'rich', name: 'Getting Rich', desc: 'Earn 500$', icon: '💰', req: () => game.money >= 500 },
-            { id: 'tycoon', name: 'Lemonade Tycoon', desc: 'Earn 1000$', icon: '👑', req: () => game.money >= 1000 && game.reputation >= 80 },
-            { id: 'week', name: 'One Week', desc: 'Survive 7 days', icon: '📅', req: () => game.day >= 8 },
-            { id: 'month', name: 'One Month', desc: 'Survive 30 days', icon: '🗓️', req: () => game.day >= 31 },
-            { id: 'popular', name: 'Popular Stand', desc: 'Reach 90% reputation', icon: '⭐', req: () => game.reputation >= 90 },
-            { id: 'perfect', name: 'Perfect Recipe', desc: 'Get 50 happy customers in one day', icon: '😊', req: () => game.feedback.happy >= 50 },
-            { id: 'monopoly', name: 'Monopoly', desc: 'Eliminate all competitors', icon: '🏆', req: () => game.competitors === 0 },
-            { id: 'upgraded', name: 'Fully Upgraded', desc: 'Max all upgrades', icon: '⬆️', req: () => game.upgrades.pitcher >= 2 && game.upgrades.sign >= 2 && game.upgrades.table >= 2 && game.upgrades.umbrella }
+        // الفم
+        ctx.fillStyle = '#8B4513';
+        const mouthY = headY + 3 + eyeOffsetY * 0.3;
+        ctx.fillRect(centerX - 1.5 + eyeOffsetX * 0.2, mouthY, 3, 1);
+
+        // الإكسسورات المحسنة
+        if (accessory === 'hat') {
+            // قبعة للرجال
+            ctx.fillStyle = '#2C3A47';
+            ctx.fillRect(centerX - 6, headY - 7, 12, 2);
+            ctx.fillRect(centerX - 4, headY - 9, 8, 2);
+            ctx.strokeStyle = '#34495E';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(centerX - 6, headY - 7, 12, 2);
+        } else if (accessory === 'dress') {
+            // فستان للمرأة
+            ctx.fillStyle = this.lightenColor('#FD79A8', -20);
+            ctx.beginPath();
+            ctx.moveTo(centerX - 6, baseY + 3);
+            ctx.lineTo(centerX + 6, baseY + 3);
+            ctx.lineTo(centerX + 4, height - 4);
+            ctx.lineTo(centerX - 4, height - 4);
+            ctx.closePath();
+            ctx.fill();
+        } else if (accessory === 'shorts') {
+            // شورت للأطفال
+            ctx.fillStyle = '#00A085';
+            ctx.fillRect(centerX - 5, baseY + 5, 10, 4);
+        } else if (accessory === 'glasses') {
+            // نظارة للقضاء
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.rect(centerX - 5, headY - 2, 4, 3);
+            ctx.rect(centerX + 1, headY - 2, 4, 3);
+            ctx.moveTo(centerX - 1, headY - 1);
+            ctx.lineTo(centerX + 1, headY - 1);
+            ctx.stroke();
+        } else if (accessory === 'hoodie') {
+            // برقع للمquila
+            ctx.fillStyle = '#74B9FF';
+            ctx.beginPath();
+            ctx.arc(centerX, headY - 4, 6, Math.PI, 0);
+            ctx.fill();
+            // حبل البرقع
+            ctx.fillStyle = '#0984E3';
+            ctx.fillRect(centerX - 1, headY + 2, 2, 3);
+        }
+    }
+
+    // دالة لتفتيح أو تغميق الألوان
+    lightenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    }
+
+    createRainAssets() {
+        // إنشاء جزيئات المطر
+        const rainTexture = this.textures.createCanvas('raindrop', 2, 8);
+        const ctx = rainTexture.getContext();
+        ctx.clearRect(0, 0, 2, 8);
+        ctx.fillStyle = '#4FC3F7';
+        ctx.fillRect(0, 0, 2, 8);
+        rainTexture.refresh();
+
+        // إنشاء تشويش الخلفية للمطر
+        const rainOverlay = this.add.graphics();
+        rainOverlay.setAlpha(0.1);
+        rainOverlay.fillStyle(0x4FC3F7);
+        
+        for (let i = 0; i < 100; i++) {
+            const x = Phaser.Math.Between(0, 400);
+            const y = Phaser.Math.Between(0, 400);
+            rainOverlay.fillRect(x, y, 1, 1);
+        }
+        rainOverlay.setVisible(false);
+        this.rainOverlay = rainOverlay;
+    }
+
+    createFeedbackIcons() {
+        // Happy Icon
+        const happyCanvas = this.textures.createCanvas('icon_happy', 24, 24);
+        let ctx = happyCanvas.getContext();
+        ctx.clearRect(0, 0, 24, 24);
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(12, 12, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(7, 8, 3, 3);
+        ctx.fillRect(14, 8, 3, 3);
+        ctx.beginPath();
+        ctx.arc(12, 13, 6, 0, Math.PI);
+        ctx.stroke();
+        happyCanvas.refresh();
+
+        // Angry Icon
+        const angryCanvas = this.textures.createCanvas('icon_angry', 24, 24);
+        ctx = angryCanvas.getContext();
+        ctx.clearRect(0, 0, 24, 24);
+        ctx.fillStyle = '#FF4444';
+        ctx.beginPath();
+        ctx.arc(12, 12, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(7, 8, 3, 3);
+        ctx.fillRect(14, 8, 3, 3);
+        ctx.beginPath();
+        ctx.arc(12, 17, 6, Math.PI, 0);
+        ctx.stroke();
+        angryCanvas.refresh();
+
+        // Expensive Icon
+        const expensiveCanvas = this.textures.createCanvas('icon_expensive', 24, 24);
+        ctx = expensiveCanvas.getContext();
+        ctx.clearRect(0, 0, 24, 24);
+        ctx.fillStyle = '#FFA500';
+        ctx.beginPath();
+        ctx.arc(12, 12, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText('$', 6, 18);
+        expensiveCanvas.refresh();
+
+        // Waiting Icon
+        const waitingCanvas = this.textures.createCanvas('icon_waiting', 24, 24);
+        ctx = waitingCanvas.getContext();
+        ctx.clearRect(0, 0, 24, 24);
+        ctx.fillStyle = '#888';
+        ctx.beginPath();
+        ctx.arc(12, 12, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(11, 6, 2, 6);
+        ctx.fillRect(11, 11, 5, 2);
+        waitingCanvas.refresh();
+    }
+
+    create() {
+        // الخلفية - صورة LEMONADE.jpg
+        this.background = this.add.image(200, 200, 'background').setDisplaySize(400, 400);
+
+        // تعريف نقاط الظهور والمغادرة من 4 جهات
+        this.setupSpawnAndExitPoints();
+
+        // مجموعة العملاء
+        this.customerGroup = this.add.group();
+
+        // النص التوضيحي
+        this.statusText = this.add.text(200, 120, 'جاهز للبدء!', {
+            fontSize: '14px',
+            color: '#fff',
+            backgroundColor: '#000000',
+            padding: { x: 8, y: 4 }
+        }).setOrigin(0.5);
+        this.statusText.setStroke('#000000', 3);
+        this.statusText.setDepth(1000);
+
+        // إنشاء أنيميشن للعملاء
+        this.createCustomerAnimations();
+
+        // إعداد المطر
+        this.setupRain();
+    }
+
+    setupSpawnAndExitPoints() {
+        // 4 نقاط ظهور من الجهات المختلفة
+        this.spawnPoints = [
+            { x: -30, y: 202, direction: 'right' },   // يسار
+            { x: 403, y: 296, direction: 'left' },    // يمين
+            { x: 401, y: 306, direction: 'down' },    // أسفل+
+            { x: 200, y: 430, direction: 'up' }       // أسفل
         ];
 
-        let game = {
-            money: 100,
-            lemons: 20,
-            sugar: 20,
-            ice: 20,
-            day: 1,
-            weather: 'sunny',
-            reputation: 50,
-            cupsSold: 0,
-            dailyCups: 0,
-            totalProfit: 0,
-            feedback: { angry: 0, happy: 0, waiting: 0, expensive: 0 },
-            upgrades: {
-                pitcher: 0,
-                sign: 0,
-                table: 0,
-                umbrella: false
+        // 4 نقاط مغادرة (يمكن أن تكون مختلفة عن نقاط الظهور)
+        this.exitPoints = [
+            { x: -30, y: 300, direction: 'left' },    // يسار
+            { x: 401, y: 303, direction: 'right' },   // يمين
+            { x: 310, y: 400, direction: 'up' },      // أسفل+
+            { x: 300, y: 430, direction: 'down' }     // أسفل
+        ];
+    }
+
+    setupRain() {
+        // إنشاء جزيئات المطر
+        this.rainParticles = this.add.particles('raindrop');
+        this.rainEmitter = this.rainParticles.createEmitter({
+            x: { min: 0, max: 400 },
+            y: -10,
+            lifespan: 2000,
+            speedY: { min: 100, max: 200 },
+            speedX: { min: -20, max: 20 },
+            quantity: 2,
+            frequency: 50,
+            alpha: { start: 0.8, end: 0 },
+            scale: { start: 1, end: 0.5 },
+            tint: 0x4FC3F7
+        });
+        this.rainParticles.setVisible(false);
+    }
+
+    createCustomerAnimations() {
+        const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
+        const directions = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
+        
+        customerTypes.forEach(type => {
+            directions.forEach(direction => {
+                const frames = [];
+                for (let i = 0; i < 6; i++) {
+                    frames.push({ key: `customer_${type}_${direction}_${i}` });
+                }
+                
+                this.anims.create({
+                    key: `walk_${type}_${direction}`,
+                    frames: frames,
+                    frameRate: 10, // زيادة معدل الإطارات للأنيميشن الأوضح
+                    repeat: -1
+                });
+            });
+        });
+    }
+
+    updateStandVisuals(upgrades) {
+        console.log('Upgrades updated:', upgrades);
+        
+        if (upgrades.table > 0) {
+            this.tweens.add({
+                targets: this.background,
+                scaleX: 1.02,
+                scaleY: 1.02,
+                duration: 200,
+                yoyo: true
+            });
+        }
+
+        // تشغيل المطر إذا كان هناك ترقية related to weather
+        if (upgrades.weather === 'rain') {
+            this.startRain();
+        } else {
+            this.stopRain();
+        }
+    }
+
+    startRain() {
+        if (!this.isRaining) {
+            this.isRaining = true;
+            this.rainParticles.setVisible(true);
+            this.rainEmitter.start();
+            this.rainOverlay.setVisible(true);
+            
+            // تأثير على الزبائن عند المطر
+            this.time.delayedCall(500, () => {
+                this.customerGroup.getChildren().forEach(customer => {
+                    customer.setTint(0xCCCCCC);
+                });
+            });
+        }
+    }
+
+    stopRain() {
+        if (this.isRaining) {
+            this.isRaining = false;
+            this.rainParticles.setVisible(false);
+            this.rainEmitter.stop();
+            this.rainOverlay.setVisible(false);
+            
+            // إزالة التأثير عن الزبائن
+            this.customerGroup.getChildren().forEach(customer => {
+                customer.clearTint();
+            });
+        }
+    }
+
+    startSimulation(maxCups, satisfactionRate) {
+        if (this.isSimulating) return;
+        this.isSimulating = true;
+        
+        this.customerGroup.clear(true, true);
+        this.statusText.setText('اليوم جاري...');
+
+        let cupsSold = 0;
+        const baseDelay = 1800;
+        
+        const spawnTimer = this.time.addEvent({
+            delay: baseDelay / this.simSpeed,
+            callback: () => {
+                if (cupsSold >= maxCups) {
+                    spawnTimer.remove();
+                    this.endSimulation();
+                    return;
+                }
+
+                this.spawnCustomer(satisfactionRate);
+                cupsSold++;
+                
+                const progress = Math.floor((cupsSold / maxCups) * 100);
+                if (document.getElementById('simTimer')) {
+                    document.getElementById('simTimer').textContent = `الوقت: ${progress}%`;
+                }
             },
-            supplyPrices: { // إضافة لأسعار الإمدادات
-                lemons: { 20: 4, 50: 10, 100: 18 },
-                sugar: { 20: 3, 50: 7, 100: 13 },
-                ice: { 20: 2, 50: 4, 100: 7 }
+            loop: true
+        });
+
+        this.currentTimer = spawnTimer;
+    }
+
+    spawnCustomer(satisfactionRate) {
+        // اختيار عشوائي لنقطة الظهور والمغادرة
+        const spawnIndex = Phaser.Math.Between(0, this.spawnPoints.length - 1);
+        const exitIndex = Phaser.Math.Between(0, this.exitPoints.length - 1);
+        
+        const spawnPoint = this.spawnPoints[spawnIndex];
+        const exitPoint = this.exitPoints[exitIndex];
+        
+        // اختيار عشوائي لنوع العميل
+        const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
+        const customerType = customerTypes[Phaser.Math.Between(0, customerTypes.length - 1)];
+        
+        // إضافة تنوع في اتجاه النظر
+        const lookDirections = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
+        const lookDirection = lookDirections[Phaser.Math.Between(0, lookDirections.length - 1)];
+        
+        const customer = this.add.sprite(spawnPoint.x, spawnPoint.y, `customer_${customerType}_${lookDirection}_0`);
+        
+        // بدء الأنيميشن مع اتجاه النظر المختلف
+        customer.play(`walk_${customerType}_${lookDirection}`);
+        
+        // ظل العميل المحسن
+        const shadow = this.add.ellipse(spawnPoint.x, spawnPoint.y + 12, 14, 5, 0x000000, 0.3);
+        customer.shadow = shadow;
+        
+        this.customerGroup.add(customer);
+
+        // الحركة إلى نقطة البيع (وسط الشاشة)
+        const targetX = 200;
+        const targetY = 200;
+        
+        this.tweens.add({
+            targets: customer,
+            x: targetX,
+            y: targetY,
+            duration: 3000 / this.simSpeed,
+            ease: 'Linear',
+            onUpdate: () => {
+                shadow.x = customer.x;
+                shadow.y = customer.y + 12;
             },
-            competitors: 2,
-            lastEvent: null,
-            unlockedAchievements: []
-        };
-
-        const weatherTypes = [
-            { type: 'sunny', name: 'Sunny', icon: '☀️', demand: 1.5 },
-            { type: 'hot', name: 'Very Hot', icon: '🥵', demand: 2.0 },
-            { type: 'cloudy', name: 'Cloudy', icon: '☁️', demand: 1.0 },
-            { type: 'rainy', name: 'Rainy', icon: '🌧️', demand: 0.5 }
-        ];
-
-        const events = [
-            { type: 'festival', name: 'Festival in the Park', icon: '🎉', demandBonus: 2.0 },
-            { type: 'competition', name: 'New Competitor Nearby', icon: '🏪', demandPenalty: 0.7 },
-            { type: 'celebrity', name: 'Celebrity Visit', icon: '⭐', demandBonus: 1.5 },
-            { type: 'roadwork', name: 'Road Construction', icon: '🚧', demandPenalty: 0.6 },
-            null, null, null
-        ];
-
-        // حفظ اللعبة تلقائياً (لم يتغير)
-        function saveGame() {
-            localStorage.setItem('lemonadeTycoonSave', JSON.stringify(game));
-        }
-
-        function loadGame() {
-            const saved = localStorage.getItem('lemonadeTycoonSave');
-            if (saved) {
-                try {
-                    const loadedGame = JSON.parse(saved);
-                    game = { ...game, ...loadedGame };
-                    addLog('💾 Game loaded successfully!', 'success');
-                } catch(e) {
-                    console.log('Error loading game:', e);
-                }
+            onComplete: () => {
+                this.serveCustomer(customer, satisfactionRate, exitPoint);
             }
-        }
-
-        function checkAchievements() {
-            achievements.forEach(achievement => {
-                if (!game.unlockedAchievements.includes(achievement.id) && achievement.req()) {
-                    game.unlockedAchievements.push(achievement.id);
-                    showAchievement(achievement);
-                    playSound('achievement');
-                }
-            });
-        }
-
-        function showAchievement(achievement) {
-            const notif = document.getElementById('achievementNotif');
-            notif.textContent = `🏆 ${achievement.name} Unlocked!`;
-            notif.style.display = 'block';
-            
-            setTimeout(() => {
-                notif.style.display = 'none';
-            }, 3000);
-        }
-
-        function updateAchievementsList() {
-            const list = document.getElementById('achievementsList');
-            list.innerHTML = '';
-            
-            achievements.forEach(achievement => {
-                const unlocked = game.unlockedAchievements.includes(achievement.id);
-                const item = document.createElement('div');
-                item.className = `achievement-item ${unlocked ? 'achievement-unlocked' : 'achievement-locked'}`;
-                item.innerHTML = `
-                    <div class="achievement-header">${achievement.icon} ${achievement.name}</div>
-                    <div class="achievement-progress">${achievement.desc}</div>
-                    <div style="text-align: center; font-weight: bold; color: ${unlocked ? '#FFD700' : '#999'};">
-                        ${unlocked ? '✅ UNLOCKED' : '🔒 LOCKED'}
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        // **دالة تحديث العرض المعدلة**
-        function updateEventBanner() {
-    const t = translations[currentLang];
-    const eventBanner = document.getElementById('eventBanner');
-
-    if (game.lastEvent) {
-        const eventTranslationKey = game.lastEvent.id;
-        
-        // البحث عن الترجمة في كائن اللغة النشطة
-        // يجب أن تتأكد أن key الحدث (مثل 'festival') موجود في كائن t.ar في الترجمة
-        const translatedName = t[eventTranslationKey]; 
-        
-        // استخدام الترجمة أو الاسم الإنجليزي الأصلي كاحتياطي
-        const displayText = translatedName || game.lastEvent.name; 
-
-        eventBanner.innerHTML = `${game.lastEvent.icon} ${displayText}`;
-        eventBanner.style.display = 'block';
-    } else {
-        eventBanner.style.display = 'none';
-    }
-}
-
-        function updateDisplay() {
-            // التحقق من التغيرات قبل التحديث
-            const currentCupsSold = game.cupsSold;
-            const currentProfit = game.totalProfit;
-            const currentDay = game.day;
-            const currentReputation = game.reputation;
-            const currentAngry = game.feedback.angry;
-            const currentHappy = game.feedback.happy;
-            const currentWaiting = game.feedback.waiting;
-            const currentExpensive = game.feedback.expensive;
-
-            // 1. تحديث الأيقونات في الشريط العلوي (الموارد)
-            document.getElementById('money').textContent = Math.floor(game.money);
-            document.getElementById('lemons').textContent = game.lemons;
-            document.getElementById('sugar').textContent = game.sugar;
-            document.getElementById('ice').textContent = game.ice;
-            const pitcherLevels = ['N', 'G', 'P']; //['normal', 'Good', 'premium']//
-            document.getElementById('pitcher-display').textContent = pitcherLevels[game.upgrades.pitcher];
-            const weatherIcon = weatherTypes.find(w => w.type === game.weather).icon;
-            document.getElementById('weatherIcon').textContent = weatherIcon;
-
-            // 2. تحديث الأيقونات على الصورة مع تشغيل تأثير التطاير
-            
-            // الأيقونات السفلية (Cups Sold, Profit, Day, Reputation)
-            const cupsDisplay = document.querySelector('#cupsSoldDisplay .icon-display-value');
-            if (currentCupsSold > prevCupsSold) createParticleEffect('cupsSoldDisplay', '🥤');
-            cupsDisplay.textContent = currentCupsSold;
-
-            const profitDisplay = document.querySelector('#profitDisplay .icon-display-value');
-            if (currentProfit > prevProfit) createParticleEffect('profitDisplay', '🪙');
-            profitDisplay.textContent = currentProfit.toFixed(2) + ' $';
-
-            const dayDisplay = document.querySelector('#dayDisplay .icon-display-value');
-            if (currentDay > prevDay) createParticleEffect('dayDisplay', '📅');
-            dayDisplay.textContent = currentDay;
-
-            const reputationDisplay = document.querySelector('#reputationDisplay .icon-display-value');
-            if (currentReputation > prevReputation) createParticleEffect('reputationDisplay', '👍');
-            reputationDisplay.textContent = game.reputation + '%';
-
-            // الأيقونات العلوية (😡, 😊, ⏳, 💵)
-            const angryDisplay = document.querySelector('#angryDisplay .icon-display-value');
-            if (currentAngry > prevAngry) createParticleEffect('angryDisplay', '😡');
-            angryDisplay.textContent = currentAngry;
-
-            const happyDisplay = document.querySelector('#happyDisplay .icon-display-value');
-            if (currentHappy > prevHappy) createParticleEffect('happyDisplay', '😊');
-            happyDisplay.textContent = currentHappy;
-
-            const waitingDisplay = document.querySelector('#waitingDisplay .icon-display-value');
-            if (currentWaiting > prevWaiting) createParticleEffect('waitingDisplay', '⏳');
-            waitingDisplay.textContent = currentWaiting;
-
-            const expensiveDisplay = document.querySelector('#expensiveDisplay .icon-display-value');
-            if (currentExpensive > prevExpensive) createParticleEffect('expensiveDisplay', '💵');
-            expensiveDisplay.textContent = currentExpensive;
-
-
-            // 3. تحديث القيم السابقة
-            prevCupsSold = currentCupsSold;
-            prevProfit = currentProfit;
-            prevDay = currentDay;
-            prevReputation = currentReputation;
-            prevAngry = currentAngry;
-            prevHappy = currentHappy;
-            prevWaiting = currentWaiting;
-            prevExpensive = currentExpensive;
-            
-            // 4. تحديث حالة أزرار الشراء في قائمة الإمدادات
-            updateSuppliesModalButtons();
-
-            saveGame();
-            checkAchievements();
-        }
-        // **نهاية دالة تحديث العرض المعدلة**
-        
-        // **دالة تبديل قائمة الإعدادات المنزلقة الجديدة والمصححة**
-        function toggleSettingsDrawer() {
-    playSound('click');
-    const drawer = document.getElementById('settingsDrawer');
-    const container = document.getElementById('imageContainer');
-    const toggleBtn = document.getElementById('settingsToggleBtn');
-    const descDrawer = document.getElementById('descriptionDrawer');
-    const descBtn = document.getElementById('descriptionToggleBtn');
-
-    // إذا كانت قائمة الوصف مفتوحة، أغلقها
-    if (descDrawer.classList.contains('open')) {
-        descDrawer.classList.remove('open');
-        container.classList.remove('desc-open');
-        descBtn.textContent = '❔';
+        });
     }
 
-    // فتح/إغلاق الإعدادات
-    drawer.classList.toggle('open');
-    container.classList.toggle('drawer-open');
-    toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '⚙️';
-}
-
-
-        function showUpgrades() {
-            playSound('click');
-            document.getElementById('upgradesModal').style.display = 'block';
-            updateUpgradeDisplay();
-        }
-
-        function closeUpgrades() {
-            playSound('click');
-            document.getElementById('upgradesModal').style.display = 'none';
-        }
-
-        function showAchievements() {
-            playSound('click');
-            document.getElementById('achievementsModal').style.display = 'block';
-            updateAchievementsList();
-        }
-
-        function closeAchievements() {
-            playSound('click');
-            document.getElementById('achievementsModal').style.display = 'none';
-        }
-
-        function showRecipe() {
-            playSound('click');
-            // عرض الإعدادات الحالية من القائمة المنزلقة بدلاً من عرض القائمة
-            const lemons = document.getElementById('lemonSlider').value;
-            const sugar = document.getElementById('sugarSlider').value;
-            const ice = document.getElementById('iceSlider').value;
-            const price = document.getElementById('priceSlider').value;
-            addLog(`📋 Recipe: ${lemons}🍋 + ${sugar}🍯 + ${ice}🧊 = ${price}$`, 'info');
-        }
+    serveCustomer(customer, satisfactionRate, exitPoint) {
+        // إيقاف أنيميشن المشي مؤقتاً
+        customer.anims.pause();
         
-        // **الدوال الجديدة لقائمة الشراء**
-        function showSuppliesModal() {
-            playSound('click');
-            document.getElementById('suppliesModal').style.display = 'block';
-            updateSuppliesModalButtons();
-        }
+        let feedbackIcon = 'icon_happy';
+        const rand = Math.random();
         
-        function closeSuppliesModal() {
-            playSound('click');
-            document.getElementById('suppliesModal').style.display = 'none';
+        if (satisfactionRate < 0.7) {
+            feedbackIcon = 'icon_angry';
+            if (window.game) window.game.feedback.angry++;
+            if (window.playSound) window.playSound('angry');
+        } else if (satisfactionRate > 1.5) {
+            feedbackIcon = 'icon_happy';
+            if (window.game) window.game.feedback.happy++;
+            if (window.playSound) window.playSound('happy');
+        } else if (rand < 0.2) {
+            feedbackIcon = 'icon_expensive';
+            if (window.game) window.game.feedback.expensive++;
+        } else {
+            if (window.game) window.game.feedback.waiting++;
         }
 
-        function updateSuppliesModalButtons() {
-            const buttons = document.querySelectorAll('#supplyList .supply-buy-btn');
-            buttons.forEach(btn => {
-                const type = btn.getAttribute('data-type');
-                const amount = parseInt(btn.getAttribute('data-amount'));
-                const cost = game.supplyPrices[type][amount];
-                
-                // تحديث نص السعر (في حالة تغير السعر مستقبلاً)
-                const costId = btn.getAttribute('data-cost-id');
-                if (costId) {
-                     document.getElementById(costId).textContent = cost;
-                }
-                
-                // تحديث حالة الزر
-                btn.disabled = game.money < cost;
-            });
-        }
+        // عرض أيقونة التغذية الراجعة
+        const icon = this.add.image(customer.x, customer.y - 40, feedbackIcon);
+        icon.setScale(0);
         
-        function buySupplyPack(event) {
-            const btn = event.target;
-            const type = btn.getAttribute('data-type');
-            const amount = parseInt(btn.getAttribute('data-amount'));
-            const cost = game.supplyPrices[type][amount];
-            
-            if (game.money >= cost) {
-                game.money -= cost;
-                game[type] += amount;
-                playSound('sell');
-                
-                let icon;
-                if (type === 'lemons') icon = '🍋';
-                else if (type === 'sugar') icon = '🍯';
-                else if (type === 'ice') icon = '🧊';
-                
-                addLog(`🛒 Bought ${amount} ${icon} for ${cost}$.`, 'success');
-                updateDisplay();
-            } else {
-                addLog('❌ Not enough money!', 'error');
-            }
-        }
-        // **نهاية الدوال الجديدة لقائمة الشراء**
-
-        function updateUpgradeDisplay() {
-    const t = translations[currentLang];
-    
-    const pitcherLevels = [t.pitcherBasic, t.pitcherGood, t.pitcherExcellent];
-    const pitcherCosts = [50, 100];
-    document.getElementById('pitcherLevel').textContent = pitcherLevels[game.upgrades.pitcher];
-    const pitcherBtn = document.getElementById('pitcherUpgradeBtn');
-    if (game.upgrades.pitcher >= 2) {
-        pitcherBtn.textContent = t.maxLevel;
-        pitcherBtn.disabled = true;
-    } else {
-        pitcherBtn.textContent = `${t.upgrade} (${pitcherCosts[game.upgrades.pitcher]} $)`;
-        pitcherBtn.disabled = game.money < pitcherCosts[game.upgrades.pitcher];
-    }
-
-    const signLevels = [t.signNone, t.signSmall, t.signLarge];
-    const signCosts = [40, 80];
-    document.getElementById('signLevel').textContent = signLevels[game.upgrades.sign];
-    const signBtn = document.getElementById('signUpgradeBtn');
-    if (game.upgrades.sign >= 2) {
-        signBtn.textContent = t.maxLevel;
-        signBtn.disabled = true;
-    } else {
-        signBtn.textContent = `${t.upgrade} (${signCosts[game.upgrades.sign]} $)`;
-        signBtn.disabled = game.money < signCosts[game.upgrades.sign];
-    }
-
-    const tableLevels = [t.tableBasic, t.tableGood, t.tableLuxury];
-    const tableCosts = [60, 120];
-    document.getElementById('tableLevel').textContent = tableLevels[game.upgrades.table];
-    const tableBtn = document.getElementById('tableUpgradeBtn');
-    if (game.upgrades.table >= 2) {
-        tableBtn.textContent = t.maxLevel;
-        tableBtn.disabled = true;
-    } else {
-        tableBtn.textContent = `${t.upgrade} (${tableCosts[game.upgrades.table]} $)`;
-        tableBtn.disabled = game.money < tableCosts[game.upgrades.table];
-    }
-
-    document.getElementById('umbrellaStatus').textContent = game.upgrades.umbrella ? t.owned : t.notOwned;
-    const umbrellaBtn = document.getElementById('umbrellaUpgradeBtn');
-    if (game.upgrades.umbrella) {
-        umbrellaBtn.textContent = t.purchased;
-        umbrellaBtn.disabled = true;
-    } else {
-        umbrellaBtn.textContent = `${t.buy} (80 $)`;
-        umbrellaBtn.disabled = game.money < 80;
-    }
-}
-
-        function buyUpgrade(type) {
-            const costs = {
-                pitcher: [50, 100],
-                sign: [40, 80],
-                table: [60, 120],
-                umbrella: 80
-            };
-
-            if (type === 'umbrella') {
-                if (game.money >= costs.umbrella && !game.upgrades.umbrella) {
-                    game.money -= costs.umbrella;
-                    game.upgrades.umbrella = true;
-                    playSound('upgrade');
-                    addLog('☂️ Purchased umbrella! Better sales in hot weather.', 'success');
-                }
-            } else {
-                const level = game.upgrades[type];
-                if (level < 2 && game.money >= costs[type][level]) {
-                    game.money -= costs[type][level];
-                    game.upgrades[type]++;
-                    playSound('upgrade');
-                    const names = {
-                        pitcher: 'Pitcher',
-                        sign: 'Sign',
-                        table: 'Table'
-                    };
-                    addLog(`⬆️ Upgraded ${names[type]} to level ${game.upgrades[type] + 1}!`, 'success');
-                }
-            }
-            
-            updateDisplay();
-            updateUpgradeDisplay();
-        }
-
-        function setWeather() {
-            const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
-            game.weather = weather.type;
-            return weather;
-        }
-
-        function triggerEvent() {
-    const event = events[Math.floor(Math.random() * events.length)];
-    game.lastEvent = event;
-    
-    updateEventBanner(); // استدعاء دالة جديدة لتحديث البانر
-    
-    return event;
-}
-
-// دالة جديدة لتحديث بانر الأحداث
-function updateEventBanner() {
-    const banner = document.getElementById('eventBanner');
-    const event = game.lastEvent;
-    
-    if (event) {
-        const t = translations[currentLang];
-        let eventName;
-        
-        // اختيار الترجمة المناسبة حسب نوع الحدث
-        switch(event.type) {
-            case 'festival': eventName = t.eventFestival; break;
-            case 'competition': eventName = t.eventCompetition; break;
-            case 'celebrity': eventName = t.eventCelebrity; break;
-            case 'roadwork': eventName = t.eventRoadwork; break;
-            default: eventName = event.name;
-        }
-        
-        banner.style.display = 'block';
-        banner.textContent = `${event.icon} ${t.eventLabel} ${eventName}`;
-    } else {
-        banner.style.display = 'none';
-    }
-}
-
-        function addLog(message, type = '') {
-            const log = document.getElementById('logContent');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            entry.textContent = `[Day ${game.day}] ${message}`;
-            log.insertBefore(entry, log.firstChild);
-            log.scrollTop = 0;
-        }
-
-        // دالة لإنهاء المحاكاة وتطبيق النتائج (لم تتغير)
-        function finalizeDay(totalMaxCups, actualDemand, recipeQuality, price, comfortBonus) {
-            if (simulationInterval) {
-                clearInterval(simulationInterval);
-                simulationInterval = null;
-            }
-
-            const maxCups = totalMaxCups;
-            
-            if (maxCups <= 0) {
-                if(actualDemand > 0) {
-                    addLog('⚠️ Demand exists, but no supplies!', 'error');
-                } else {
-                    addLog('📉 No customers today.', 'warning');
-                }
-            } else {
-                const lemons = parseInt(document.getElementById('lemonSlider').value);
-                const sugar = parseInt(document.getElementById('sugarSlider').value);
-                const ice = parseInt(document.getElementById('iceSlider').value);
-                
-                game.lemons -= maxCups * lemons;
-                game.sugar -= maxCups * sugar;
-                game.ice -= maxCups * ice;
-
-                const revenue = maxCups * price;
-                const cost = maxCups * (lemons * 0.2 + sugar * 0.15 + ice * 0.1);
-                const profit = revenue - cost;
-                
-                game.money += revenue;
-                game.cupsSold += maxCups;
-                game.dailyCups = maxCups;
-                game.totalProfit += profit;
-                
-                const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
-
-                if (satisfactionRate > 2.0) {
-                    game.reputation = Math.min(100, game.reputation + 10);
-                    addLog(`⭐⭐⭐ Customers love it! Sold ${maxCups} cups! Rep +10`, 'success');
-                } else if (satisfactionRate > 1.5) {
-                    game.reputation = Math.min(100, game.reputation + 7);
-                    addLog(`⭐⭐ Very happy! Sold ${maxCups} cups! Rep +7`, 'success');
-                } else if (satisfactionRate >= 1) {
-                    game.reputation = Math.min(100, game.reputation + 3);
-                    addLog(`⭐ Satisfied. Sold ${maxCups} cups. Rep +3`, 'success');
-                } else if (satisfactionRate < 0.7) {
-                    game.reputation = Math.max(0, game.reputation - 5);
-                    addLog(`😞 Customers unhappy. Rep -5`, 'error');
-                } else {
-                    addLog(`✅ Good day! Sold ${maxCups} cups.`, 'info');
-                }
-                
-                addLog(`💰 Earned ${revenue}$ selling ${maxCups} cups.`, 'success');
-            }
-
-            if (Math.random() < 0.15 && game.reputation > 70) {
-                game.competitors = Math.max(0, game.competitors - 1);
-                if (game.competitors === 0) {
-                    addLog('🏆 You are the only stand!', 'success');
-                } else {
-                    addLog('👋 A competitor closed!', 'success');
-                }
-            } else if (Math.random() < 0.1) {
-                game.competitors++;
-                addLog('🏪 New competitor opened!', 'warning');
-            }
-            
-            document.getElementById('liveSimulationModal').style.display = 'none';
-            game.day++;
-            setWeather();
-            triggerEvent();
-            updateDisplay();
-        }
-
-        // دالة المحاكاة الرئيسية (تم تعديل تحديث المؤقت)
-        function startDay() {
-            playSound('click');
-            
-            const lemons = parseInt(document.getElementById('lemonSlider').value);
-            const sugar = parseInt(document.getElementById('sugarSlider').value);
-            const ice = parseInt(document.getElementById('iceSlider').value);
-            const price = parseInt(document.getElementById('priceSlider').value);
-            
-            if (game.lemons < lemons || game.sugar < sugar || game.ice < ice) {
-                addLog('❌ Not enough supplies!', 'error');
-                return;
-            }
-
-            const weather = weatherTypes.find(w => w.type === game.weather);
-            game.feedback = { angry: 0, happy: 0, waiting: 0, expensive: 0 };
-            game.dailyCups = 0;
-            
-            let baseDemand = Math.floor(10 + Math.random() * 20) + Math.floor(game.reputation / 10);
-            let demandMultiplier = weather.demand;
-            
-            if (game.weather === 'hot' && game.upgrades.umbrella) demandMultiplier *= 1.3;
-            if (game.upgrades.sign === 1) baseDemand += 5;
-            else if (game.upgrades.sign === 2) baseDemand += 12;
-            
-            const comfortBonus = 1 + (game.upgrades.table * 0.15);
-            
-            if (game.lastEvent) {
-                if (game.lastEvent.demandBonus) demandMultiplier *= game.lastEvent.demandBonus;
-                if (game.lastEvent.demandPenalty) demandMultiplier *= game.lastEvent.demandPenalty;
-            }
-            const competitorEffect = Math.max(0.5, 1 - (game.competitors * 0.1));
-            demandMultiplier *= competitorEffect;
-            
-            const totalDemand = Math.floor(baseDemand * demandMultiplier);
-            const recipeQuality = (lemons + sugar + ice) / 3;
-            const pitcherBonus = 1 + (game.upgrades.pitcher * 0.2);
-            const finalQuality = recipeQuality * pitcherBonus;
-            const qualityFactor = Math.min(finalQuality / 5, 2.0);
-            const priceResistance = Math.max(0.2, 1 - (price - 5) / 10);
-            const actualDemand = Math.floor(totalDemand * qualityFactor * priceResistance);
-
-            const maxCups = Math.min(
-                Math.floor(game.lemons / lemons),
-                Math.floor(game.sugar / sugar),
-                Math.floor(game.ice / ice),
-                actualDemand
-            );
-            
-            const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
-            // ✅ تحديث Phaser
-            window.updatePhaserStand(game.upgrades);
-            // ✅ بدء المحاكاة في Phaser
-            document.getElementById('simDayDisplay').textContent = game.day;
-            document.getElementById('startDayBtn').disabled = true;
-            document.getElementById('liveSimulationModal').style.display = 'block';
-            window.startPhaserSimulation(maxCups, satisfactionRate);
-            // ⏱️ انتظار انتهاء المحاكاة (مدة تقريبية)
-            const simulationDuration = maxCups * 1500 + 3000; // 1.5 ثانية لكل زبون + 3 ثوان إضافية
-            setTimeout(() => {
-                finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
-                document.getElementById('startDayBtn').disabled = false;
-            }, simulationDuration);
-            // ✅ زر التخطي
-            document.getElementById('skipDayBtn').onclick = function() {
-                window.skipPhaserDay();
-                finalizeDay(maxCups, actualDemand, recipeQuality, price, comfortBonus);
-                document.getElementById('startDayBtn').disabled = false;
-            };
-        }
-
-        // دالة الشراء السريع (لم تتغير)
-        function quickBuySupplies() {
-            playSound('click');
-            const cost = 30;
-            const items = 20;
-            if (game.money < cost) {
-                addLog('❌ Not enough money! Need 30$.', 'error');
-                return;
-            }
-
-            game.money -= cost;
-            game.lemons += items;
-            game.sugar += items;
-            game.ice += items;
-
-            playSound('sell');
-            addLog(`🛒 QUICK BUY: ${items}🍋 ${items}🍯 ${items}🧊 (-${cost}$)`, 'success');
-            updateDisplay();
-        }
-
-        // ربط الأزرار (تم تحديث ربط زر الإعدادات)
-        document.getElementById('upgradesBtn').onclick = showUpgrades;
-        document.getElementById('suppliesBtn').onclick = showSuppliesModal;
-        document.getElementById('recipeBtn').onclick = showRecipe;
-        document.getElementById('achievementsBtn').onclick = showAchievements;
-        document.getElementById('startDayBtn').onclick = startDay;
-        document.getElementById('buySuppliesBtn').onclick = quickBuySupplies;
-        document.getElementById('closeUpgradesBtn').onclick = closeUpgrades;
-        document.getElementById('closeSuppliesBtn').onclick = closeSuppliesModal;
-        document.getElementById('closeAchievementsBtn').onclick = closeAchievements;
-        document.getElementById('soundToggle').onclick = toggleSound;
-        document.getElementById('settingsToggleBtn').onclick = toggleSettingsDrawer; // ربط الزر الجديد
-        
-        document.querySelectorAll('.supply-buy-btn').forEach(btn => {
-            btn.onclick = buySupplyPack;
+        this.tweens.add({
+            targets: icon,
+            scale: 1,
+            duration: 200,
+            ease: 'Back.easeOut'
         });
         
-        document.getElementById('pitcherUpgradeBtn').onclick = function() { buyUpgrade('pitcher'); };
-        document.getElementById('signUpgradeBtn').onclick = function() { buyUpgrade('sign'); };
-        document.getElementById('tableUpgradeBtn').onclick = function() { buyUpgrade('table'); };
-        document.getElementById('umbrellaUpgradeBtn').onclick = function() { buyUpgrade('umbrella'); };
+        if (window.playSound) window.playSound('sell');
 
-        // ربط السلايدرات (لم يتغير)
-        document.getElementById('lemonSlider').oninput = function() {
-            document.getElementById('lemonValue').textContent = this.value;
-        };
+        // تأثير النقود الطائر
+        this.createMoneyEffect(customer.x, customer.y);
 
-        document.getElementById('sugarSlider').oninput = function() {
-            document.getElementById('sugarValue').textContent = this.value;
-        };
-
-        document.getElementById('iceSlider').oninput = function() {
-            document.getElementById('iceValue').textContent = this.value;
-        };
-
-        document.getElementById('priceSlider').oninput = function() {
-            document.getElementById('priceValue').textContent = this.value + ' $';
-        };
-
-        // بدء اللعبة (تمت إضافة حفظ القيم السابقة للتحكم في التطاير)
-        initSounds();
-        loadGame();
-        setWeather();
-        triggerEvent();
-        
-        // إعداد القيم السابقة لعدم تشغيل التطاير عند التحميل
-        prevCupsSold = game.cupsSold;
-        prevProfit = game.totalProfit;
-        prevDay = game.day;
-        prevReputation = game.reputation;
-        prevAngry = game.feedback.angry;
-        prevHappy = game.feedback.happy;
-        prevWaiting = game.feedback.waiting;
-        prevExpensive = game.feedback.expensive;
-
-        updateDisplay();
-        
-        document.body.addEventListener('click', function() {
-            if (soundEnabled && audioElements.bgMusic && audioElements.bgMusic.paused) {
-                playSound('bgMusic');
-            }
-        }, { once: true });
-        // ===== GAME DESCRIPTION DRAWER TOGGLE =====
-function toggleDescriptionDrawer() {
-    playSound('click');
-    const drawer = document.getElementById('descriptionDrawer');
-    const toggleBtn = document.getElementById('descriptionToggleBtn');
-    const container = document.getElementById('imageContainer');
-    const settingsDrawer = document.getElementById('settingsDrawer');
-    const settingsBtn = document.getElementById('settingsToggleBtn');
-
-    // إذا كانت قائمة الإعدادات مفتوحة، أغلقها أولاً
-    if (settingsDrawer.classList.contains('open')) {
-        settingsDrawer.classList.remove('open');
-        container.classList.remove('drawer-open');
-        settingsBtn.textContent = '⚙️';
+        // مغادرة العميل
+        this.time.delayedCall(1000 / this.simSpeed, () => {
+            this.tweens.add({
+                targets: icon,
+                alpha: 0,
+                duration: 300,
+                onComplete: () => icon.destroy()
+            });
+            
+            // استئناف الأنيميشن مع اتجاه المغادرة
+            customer.setTexture(`customer_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}_0`);
+            customer.play(`walk_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}`);
+            
+            // الحركة للخروج من الشاشة
+            this.tweens.add({
+                targets: customer,
+                x: exitPoint.x,
+                y: exitPoint.y,
+                duration: 2500 / this.simSpeed,
+                ease: 'Linear',
+                onUpdate: () => {
+                    if (customer.shadow) {
+                        customer.shadow.x = customer.x;
+                        customer.shadow.y = customer.y + 12;
+                    }
+                },
+                onComplete: () => {
+                    if (customer.shadow) customer.shadow.destroy();
+                    customer.destroy();
+                }
+            });
+        });
     }
 
-    // الآن افتح أو أغلق قائمة الوصف
-    drawer.classList.toggle('open');
-    container.classList.toggle('desc-open');
-    toggleBtn.textContent = drawer.classList.contains('open') ? '❌' : '❔';
+    createMoneyEffect(x, y) {
+        const money = this.add.text(x, y, '💰', {
+            fontSize: '18px'
+        });
+        
+        this.tweens.add({
+            targets: money,
+            y: y - 50,
+            alpha: 0,
+            duration: 1200,
+            ease: 'Power2',
+            onComplete: () => money.destroy()
+        });
+    }
+
+    endSimulation() {
+        this.isSimulating = false;
+        this.statusText.setText('انتهى اليوم!');
+        
+        this.tweens.add({
+            targets: this.statusText,
+            y: '-=10',
+            duration: 200,
+            yoyo: true,
+            repeat: 2
+        });
+        
+        this.time.delayedCall(1500, () => {
+            this.statusText.setText('جاهز لليوم التالي');
+        });
+    }
+
+    skipDay() {
+        if (this.currentTimer) {
+            this.currentTimer.remove();
+        }
+        this.time.removeAllEvents();
+        this.customerGroup.clear(true, true);
+        this.endSimulation();
+    }
+
+    toggleSpeed() {
+        this.simSpeed = this.simSpeed === 1 ? 10 : 1;
+        
+        if (this.currentTimer && this.isSimulating) {
+            const newDelay = 1800 / this.simSpeed;
+            this.currentTimer.delay = newDelay;
+        }
+    }
 }
 
+// ========================================
+// PHASER GAME CONFIG - 400x400
+// ========================================
 
-document.getElementById('descriptionToggleBtn').addEventListener('click', toggleDescriptionDrawer);
-// ربط زر التسريع
-document.getElementById('speedToggleBtn').onclick = function() {
-    playSound('click');
-    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
-    if (scene && scene.isSimulating) {
-        scene.toggleSpeed();
-        // تحديث نص الزر
-        this.textContent = scene.simSpeed === 1 ? '⏩ x1' : '⏩ x10';
-    }
-};
-let currentLang = 'en'; // اللغة الافتراضية
-
-const translations = {
-    en: {
-        // Top Bar Resources
-        lemonsTitle: "Lemons",
-        sugarTitle: "Sugar",
-        iceTitle: "Ice",
-        moneyTitle: "Money",
-        qualityTitle: "Quality",
-        weatherTitle: "Weather",
-        
-        // Main Buttons
-        startDay: "🚀 START DAY",
-        buySupplies: "🛒 BUY SUPPLIES (Quick)",
-        
-        // Menu Buttons
-        upgrades: "upgrades",
-        supplies: "supplies",
-        recipe: "recipe",
-        achievements: "achievements",
-        
-        // Activity Log
-        logTitle: "📋 Activity Log",
-        welcomeMsg: "🎮 Welcome to Lemonade! Set your recipe and start selling.",
-        
-        // Settings Drawer
-        settingsTitle: "TODAY'S SETTING",
-        lemonsPerCup: "🍋 Lemons per cup:",
-        sugarPerCup: "🍯 Sugar per cup:",
-        icePerCup: "🧊 Ice per cup:",
-        cupPrice: "💵 Cup Price:",
-        
-        // Game Description
-        descTitle: "🍋 Game Description",
-        descText: "Lemonade is a business management game where you run your own lemonade stand. Each day, you decide how much lemon, sugar, and ice to use in your recipe – and set the perfect price per cup. Make sure you buy enough ingredients for the next day. Adjust your recipe carefully: too much lemon makes it sour, too much sugar makes it too sweet, and ice is essential on hot days! Your success depends on weather conditions, customer satisfaction, and smart upgrades. A reasonable price attracts customers, but a high price will drive them away. Buy supplies, improve your equipment, and build your reputation to attract more customers and increase profits. Face random events, deal with competitors, and try to become the ultimate Lemonade! 🏆",
-        createdBy: "Created by",
-        
-        // Icon Bar Tooltips
-        angry: "Angry",
-        happy: "Happy",
-        waiting: "Waiting",
-        expensive: "Too Expensive",
-        cupsSold: "Cups Sold",
-        profit: "Profit",
-        day: "Day",
-        reputation: "Reputation",
-        
-        // Live Simulation
-        liveDay: "LIVE - DAY",
-        time: "TIME:",
-        skip: "⏭️ SKIP",
-        
-        // Upgrades Modal
-        upgradesTitle: "🪙 UPGRADES",
-        pitcherQuality: "🥤 Pitcher Quality",
-        sign: "🪧 Sign",
-        table: "🪑 Table",
-        umbrella: "☂️ Umbrella",
-        level: "Level:",
-        status: "Status:",
-        upgrade: "Upgrade",
-        buy: "Buy",
-        maxLevel: "✅ MAX LEVEL",
-        purchased: "✅ PURCHASED",
-        notOwned: "Not Owned",
-        owned: "Owned ✅",
-        close: "❌ CLOSE",
-        
-        // Pitcher Levels
-        pitcherBasic: "Basic",
-        pitcherGood: "Good",
-        pitcherExcellent: "Excellent",
-        
-        // Sign Levels
-        signNone: "None",
-        signSmall: "Small",
-        signLarge: "Large",
-        
-        // Table Levels
-        tableBasic: "Basic",
-        tableGood: "Good",
-        tableLuxury: "Luxury",
-        
-        // Supplies Modal
-        suppliesTitle: "📦 BUY SUPPLIES",
-        lemons: "🍋 Lemons",
-        sugar: "🍯 Sugar",
-        ice: "🧊 Ice",
-        buyBtn: "Buy",
-        
-        // Achievements Modal
-        achievementsTitle: "🏆 ACHIEVEMENTS",
-        unlocked: "✅ UNLOCKED",
-        locked: "🔒 LOCKED",
-        
-        // Achievement Names
-        firstSale: "First Sale",
-        firstSaleDesc: "Sell your first cup",
-        bigDay: "Big Day",
-        bigDayDesc: "Sell 50 cups in one day",
-        rich: "Getting Rich",
-        richDesc: "Earn 500$",
-        tycoon: "Lemonade Tycoon",
-        tycoonDesc: "Earn 1000$",
-        week: "One Week",
-        weekDesc: "Survive 7 days",
-        month: "One Month",
-        monthDesc: "Survive 30 days",
-        popular: "Popular Stand",
-        popularDesc: "Reach 90% reputation",
-        perfect: "Perfect Recipe",
-        perfectDesc: "Get 50 happy customers in one day",
-        monopoly: "Monopoly",
-        monopolyDesc: "Eliminate all competitors",
-        upgraded: "Fully Upgraded",
-        upgradedDesc: "Max all upgrades",
-        
-        // Weather Types
-        sunny: "Sunny",
-        hot: "Very Hot",
-        cloudy: "Cloudy",
-        rainy: "Rainy",
-        
-        // Events
-        eventFestival: "Festival in the Park",
-        eventCompetition: "New Competitor Nearby",
-        eventCelebrity: "Celebrity Visit",
-        eventRoadwork: "Road Construction",
-        eventLabel: "Event:",
-        
-        // Log Messages
-        notEnoughSupplies: "❌ Not enough supplies!",
-        notEnoughMoney: "❌ Not enough money!",
-        bought: "🛒 Bought",
-        for: "for",
-        quickBuy: "🛒 QUICK BUY:",
-        earned: "💰 Earned",
-        selling: "selling",
-        cups: "cups",
-        demandExists: "⚠️ Demand exists, but no supplies!",
-        noCustomers: "📉 No customers today.",
-        customersLove: "⭐⭐⭐ Customers love it! Sold",
-        repPlus: "Rep +",
-        veryHappy: "⭐⭐ Very happy! Sold",
-        satisfied: "⭐ Satisfied. Sold",
-        customersUnhappy: "😞 Customers unhappy. Rep -5",
-        goodDay: "✅ Good day! Sold",
-        onlyStand: "🏆 You are the only stand!",
-        competitorClosed: "👋 A competitor closed!",
-        newCompetitor: "🪙 New competitor opened!",
-        upgradedTo: "⬆️ Upgraded",
-        to: "to level",
-        purchased: "☂️ Purchased umbrella! Better sales in hot weather.",
-        recipeLog: "📋 Recipe:",
-        achievementUnlocked: "🏆",
-        unlocked: "Unlocked!",
-        need: "Need"
+const phaserConfig = {
+    type: Phaser.AUTO,
+    width: 400,
+    height: 400,
+    parent: 'phaser-container',
+    backgroundColor: '#87CEEB',
+    scene: LemonadeStandScene,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    ar: {
-        // شريط الموارد العلوي
-        lemonsTitle: "ليمون",
-        sugarTitle: "سكر",
-        iceTitle: "ثلج",
-        moneyTitle: "نقود",
-        qualityTitle: "الجودة",
-        weatherTitle: "الطقس",
-        
-        // الأزرار الرئيسية
-        startDay: "🚀 ابدأ اليوم",
-        buySupplies: "🛒 شراء الإمدادات (سريع)",
-        
-        // أزرار القائمة
-        upgrades: "ترقيات",
-        supplies: "إمدادات",
-        recipe: "وصفة",
-        achievements: "إنجازات",
-        
-        // سجل النشاط
-        logTitle: "📋 سجل النشاط",
-        welcomeMsg: "🎮 مرحبًا بك في Lemonade! اضبط وصفتك وابدأ البيع.",
-        
-        // قائمة الإعدادات
-        settingsTitle: "إعدادات اليوم",
-        lemonsPerCup: "🍋 ليمون لكل كوب:",
-        sugarPerCup: "🍯 سكر لكل كوب:",
-        icePerCup: "🧊 ثلج لكل كوب:",
-        cupPrice: "💵 سعر الكوب:",
-        
-        // وصف اللعبة
-        descTitle: "🍋 وصف اللعبة",
-        descText: "Lemonade هي لعبة إدارة أعمال حيث تدير كشك الليموناضة الخاص بك. كل يوم، تقرر كم من الليمون والسكر والثلج تستخدم في وصفتك – وتحدد السعر المثالي لكل كوب. تأكد من شراء مكونات كافية لليوم التالي. اضبط وصفتك بعناية: الكثير من الليمون يجعلها حامضة، والكثير من السكر يجعلها حلوة جدًا، والثلج ضروري في الأيام الحارة! نجاحك يعتمد على الظروف الجوية ورضا العملاء والترقيات الذكية. السعر المعقول يجذب العملاء، لكن السعر المرتفع سيطردهم. اشترِ الإمدادات، وحسّن معداتك، وابنِ سمعتك لجذب المزيد من العملاء وزيادة الأرباح. واجه الأحداث العشوائية، وتعامل مع المنافسين، وحاول أن تصبح ملك الليموناضة! 🏆",
-        createdBy: "تم الإنشاء بواسطة",
-        
-        // تلميحات شريط الأيقونات
-        angry: "غاضب",
-        happy: "سعيد",
-        waiting: "منتظر",
-        expensive: "غالي جدًا",
-        cupsSold: "أكواب مباعة",
-        profit: "الربح",
-        day: "يوم",
-        reputation: "السمعة",
-        
-        // المحاكاة المباشرة
-        liveDay: "مباشر - اليوم",
-        time: "الوقت:",
-        skip: "⏭️ تخطي",
-        
-        // نافذة الترقيات
-        upgradesTitle: "🪙 الترقيات",
-        pitcherQuality: "🥤 جودة الإبريق",
-        sign: "🪧 اللافتة",
-        table: "🪑 الطاولة",
-        umbrella: "☂️ المظلة",
-        level: "المستوى:",
-        status: "الحالة:",
-        upgrade: "ترقية",
-        buy: "شراء",
-        maxLevel: "✅ أقصى مستوى",
-        purchased: "✅ تم الشراء",
-        notOwned: "غير مملوك",
-        owned: "مملوك ✅",
-        close: "❌ إغلاق",
-        
-        // مستويات الإبريق
-        pitcherBasic: "عادي",
-        pitcherGood: "جيد",
-        pitcherExcellent: "ممتاز",
-        
-        // مستويات اللافتة
-        signNone: "بدون",
-        signSmall: "صغيرة",
-        signLarge: "كبيرة",
-        
-        // مستويات الطاولة
-        tableBasic: "عادية",
-        tableGood: "جيدة",
-        tableLuxury: "فاخرة",
-        
-        // نافذة الإمدادات
-        suppliesTitle: "📦 شراء الإمدادات",
-        lemons: "🍋 ليمون",
-        sugar: "🍯 سكر",
-        ice: "🧊 ثلج",
-        buyBtn: "شراء",
-        
-        // نافذة الإنجازات
-        achievementsTitle: "🏆 الإنجازات",
-        unlocked: "✅ مفتوح",
-        locked: "🔒 مقفل",
-        
-        // أسماء الإنجازات
-        firstSale: "أول بيعة",
-        firstSaleDesc: "بع كوبك الأول",
-        bigDay: "يوم كبير",
-        bigDayDesc: "بع 50 كوبًا في يوم واحد",
-        rich: "نحو الثراء",
-        richDesc: "اكسب 500$",
-        tycoon: "قطب الليموناضة",
-        tycoonDesc: "اكسب 1000$",
-        week: "أسبوع واحد",
-        weekDesc: "اصمد 7 أيام",
-        month: "شهر واحد",
-        monthDesc: "اصمد 30 يومًا",
-        popular: "كشك مشهور",
-        popularDesc: "حقق سمعة 90%",
-        perfect: "وصفة مثالية",
-        perfectDesc: "احصل على 50 زبونًا سعيدًا في يوم واحد",
-        monopoly: "احتكار",
-        monopolyDesc: "تخلص من جميع المنافسين",
-        upgraded: "ترقية كاملة",
-        upgradedDesc: "ارفع جميع الترقيات للحد الأقصى",
-        
-        // أنواع الطقس
-        sunny: "مشمس",
-        hot: "حار جدًا",
-        cloudy: "غائم",
-        rainy: "ممطر",
-        
-        // الأحداث
-        eventFestival: "مهرجان في الحديقة",
-        eventCompetition: "منافس جديد قريب",
-        eventCelebrity: "زيارة مشهور",
-        eventRoadwork: "أعمال طرق",
-        eventLabel: "حدث:",
-        
-        // رسائل السجل
-        notEnoughSupplies: "❌ لا توجد إمدادات كافية!",
-        notEnoughMoney: "❌ لا توجد أموال كافية!",
-        bought: "🛒 تم شراء",
-        for: "مقابل",
-        quickBuy: "🛒 شراء سريع:",
-        earned: "💰 ربحت",
-        selling: "ببيع",
-        cups: "كوب",
-        demandExists: "⚠️ يوجد طلب، لكن لا توجد إمدادات!",
-        noCustomers: "📉 لا زبائن اليوم.",
-        customersLove: "⭐⭐⭐ الزبائن يحبونها! بيع",
-        repPlus: "سمعة +",
-        veryHappy: "⭐⭐ سعداء جدًا! بيع",
-        satisfied: "⭐ راضون. بيع",
-        customersUnhappy: "😞 الزبائن غير راضين. سمعة -5",
-        goodDay: "✅ يوم جيد! بيع",
-        onlyStand: "🏆 أنت الكشك الوحيد!",
-        competitorClosed: "👋 منافس أغلق!",
-        newCompetitor: "🪙 منافس جديد افتتح!",
-        upgradedTo: "⬆️ تمت ترقية",
-        to: "إلى مستوى",
-        purchased: "☂️ تم شراء المظلة! مبيعات أفضل في الطقس الحار.",
-        recipeLog: "📋 الوصفة:",
-        achievementUnlocked: "🏆",
-        unlocked: "إنجاز مفتوح!",
-        need: "تحتاج"
+    pixelArt: false,
+    transparent: false
+};
+
+// تهيئة اللعبة
+window.addEventListener('DOMContentLoaded', () => {
+    window.phaserGame = new Phaser.Game(phaserConfig);
+});
+
+// ========================================
+// INTEGRATION FUNCTIONS
+// ========================================
+
+window.updatePhaserStand = function(upgrades) {
+    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
+    if (scene) {
+        scene.updateStandVisuals(upgrades);
     }
 };
 
-function toggleLanguage() {
-    playSound('click');
-    currentLang = currentLang === 'en' ? 'ar' : 'en';
-    
-    // تغيير اتجاه الصفحة
-    document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-    document.documentElement.setAttribute('lang', currentLang === 'ar' ? 'ar' : 'en');
-    
-    // تحديث النصوص
-    updateTexts();
-    
-    // تحديث أيقونة الزر
-    document.getElementById('langIcon').textContent = currentLang === 'ar' ? 'AR' : 'EN';
-}
-
-function updateTexts() {
-    const t = translations[currentLang];
-    
-    // Main Buttons
-    document.getElementById('startDayBtn').innerHTML = t.startDay;
-    document.getElementById('buySuppliesBtn').innerHTML = t.buySupplies;
-    
-    // Menu Buttons
-    document.querySelectorAll('.menu-btn-text')[0].textContent = t.upgrades;
-    document.querySelectorAll('.menu-btn-text')[1].textContent = t.supplies;
-    document.querySelectorAll('.menu-btn-text')[2].textContent = t.recipe;
-    document.querySelectorAll('.menu-btn-text')[3].textContent = t.achievements;
-    
-    // Activity Log
-    document.querySelector('.log-title').textContent = t.logTitle;
-    
-    // Settings Title
-    document.querySelector('.settings-title').textContent = t.settingsTitle;
-    document.querySelectorAll('.setting-label')[0].textContent = t.lemonsPerCup;
-    document.querySelectorAll('.setting-label')[1].textContent = t.sugarPerCup;
-    document.querySelectorAll('.setting-label')[2].textContent = t.icePerCup;
-    document.querySelectorAll('.setting-label')[3].textContent = t.cupPrice;
-    
-    // Game Description
-    document.querySelector('.description-title').textContent = t.descTitle;
-    document.querySelector('.description-section p').textContent = t.descText;
-    
-    // Tooltips
-    document.getElementById('angryDisplay').setAttribute('title', t.angry);
-    document.getElementById('happyDisplay').setAttribute('title', t.happy);
-    document.getElementById('waitingDisplay').setAttribute('title', t.waiting);
-    document.getElementById('expensiveDisplay').setAttribute('title', t.expensive);
-    document.getElementById('cupsSoldDisplay').setAttribute('title', t.cupsSold);
-    document.getElementById('profitDisplay').setAttribute('title', t.profit);
-    document.getElementById('dayDisplay').setAttribute('title', t.day);
-    document.getElementById('reputationDisplay').setAttribute('title', t.reputation);
-    
-    // Upgrades Modal
-    const upgradesModal = document.getElementById('upgradesModal');
-    upgradesModal.querySelector('.modal-title').textContent = t.upgradesTitle;
-    upgradesModal.querySelectorAll('.upgrade-header')[0].textContent = t.pitcherQuality;
-    upgradesModal.querySelectorAll('.upgrade-header')[1].textContent = t.sign;
-    upgradesModal.querySelectorAll('.upgrade-header')[2].textContent = t.table;
-    upgradesModal.querySelectorAll('.upgrade-header')[3].textContent = t.umbrella;
-    document.getElementById('closeUpgradesBtn').textContent = t.close;
-    
-    // Supplies Modal
-    const suppliesModal = document.getElementById('suppliesModal');
-    suppliesModal.querySelector('.modal-title').textContent = t.suppliesTitle;
-    suppliesModal.querySelectorAll('.supply-header')[0].textContent = t.lemons;
-    suppliesModal.querySelectorAll('.supply-header')[1].textContent = t.sugar;
-    suppliesModal.querySelectorAll('.supply-header')[2].textContent = t.ice;
-    document.querySelectorAll('.supply-buy-btn').forEach(btn => {
-        btn.textContent = t.buyBtn;
-    });
-    document.getElementById('closeSuppliesBtn').textContent = t.close;
-    
-    // Achievements Modal
-    document.getElementById('achievementsModal').querySelector('.modal-title').textContent = t.achievementsTitle;
-    document.getElementById('closeAchievementsBtn').textContent = t.close;
-    
-    // Update upgrade display texts
-    updateUpgradeDisplay();
-    
-    // Update achievement list if modal is open
-    if (document.getElementById('achievementsModal').style.display === 'block') {
-        updateAchievementsList();
+window.startPhaserSimulation = function(maxCups, satisfactionRate) {
+    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
+    if (scene) {
+        scene.startSimulation(maxCups, satisfactionRate);
     }
-    updateEventBanner();
-}
+};
 
-// ربط الزر
-document.getElementById('languageToggle').onclick = toggleLanguage;
-    </script>
-    <script src="game.js"></script>
-</body>
-</html>
+window.skipPhaserDay = function() {
+    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
+    if (scene) {
+        scene.skipDay();
+    }
+};
