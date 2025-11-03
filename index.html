@@ -1288,17 +1288,35 @@
 
         function updateAchievementsList() {
             const list = document.getElementById('achievementsList');
+            const t = translations[currentLang];
             list.innerHTML = '';
-            
-            achievements.forEach(achievement => {
+    
+            // مصفوفة ترجمات الإنجازات
+            const achTranslations = [
+                { name: t.achFirstSale, desc: t.achFirstSaleDesc },
+                { name: t.achBigDay, desc: t.achBigDayDesc },
+                { name: t.achRich, desc: t.achRichDesc },
+                { name: t.achTycoon, desc: t.achTycoonDesc },
+                { name: t.achWeek, desc: t.achWeekDesc },
+                { name: t.achMonth, desc: t.achMonthDesc },
+                { name: t.achPopular, desc: t.achPopularDesc },
+                { name: t.achPerfect, desc: t.achPerfectDesc },
+                { name: t.achMonopoly, desc: t.achMonopolyDesc },
+                { name: t.achUpgraded, desc: t.achUpgradedDesc }
+            ];
+    
+            achievements.forEach((achievement, index) => {
                 const unlocked = game.unlockedAchievements.includes(achievement.id);
                 const item = document.createElement('div');
                 item.className = `achievement-item ${unlocked ? 'achievement-unlocked' : 'achievement-locked'}`;
+                
+                const achText = achTranslations[index];
+        
                 item.innerHTML = `
-                    <div class="achievement-header">${achievement.icon} ${achievement.name}</div>
-                    <div class="achievement-progress">${achievement.desc}</div>
+                    <div class="achievement-header">${achievement.icon} ${achText.name}</div>
+                    <div class="achievement-progress">${achText.desc}</div>
                     <div style="text-align: center; font-weight: bold; color: ${unlocked ? '#FFD700' : '#999'};">
-                        ${unlocked ? '✅ UNLOCKED' : '🔒 LOCKED'}
+                        ${unlocked ? t.unlocked : t.locked}
                     </div>
                 `;
                 list.appendChild(item);
@@ -1585,15 +1603,34 @@
             const event = events[Math.floor(Math.random() * events.length)];
             game.lastEvent = event;
             
+            updateEventBanner(); // استدعاء دالة جديدة لتحديث البانر
+    
+            return event;
+        }
+
+        // دالة جديدة لتحديث بانر الأحداث
+        function updateEventBanner() {
             const banner = document.getElementById('eventBanner');
+            const event = game.lastEvent;
+            
             if (event) {
+                const t = translations[currentLang];
+                let eventName;
+        
+                // اختيار الترجمة المناسبة حسب نوع الحدث
+                switch(event.type) {
+                    case 'festival': eventName = t.eventFestival; break;
+                    case 'competition': eventName = t.eventCompetition; break;
+                    case 'celebrity': eventName = t.eventCelebrity; break;
+                    case 'roadwork': eventName = t.eventRoadwork; break;
+                    default: eventName = event.name;
+                }
+        
                 banner.style.display = 'block';
-                banner.textContent = `${event.icon} Event: ${event.name}`;
+                banner.textContent = `${event.icon} ${t.eventLabel} ${eventName}`;
             } else {
                 banner.style.display = 'none';
             }
-            
-            return event;
         }
 
         function addLog(message, type = '') {
@@ -1962,26 +1999,26 @@ const translations = {
         locked: "🔒 LOCKED",
         
         // Achievement Names
-        firstSale: "First Sale",
-        firstSaleDesc: "Sell your first cup",
-        bigDay: "Big Day",
-        bigDayDesc: "Sell 50 cups in one day",
-        rich: "Getting Rich",
-        richDesc: "Earn 500$",
-        tycoon: "Lemonade Tycoon",
-        tycoonDesc: "Earn 1000$",
-        week: "One Week",
-        weekDesc: "Survive 7 days",
-        month: "One Month",
-        monthDesc: "Survive 30 days",
-        popular: "Popular Stand",
-        popularDesc: "Reach 90% reputation",
-        perfect: "Perfect Recipe",
-        perfectDesc: "Get 50 happy customers in one day",
-        monopoly: "Monopoly",
-        monopolyDesc: "Eliminate all competitors",
-        upgraded: "Fully Upgraded",
-        upgradedDesc: "Max all upgrades",
+        achFirstSale: "First Sale",
+        achFirstSaleDesc: "Sell your first cup",
+        achBigDay: "Big Day",
+        achBigDayDesc: "Sell 50 cups in one day",
+        achRich: "Getting Rich",
+        achRichDesc: "Earn 500$",
+        achTycoon: "Lemonade Tycoon",
+        achTycoonDesc: "Earn 1000$",
+        achWeek: "One Week",
+        achWeekDesc: "Survive 7 days",
+        achMonth: "One Month",
+        achMonthDesc: "Survive 30 days",
+        achPopular: "Popular Stand",
+        achPopularDesc: "Reach 90% reputation",
+        achPerfect: "Perfect Recipe",
+        achPerfectDesc: "Get 50 happy customers in one day",
+        achMonopoly: "Monopoly",
+        achMonopolyDesc: "Eliminate all competitors",
+        achUpgraded: "Fully Upgraded",
+        achUpgradedDesc: "Max all upgrades",
         
         // Weather Types
         sunny: "Sunny",
@@ -1990,10 +2027,11 @@ const translations = {
         rainy: "Rainy",
         
         // Events
-        festival: "Festival in the Park",
-        competition: "New Competitor Nearby",
-        celebrity: "Celebrity Visit",
-        roadwork: "Road Construction",
+        eventFestival: "Festival in the Park",
+        eventCompetition: "New Competitor Nearby",
+        eventCelebrity: "Celebrity Visit",
+        eventRoadwork: "Road Construction",
+        eventLabel: "Event:",
         
         // Log Messages
         notEnoughSupplies: "❌ Not enough supplies!",
@@ -2117,26 +2155,26 @@ const translations = {
         locked: "🔒 مقفل",
         
         // أسماء الإنجازات
-        firstSale: "أول بيعة",
-        firstSaleDesc: "بع كوبك الأول",
-        bigDay: "يوم كبير",
-        bigDayDesc: "بع 50 كوبًا في يوم واحد",
-        rich: "نحو الثراء",
-        richDesc: "اكسب 500$",
-        tycoon: "قطب الليموناضة",
-        tycoonDesc: "اكسب 1000$",
-        week: "أسبوع واحد",
-        weekDesc: "اصمد 7 أيام",
-        month: "شهر واحد",
-        monthDesc: "اصمد 30 يومًا",
-        popular: "كشك مشهور",
-        popularDesc: "حقق سمعة 90%",
-        perfect: "وصفة مثالية",
-        perfectDesc: "احصل على 50 زبونًا سعيدًا في يوم واحد",
-        monopoly: "احتكار",
-        monopolyDesc: "تخلص من جميع المنافسين",
-        upgraded: "ترقية كاملة",
-        upgradedDesc: "ارفع جميع الترقيات للحد الأقصى",
+        achFirstSale: "أول بيعة",
+        achFirstSaleDesc: "بع كوبك الأول",
+        achBigDay: "يوم كبير",
+        achBigDayDesc: "بع 50 كوبًا في يوم واحد",
+        achRich: "نحو الثراء",
+        achRichDesc: "اكسب 500$",
+        achTycoon: "قطب الليموناضة",
+        achTycoonDesc: "اكسب 1000$",
+        achWeek: "أسبوع واحد",
+        achWeekDesc: "اصمد 7 أيام",
+        achMonth: "شهر واحد",
+        achMonthDesc: "اصمد 30 يومًا",
+        achPopular: "كشك مشهور",
+        achPopularDesc: "حقق سمعة 90%",
+        achPerfect: "وصفة مثالية",
+        achPerfectDesc: "احصل على 50 زبونًا سعيدًا في يوم واحد",
+        achMonopoly: "احتكار",
+        achMonopolyDesc: "تخلص من جميع المنافسين",
+        achUpgraded: "ترقية كاملة",
+        achUpgradedDesc: "ارفع جميع الترقيات للحد الأقصى",
         
         // أنواع الطقس
         sunny: "مشمس",
@@ -2145,10 +2183,11 @@ const translations = {
         rainy: "ممطر",
         
         // الأحداث
-        festival: "مهرجان في الحديقة",
-        competition: "منافس جديد قريب",
-        celebrity: "زيارة مشهور",
-        roadwork: "أعمال طرق",
+        eventFestival: "مهرجان في الحديقة",
+        eventCompetition: "منافس جديد قريب",
+        eventCelebrity: "زيارة مشهور",
+        eventRoadwork: "أعمال طرق",
+        eventLabel: "حدث:",
         
         // رسائل السجل
         notEnoughSupplies: "❌ لا توجد إمدادات كافية!",
@@ -2263,6 +2302,7 @@ function updateTexts() {
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
     }
+    updateEventBanner();
 }
 
 // ربط الزر
@@ -2271,3 +2311,4 @@ document.getElementById('languageToggle').onclick = toggleLanguage;
     <script src="game.js"></script>
 </body>
 </html>
+
