@@ -922,7 +922,7 @@
     
     <div class="sound-toggle" id="soundToggle">🔊</div>
     <div class="language-toggle" id="languageToggle" title="التبديل إلى العربية">
-    <span id="langIcon">EN</span>
+    <span id="langIcon">🌐</span>
 </div>
 
     <div class="achievement-notification" id="achievementNotif"></div>
@@ -2192,7 +2192,7 @@ function toggleLanguage() {
     updateTexts();
     
     // تحديث أيقونة الزر
-    document.getElementById('langIcon').textContent = currentLang === 'ar' ? 'AR' : 'EN';
+    document.getElementById('langIcon').textContent = currentLang === '🌐' ? '🌐' : 'EN';
 }
 
 function updateTexts() {
