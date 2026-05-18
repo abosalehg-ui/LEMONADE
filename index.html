@@ -136,6 +136,8 @@
                         <div class="slider-value" id="priceValue">5 $</div>
                     </div>
                 </div>
+
+                <button class="reset-btn" id="resetGameBtn">🔄 Reset Game</button>
             </div>
         </div>
         <button class="settings-toggle-btn" id="settingsToggleBtn" title="SETTING" aria-label="Toggle Settings Menu">⚙️</button>
@@ -190,9 +192,12 @@
             <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
                 <div class="modal-title" style="margin-bottom: 0;">LIVE - DAY <span id="simDayDisplay">1</span></div>
 
+                <div class="sim-progress-bar">
+                    <div class="sim-progress-fill" id="simProgressFill"></div>
+                    <span class="sim-progress-text" id="simTimer">0%</span>
+                </div>
                 <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 5px 10px; background: #3d6520; border-top: 2px solid #1a3d0a;">
                     <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
-                    <div id="simTimer" style="color: white; font-weight: bold; align-self: center; font-size: 0.9em;">TIME: 0%</div>
                     <button id="skipDayBtn" class="action-btn" style="width: 30%; padding: 8px 10px; background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border-color: #990000;">⏭️ SKIP</button>
                 </div>
             </div>
@@ -299,7 +304,26 @@
                 <button class="close-modal-btn" id="closeAchievementsBtn">❌ CLOSE</button>
             </div>
         </div>
+
+        <div class="modal" id="dailyReportModal">
+            <div class="modal-content">
+                <div class="modal-title">📊 DAY <span id="reportDay">1</span> REPORT</div>
+                <div class="report-tier" id="reportTier">—</div>
+                <div class="report-stats">
+                    <div class="report-row"><span id="reportCupsLabel">🥤 Cups Sold</span><span id="reportCups">0</span></div>
+                    <div class="report-row"><span id="reportRevenueLabel">💰 Revenue</span><span id="reportRevenue">$0</span></div>
+                    <div class="report-row"><span id="reportCostLabel">💸 Cost</span><span id="reportCost">$0</span></div>
+                    <div class="report-row profit-row"><span id="reportProfitLabel">📈 Profit</span><span id="reportProfit">$0</span></div>
+                    <div class="report-row"><span id="reportRepLabel">👍 Reputation</span><span id="reportRep">+0</span></div>
+                </div>
+                <div class="report-chart-title" id="reportChartTitle">📈 Profit history (last days)</div>
+                <div class="report-chart" id="reportChart"></div>
+                <button class="close-modal-btn" id="closeReportBtn" style="background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%); border-color: #3d5e27;">✅ CONTINUE</button>
+            </div>
+        </div>
     </div>
+
+    <div class="save-indicator" id="saveIndicator">💾 Saved</div>
 
     <!-- Scripts: load order matters -->
     <script src="translations.js"></script>

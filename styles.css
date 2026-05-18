@@ -777,3 +777,154 @@ body {
         top: 60%;
     }
 }
+
+/* ===== Day progress bar (replaces text % timer) ===== */
+.sim-progress-bar {
+    position: relative;
+    height: 18px;
+    margin: 8px 10px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #1a3d0a;
+    border-radius: 9px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+.sim-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FF6B35 100%);
+    transition: width 0.3s ease-out;
+    box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
+}
+.sim-progress-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    line-height: 14px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.75em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* ===== Daily report modal ===== */
+.report-tier {
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 8px;
+    margin-bottom: 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.report-stats {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.95em;
+}
+.report-row:last-child {
+    border-bottom: none;
+}
+.report-row.profit-row {
+    font-weight: bold;
+    font-size: 1.05em;
+    color: #FFD700;
+    border-top: 1px solid rgba(255,215,0,0.3);
+    margin-top: 4px;
+    padding-top: 8px;
+}
+.report-chart-title {
+    font-size: 0.85em;
+    margin-bottom: 6px;
+    color: #ccc;
+}
+.report-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2px;
+    height: 80px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 6px;
+    margin-bottom: 8px;
+}
+.chart-bar {
+    flex: 1;
+    min-width: 4px;
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    transition: height 0.3s ease-out;
+}
+.chart-bar.negative {
+    background: linear-gradient(180deg, #ff6b6b 0%, #cc0000 100%);
+}
+.chart-bar-empty {
+    flex: 1;
+    min-width: 4px;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    align-self: flex-end;
+}
+
+/* ===== Reset button (in settings drawer) ===== */
+.reset-btn {
+    width: 100%;
+    margin-top: 12px;
+    background: linear-gradient(180deg, #ff6b6b 0%, #c92a2a 100%);
+    border: 2px solid #8b0000;
+    border-radius: 6px;
+    padding: 8px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85em;
+    box-shadow: 0 2px 0 #690000, 0 2px 6px rgba(0,0,0,0.3);
+}
+.reset-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #690000;
+}
+
+/* ===== Save indicator ===== */
+.save-indicator {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(45, 80, 22, 0.95);
+    border: 1px solid #FFD700;
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 0.8em;
+    z-index: 2500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.save-indicator.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ===== Achievement toast — improved animation ===== */
+.achievement-notification {
+    cursor: pointer;
+}

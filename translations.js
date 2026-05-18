@@ -156,7 +156,36 @@ const translations = {
         purchasedUmbrella: "☂️ Purchased umbrella! Better sales in hot weather.",
         recipeLog: "📋 Recipe:",
         achievementUnlocked: "🏆",
-        need: "Need"
+        need: "Need",
+
+        // Daily Report
+        reportTitle: "📊 DAY REPORT",
+        reportCups: "🥤 Cups Sold",
+        reportRevenue: "💰 Revenue",
+        reportCost: "💸 Cost",
+        reportProfit: "📈 Profit",
+        reportRep: "👍 Reputation",
+        reportChartTitle: "📈 Profit history (last days)",
+        reportContinue: "✅ CONTINUE",
+        tierLove: "⭐⭐⭐ Customers love it!",
+        tierVeryHappy: "⭐⭐ Very happy!",
+        tierSatisfied: "⭐ Satisfied",
+        tierUnhappy: "😞 Customers unhappy",
+        tierGood: "✅ Good day",
+        tierNoSupplies: "⚠️ Out of supplies",
+        tierNoCustomers: "📉 No customers",
+
+        // Reset
+        resetButton: "🔄 Reset Game",
+        resetConfirm: "Reset all progress? This cannot be undone.",
+        resetDone: "🔄 Game reset.",
+
+        // Sim
+        timeLabel: "TIME",
+        savedIndicator: "💾 Saved",
+
+        // Toast
+        unlockedToast: "Unlocked!"
     },
     ar: {
         // شريط الموارد العلوي
@@ -311,7 +340,36 @@ const translations = {
         purchasedUmbrella: "☂️ تم شراء المظلة! مبيعات أفضل في الطقس الحار.",
         recipeLog: "📋 الوصفة:",
         achievementUnlocked: "🏆",
-        need: "تحتاج"
+        need: "تحتاج",
+
+        // التقرير اليومي
+        reportTitle: "📊 تقرير اليوم",
+        reportCups: "🥤 أكواب مباعة",
+        reportRevenue: "💰 الإيرادات",
+        reportCost: "💸 التكلفة",
+        reportProfit: "📈 الربح",
+        reportRep: "👍 السمعة",
+        reportChartTitle: "📈 سجل الربح (آخر الأيام)",
+        reportContinue: "✅ متابعة",
+        tierLove: "⭐⭐⭐ الزبائن يحبونها!",
+        tierVeryHappy: "⭐⭐ سعداء جداً!",
+        tierSatisfied: "⭐ راضون",
+        tierUnhappy: "😞 الزبائن غير راضين",
+        tierGood: "✅ يوم جيد",
+        tierNoSupplies: "⚠️ نفدت الإمدادات",
+        tierNoCustomers: "📉 لا زبائن",
+
+        // إعادة التعيين
+        resetButton: "🔄 إعادة تعيين",
+        resetConfirm: "هل تريد مسح كل التقدّم؟ لا يمكن التراجع.",
+        resetDone: "🔄 تمت إعادة التعيين.",
+
+        // المحاكاة
+        timeLabel: "الوقت",
+        savedIndicator: "💾 تم الحفظ",
+
+        // إشعار
+        unlockedToast: "إنجاز جديد!"
     }
 };
 

@@ -560,11 +560,12 @@ class LemonadeStandScene extends Phaser.Scene {
 
                 this.spawnCustomer(satisfactionRate);
                 cupsSold++;
-                
-                const progress = Math.floor((cupsSold / maxCups) * 100);
-                if (document.getElementById('simTimer')) {
-                    document.getElementById('simTimer').textContent = `الوقت: ${progress}%`;
-                }
+
+                const progress = Math.min(100, Math.floor((cupsSold / maxCups) * 100));
+                const timerEl = document.getElementById('simTimer');
+                const fillEl = document.getElementById('simProgressFill');
+                if (timerEl) timerEl.textContent = `${progress}%`;
+                if (fillEl) fillEl.style.width = `${progress}%`;
             },
             loop: true
         });
