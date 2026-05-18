@@ -142,6 +142,7 @@ function updateDisplay() {
     document.getElementById('weatherIcon').textContent = weather.icon;
 
     updateCrowdBanner();
+    updateChallengeBanner();
     updateRivalWidget();
     if (window.updatePhaserAmbience) {
         window.updatePhaserAmbience(game.weather, game.getTimeOfDay());
@@ -328,6 +329,39 @@ function updateUpgradeDisplay() {
         umbrellaBtn.textContent = `${t.buy} (${UPGRADE_COSTS.umbrella} $)`;
         umbrellaBtn.disabled = game.money < UPGRADE_COSTS.umbrella;
     }
+
+    // ---- Advanced (tech tree) ----
+    renderAdvancedUpgrade('industrialPress', t.upgradeIndustrialPress, t.reqPitcher2);
+    renderAdvancedUpgrade('neonSign',        t.upgradeNeonSign,        t.reqSign2);
+    renderAdvancedUpgrade('lounge',          t.upgradeLounge,          t.reqTableUmbrella);
+    document.getElementById('advancedDivider').textContent = t.advancedUpgradesTitle;
+}
+
+function renderAdvancedUpgrade(key, label, requirementLabel) {
+    const t = translations[currentLang];
+    const item   = document.getElementById(`${key}Item`);
+    const header = document.getElementById(`${key}Header`);
+    const status = document.getElementById(`${key}Status`);
+    const btn    = document.getElementById(`${key}Btn`);
+    const owned  = !!game.upgrades[key];
+    const unlocked = game.isAdvancedUnlocked(key);
+
+    header.textContent = label;
+    item.classList.toggle('locked', !owned && !unlocked);
+
+    if (owned) {
+        status.textContent = t.owned;
+        btn.textContent = t.purchased;
+        btn.disabled = true;
+    } else if (!unlocked) {
+        status.textContent = `${t.upgradeLocked} ${requirementLabel}`;
+        btn.textContent = `${t.buy} (${UPGRADE_COSTS[key]} $)`;
+        btn.disabled = true;
+    } else {
+        status.textContent = t.notOwned;
+        btn.textContent = `${t.buy} (${UPGRADE_COSTS[key]} $)`;
+        btn.disabled = game.money < UPGRADE_COSTS[key];
+    }
 }
 
 function buyUpgrade(type) {
@@ -336,6 +370,12 @@ function buyUpgrade(type) {
         SoundManager.play('upgrade');
         if (type === 'umbrella') {
             addLog('☂️ Purchased umbrella! Better sales in hot weather.', 'success');
+        } else if (type === 'industrialPress') {
+            addLog('🏭 Industrial Press installed — pitcher quality boosted!', 'success');
+        } else if (type === 'neonSign') {
+            addLog('💡 Neon Sign lit — crowds notice from afar!', 'success');
+        } else if (type === 'lounge') {
+            addLog('🛋️ Lounge built — customers stay longer and tip better!', 'success');
         } else {
             const names = { pitcher: 'Pitcher', sign: 'Sign', table: 'Table' };
             addLog(`⬆️ Upgraded ${names[type]} to level ${result.newLevel + 1}!`, 'success');
@@ -395,6 +435,108 @@ function updateCrowdBanner() {
     labelEl.textContent = t.crowdLabel;
     valueEl.textContent = map[type] || t.crowdAdult;
     banner.style.display = 'flex';
+}
+
+// ----------------------------------------
+// Daily challenge banner
+// ----------------------------------------
+function challengeDescription(ch) {
+    const t = translations[currentLang];
+    if (!ch) return '';
+    switch (ch.type) {
+        case 'minCups':   return (t.challengeMinCups   || '').replace('{n}', ch.target);
+        case 'minProfit': return (t.challengeMinProfit || '').replace('{n}', ch.target);
+        case 'maxAngry':  return t.challengeMaxAngry || '';
+        case 'minHappy':  return (t.challengeMinHappy  || '').replace('{n}', ch.target);
+        case 'maxPrice':  return (t.challengeMaxPrice  || '').replace('{n}', ch.target);
+        case 'minTier':   return (t.challengeMinTier   || '').replace('{tier}', ch.target);
+        default: return '';
+    }
+}
+
+function updateChallengeBanner() {
+    const banner = document.getElementById('challengeBanner');
+    if (!banner) return;
+    const ch = game.currentChallenge;
+    if (!ch) { banner.style.display = 'none'; return; }
+    const t = translations[currentLang];
+    document.getElementById('challengeLabel').textContent = t.challengeBannerLabel || '🎯 Challenge:';
+    document.getElementById('challengeText').textContent = challengeDescription(ch);
+    document.getElementById('challengeReward').textContent =
+        `+${ch.reward.money || 0}$` + (ch.reward.rep ? ` +${ch.reward.rep}🪙` : '');
+    banner.classList.toggle('completed', !!ch.completed);
+    banner.style.display = 'flex';
+}
+
+// ----------------------------------------
+// Story mode modal
+// ----------------------------------------
+function showStoryModal() {
+    SoundManager.play('click');
+    renderStoryList();
+    document.getElementById('storyModal').style.display = 'block';
+}
+function closeStoryModal() {
+    SoundManager.play('click');
+    document.getElementById('storyModal').style.display = 'none';
+}
+
+function renderStoryList() {
+    const t = translations[currentLang];
+    document.getElementById('storyTitleEl').textContent = t.storyTitle;
+    const list = document.getElementById('storyList');
+    list.innerHTML = '';
+    const total = 8;
+    for (let i = 0; i < total; i++) {
+        const idx = i + 1;
+        const isDone   = game.storyProgress > i;
+        const isActive = game.storyProgress === i;
+        const stateLabel = isDone ? t.storyChapterDone : (isActive ? t.storyChapterActive : t.storyChapterLocked);
+        const cls = isDone ? 'done' : (isActive ? 'active' : 'locked');
+        const description = t[`storyChapter${idx}`] || `Chapter ${idx}`;
+        const div = document.createElement('div');
+        div.className = `story-chapter ${cls}`;
+        div.innerHTML = `
+            <div><b>${t.storyChapterLabel} ${idx}</b> — ${description}
+                <span class="story-chapter-state">${stateLabel}</span>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+    if (game.storyProgress >= total) {
+        const done = document.createElement('div');
+        done.className = 'story-chapter done';
+        done.innerHTML = `<div>${t.storyAllDone}</div>`;
+        list.appendChild(done);
+    }
+}
+
+// ----------------------------------------
+// Leaderboard modal
+// ----------------------------------------
+function showLeaderboardModal() {
+    SoundManager.play('click');
+    const t = translations[currentLang];
+    const lb = GameState.getLeaderboard();
+
+    document.getElementById('leaderboardTitleEl').textContent = t.leaderboardTitle;
+    document.getElementById('recBestDayLabel').textContent     = t.recBestDayProfit;
+    document.getElementById('recBestTotalLabel').textContent   = t.recBestTotalProfit;
+    document.getElementById('recBestStreakLabel').textContent  = t.recBestStreak;
+    document.getElementById('recBestLoyalLabel').textContent   = t.recBestLoyal;
+    document.getElementById('recBestDayLabelDays').textContent = t.recBestDay;
+
+    document.getElementById('recBestDayProfit').textContent   = `$${(lb.bestDayProfit || 0).toFixed(2)}`;
+    document.getElementById('recBestTotalProfit').textContent = `$${(lb.bestTotalProfit || 0).toFixed(2)}`;
+    document.getElementById('recBestStreak').textContent      = lb.bestStreak || 0;
+    document.getElementById('recBestLoyal').textContent       = lb.bestLoyal || 0;
+    document.getElementById('recBestDay').textContent         = lb.bestDay || 0;
+
+    document.getElementById('leaderboardModal').style.display = 'block';
+}
+function closeLeaderboardModal() {
+    SoundManager.play('click');
+    document.getElementById('leaderboardModal').style.display = 'none';
 }
 
 // ----------------------------------------
@@ -520,6 +662,42 @@ function finalizeDay(plan, recipe) {
                 .replace('{s}', s.sugar  || 0)
                 .replace('{i}', s.ice    || 0), 'warning');
     }
+
+    // Challenge result for the day just finished
+    if (summary.challenge) {
+        const ch = summary.challenge;
+        const desc = challengeDescription(ch);
+        if (ch.completed) {
+            addLog((t.challengeDone || '✅ Challenge complete! +{m}$ +{r}🪙')
+                .replace('{m}', ch.reward.money || 0)
+                .replace('{r}', ch.reward.rep || 0), 'success');
+            SoundManager.play('achievement');
+        } else {
+            addLog((t.challengeFailed || '❌ Challenge missed: {desc}').replace('{desc}', desc), 'warning');
+        }
+    }
+
+    // Story chapter advances
+    (summary.storyAdvances || []).forEach(ch => {
+        addLog((t.storyAdvance || '📜 Chapter {n} complete! +{m}$ +{r}🪙')
+            .replace('{n}', ch.id)
+            .replace('{m}', ch.reward.money || 0)
+            .replace('{r}', ch.reward.rep || 0), 'success');
+        SoundManager.play('achievement');
+    });
+
+    // New personal records
+    (summary.records || []).forEach(key => {
+        const labelMap = {
+            bestDayProfit: t.recBestDayProfit,
+            bestTotalProfit: t.recBestTotalProfit,
+            bestStreak: t.recBestStreak,
+            bestLoyal: t.recBestLoyal,
+            bestDay: t.recBestDay
+        };
+        const what = labelMap[key] || key;
+        addLog((t.newRecord || '🏅 NEW RECORD: {what}!').replace('{what}', what), 'success');
+    });
 
     document.getElementById('liveSimulationModal').style.display = 'none';
     updateEventBanner();
@@ -647,6 +825,7 @@ function pickDifficulty(diff) {
     newGame.rollWeather();
     newGame.rollEvent();
     newGame.rollCustomerMix();
+    newGame.rollChallenge();
     newGame.applyEventSupplyEffects();
     newGame.save();
 
@@ -850,8 +1029,16 @@ function updateTexts() {
 
     updateDifficultyDisplay();
     updateCrowdBanner();
+    updateChallengeBanner();
     updateRivalWidget();
     updateUpgradeDisplay();
+    // Re-localize labels on bottom buttons + modal labels
+    const storyBtn = document.getElementById('storyBtn');
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    if (storyBtn) storyBtn.textContent = t.storyBtn;
+    if (leaderboardBtn) leaderboardBtn.textContent = t.leaderboardBtn;
+    if (document.getElementById('storyModal').style.display === 'block')      renderStoryList();
+    if (document.getElementById('leaderboardModal').style.display === 'block') showLeaderboardModal();
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
     }
@@ -906,5 +1093,9 @@ window.UI = {
     endTutorial,
     toggleColorblind,
     initColorblind,
-    onPhaserReady
+    onPhaserReady,
+    showStoryModal,
+    closeStoryModal,
+    showLeaderboardModal,
+    closeLeaderboardModal
 };

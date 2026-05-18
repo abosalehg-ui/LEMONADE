@@ -146,6 +146,8 @@
                     <span class="difficulty-badge" id="currentDifficultyValue">Normal</span>
                 </div>
 
+                <button class="settings-extra-btn" id="storyBtn" type="button">📜 Story</button>
+                <button class="settings-extra-btn" id="leaderboardBtn" type="button">🏅 Records</button>
                 <button class="settings-extra-btn" id="replayTutorialBtn" type="button">🎓 Tutorial</button>
                 <button class="settings-extra-btn" id="colorblindBtn" type="button">👁️ Colorblind mode</button>
                 <button class="reset-btn" id="resetGameBtn" type="button">🔄 Reset Game</button>
@@ -167,6 +169,11 @@
         </div>
 
         <div id="eventBanner" class="event-banner" style="display: none;"></div>
+        <div id="challengeBanner" class="challenge-banner" style="display: none;">
+            <span id="challengeLabel">🎯 Today's challenge:</span>
+            <span id="challengeText"></span>
+            <span class="challenge-reward" id="challengeReward"></span>
+        </div>
         <div id="crowdBanner" class="crowd-banner">
             <span id="crowdLabel">Today's crowd:</span>
             <span id="crowdValue">🧑‍💼 Adults — balanced</span>
@@ -246,6 +253,26 @@
                     <button class="upgrade-btn" id="umbrellaUpgradeBtn">Buy (80 $)</button>
                 </div>
 
+                <div class="advanced-divider" id="advancedDivider">🔬 Advanced</div>
+
+                <div class="upgrade-item advanced" id="industrialPressItem">
+                    <div class="upgrade-header" id="industrialPressHeader">🏭 Industrial Press</div>
+                    <div class="upgrade-status" id="industrialPressStatus">Not Owned</div>
+                    <button class="upgrade-btn" id="industrialPressBtn">Buy (150 $)</button>
+                </div>
+
+                <div class="upgrade-item advanced" id="neonSignItem">
+                    <div class="upgrade-header" id="neonSignHeader">💡 Neon Sign</div>
+                    <div class="upgrade-status" id="neonSignStatus">Not Owned</div>
+                    <button class="upgrade-btn" id="neonSignBtn">Buy (120 $)</button>
+                </div>
+
+                <div class="upgrade-item advanced" id="loungeItem">
+                    <div class="upgrade-header" id="loungeHeader">🛋️ Lounge</div>
+                    <div class="upgrade-status" id="loungeStatus">Not Owned</div>
+                    <button class="upgrade-btn" id="loungeBtn">Buy (200 $)</button>
+                </div>
+
                 <button class="close-modal-btn" id="closeUpgradesBtn">❌ CLOSE</button>
             </div>
         </div>
@@ -317,6 +344,28 @@
                 <div class="modal-title">🏆 ACHIEVEMENTS</div>
                 <div id="achievementsList"></div>
                 <button class="close-modal-btn" id="closeAchievementsBtn">❌ CLOSE</button>
+            </div>
+        </div>
+
+        <div class="modal" id="storyModal" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-title" id="storyTitleEl">📜 Story Mode</div>
+                <div id="storyList"></div>
+                <button class="close-modal-btn" id="closeStoryBtn">❌ CLOSE</button>
+            </div>
+        </div>
+
+        <div class="modal" id="leaderboardModal" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-title" id="leaderboardTitleEl">🏅 Personal Records</div>
+                <div class="report-stats">
+                    <div class="report-row"><span id="recBestDayLabel">🪙 Best single-day profit</span><span id="recBestDayProfit">$0</span></div>
+                    <div class="report-row"><span id="recBestTotalLabel">💰 Best total profit</span><span id="recBestTotalProfit">$0</span></div>
+                    <div class="report-row"><span id="recBestStreakLabel">🔥 Longest happy streak</span><span id="recBestStreak">0</span></div>
+                    <div class="report-row"><span id="recBestLoyalLabel">🤝 Most regulars</span><span id="recBestLoyal">0</span></div>
+                    <div class="report-row"><span id="recBestDayLabelDays">📅 Longest run (days)</span><span id="recBestDay">0</span></div>
+                </div>
+                <button class="close-modal-btn" id="closeLeaderboardBtn">❌ CLOSE</button>
             </div>
         </div>
 

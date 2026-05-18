@@ -17,11 +17,17 @@
         game.rollWeather();
         game.rollEvent();
         game.rollCustomerMix();
+        game.rollChallenge();
         game.applyEventSupplyEffects();
-    } else if (!game.todaysCustomerType) {
-        // Returning player from before Phase 3: pick their crowd once.
-        game.rollCustomerMix();
-        game.applyEventSupplyEffects();
+    } else {
+        // Returning player: backfill any fields missing from older saves.
+        if (!game.todaysCustomerType) {
+            game.rollCustomerMix();
+            game.applyEventSupplyEffects();
+        }
+        if (!game.currentChallenge) {
+            game.rollChallenge();
+        }
     }
 
     // Seed the prev-snapshot so the first updateDisplay doesn't trigger particles.
@@ -54,11 +60,18 @@
     document.getElementById('signUpgradeBtn').onclick     = () => UI.buyUpgrade('sign');
     document.getElementById('tableUpgradeBtn').onclick    = () => UI.buyUpgrade('table');
     document.getElementById('umbrellaUpgradeBtn').onclick = () => UI.buyUpgrade('umbrella');
+    document.getElementById('industrialPressBtn').onclick = () => UI.buyUpgrade('industrialPress');
+    document.getElementById('neonSignBtn').onclick        = () => UI.buyUpgrade('neonSign');
+    document.getElementById('loungeBtn').onclick          = () => UI.buyUpgrade('lounge');
 
     document.getElementById('resetGameBtn').onclick   = UI.resetGame;
     document.getElementById('closeReportBtn').onclick = UI.closeDailyReport;
     document.getElementById('replayTutorialBtn').onclick = () => { UI.toggleSettingsDrawer(); UI.startTutorial(); };
     document.getElementById('colorblindBtn').onclick     = UI.toggleColorblind;
+    document.getElementById('storyBtn').onclick          = () => { UI.toggleSettingsDrawer(); UI.showStoryModal(); };
+    document.getElementById('leaderboardBtn').onclick    = () => { UI.toggleSettingsDrawer(); UI.showLeaderboardModal(); };
+    document.getElementById('closeStoryBtn').onclick     = UI.closeStoryModal;
+    document.getElementById('closeLeaderboardBtn').onclick = UI.closeLeaderboardModal;
 
     // Difficulty modal buttons
     document.querySelectorAll('.difficulty-btn').forEach(btn => {

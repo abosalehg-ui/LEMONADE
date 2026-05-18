@@ -42,8 +42,47 @@ const UPGRADE_COSTS = {
     pitcher:  [50, 100],
     sign:     [40, 80],
     table:    [60, 120],
-    umbrella: 80
+    umbrella: 80,
+    // Advanced (tech tree) — each requires basic upgrades first.
+    industrialPress: 150,  // requires pitcher >= 2
+    neonSign:        120,  // requires sign >= 2
+    lounge:          200   // requires table >= 2 && umbrella
 };
+
+const ADVANCED_REQUIREMENTS = {
+    industrialPress: g => g.upgrades.pitcher >= 2,
+    neonSign:        g => g.upgrades.sign >= 2,
+    lounge:          g => g.upgrades.table >= 2 && g.upgrades.umbrella
+};
+
+// Daily challenges — one picked at the start of each day.
+const CHALLENGES = [
+    { id: 'sell30',    type: 'minCups',   target: 30,           reward: { money: 30, rep: 0 } },
+    { id: 'sell50',    type: 'minCups',   target: 50,           reward: { money: 60, rep: 5 } },
+    { id: 'profit80',  type: 'minProfit', target: 80,           reward: { money: 40, rep: 0 } },
+    { id: 'profit150', type: 'minProfit', target: 150,          reward: { money: 80, rep: 5 } },
+    { id: 'noAngry',   type: 'maxAngry',  target: 0,            reward: { money: 50, rep: 5 } },
+    { id: 'happy30',   type: 'minHappy',  target: 30,           reward: { money: 60, rep: 3 } },
+    { id: 'cheap',     type: 'maxPrice',  target: 5,            reward: { money: 40, rep: 3 } },
+    { id: 'love',      type: 'minTier',   target: 'love',       reward: { money: 100, rep: 10 } },
+    { id: 'veryHappy', type: 'minTier',   target: 'very_happy', reward: { money: 60, rep: 5 } }
+];
+
+const TIER_RANK = { unhappy: 0, good: 1, satisfied: 2, very_happy: 3, love: 4 };
+
+// Story chapters — one-time progression goals with rewards.
+const STORY_CHAPTERS = [
+    { id: 1, predicate: g => g.cupsSold >= 5,                                    reward: { money: 50,  rep: 0 } },
+    { id: 2, predicate: g => g.money >= 250,                                     reward: { money: 100, rep: 0 } },
+    { id: 3, predicate: g => g.upgrades.sign >= 1,                               reward: { money: 0,   rep: 10 } },
+    { id: 4, predicate: g => g.loyalCustomers >= 10,                             reward: { money: 200, rep: 5 } },
+    { id: 5, predicate: g => g.reputation >= 80,                                 reward: { money: 250, rep: 0 } },
+    { id: 6, predicate: g => g.competitors === 0,                                reward: { money: 400, rep: 10 } },
+    { id: 7, predicate: g => g.upgrades.lounge,                                  reward: { money: 500, rep: 0 } },
+    { id: 8, predicate: g => g.unlockedAchievements.length >= 8,                 reward: { money: 1000, rep: 5 } }
+];
+
+const LEADERBOARD_KEY = 'lemonadeTycoonLeaderboard';
 
 const ACHIEVEMENTS = [
     { id: 'first_sale', icon: '🎉', req: s => s.cupsSold >= 1 },
@@ -85,7 +124,13 @@ class GameState {
         this.dailyCups = 0;
         this.totalProfit = 0;
         this.feedback = { angry: 0, happy: 0, waiting: 0, expensive: 0 };
-        this.upgrades = { pitcher: 0, sign: 0, table: 0, umbrella: false };
+        this.upgrades = {
+            pitcher: 0, sign: 0, table: 0, umbrella: false,
+            // Advanced (tech tree)
+            industrialPress: false,
+            neonSign: false,
+            lounge: false
+        };
         this.supplyPrices = {
             lemons: { 20: 4, 50: 10, 100: 18 },
             sugar:  { 20: 3, 50: 7,  100: 13 },
@@ -103,6 +148,10 @@ class GameState {
         this.todaysCustomerType = null; // dominant demographic for next/current day
         this.loyalCustomers = 0;         // recurring fan base
         this.lastSpoilage = null;        // { lemons, sugar, ice } loss from spoilage at end of last day
+        // Phase 5 fields
+        this.currentChallenge = null;    // { id, type, target, reward, completed }
+        this.happyStreak = 0;            // consecutive happy/love days (leaderboard stat)
+        this.storyProgress = 0;          // index into STORY_CHAPTERS, advances on predicate match
     }
 
     save() {
@@ -152,14 +201,21 @@ class GameState {
     }
 
     buyUpgrade(type) {
-        if (type === 'umbrella') {
-            if (this.upgrades.umbrella) return { ok: false, reason: 'owned' };
-            const cost = UPGRADE_COSTS.umbrella;
+        // Boolean / advanced upgrades
+        const flagUpgrades = ['umbrella', 'industrialPress', 'neonSign', 'lounge'];
+        if (flagUpgrades.includes(type)) {
+            if (this.upgrades[type]) return { ok: false, reason: 'owned' };
+            // Check prerequisites for advanced ones
+            if (ADVANCED_REQUIREMENTS[type] && !ADVANCED_REQUIREMENTS[type](this)) {
+                return { ok: false, reason: 'locked' };
+            }
+            const cost = UPGRADE_COSTS[type];
             if (this.money < cost) return { ok: false, reason: 'money', cost };
             this.money -= cost;
-            this.upgrades.umbrella = true;
+            this.upgrades[type] = true;
             return { ok: true, type, cost };
         }
+        // Tiered upgrades (pitcher / sign / table)
         const level = this.upgrades[type];
         if (level >= 2) return { ok: false, reason: 'max' };
         const cost = UPGRADE_COSTS[type][level];
@@ -167,6 +223,10 @@ class GameState {
         this.money -= cost;
         this.upgrades[type]++;
         return { ok: true, type, cost, newLevel: this.upgrades[type] };
+    }
+
+    isAdvancedUnlocked(type) {
+        return ADVANCED_REQUIREMENTS[type] ? ADVANCED_REQUIREMENTS[type](this) : true;
     }
 
     buySupplyPack(type, amount) {
@@ -292,8 +352,12 @@ class GameState {
         if (this.weather === 'hot' && this.upgrades.umbrella) demandMultiplier *= 1.3;
         if (this.upgrades.sign === 1) baseDemand += 5;
         else if (this.upgrades.sign === 2) baseDemand += 12;
+        // Tech tree: neon sign adds a fat baseDemand bonus
+        if (this.upgrades.neonSign) baseDemand += 25;
 
-        const comfortBonus = 1 + (this.upgrades.table * 0.15);
+        // Tech tree: lounge boosts the comfort multiplier
+        const loungeMult = this.upgrades.lounge ? 1.5 : 1;
+        const comfortBonus = (1 + (this.upgrades.table * 0.15)) * loungeMult;
 
         if (this.lastEvent) {
             if (this.lastEvent.demandBonus)   demandMultiplier *= this.lastEvent.demandBonus;
@@ -306,7 +370,9 @@ class GameState {
 
         const totalDemand    = Math.floor(baseDemand * demandMultiplier);
         const recipeQuality  = (lemons + sugar + ice) / 3;
-        const pitcherBonus   = 1 + (this.upgrades.pitcher * 0.2);
+        // Tech tree: industrial press multiplies the pitcher bonus
+        const pressMult      = this.upgrades.industrialPress ? 1.5 : 1;
+        const pitcherBonus   = (1 + (this.upgrades.pitcher * 0.2)) * pressMult;
         const finalQuality   = recipeQuality * pitcherBonus;
         const qualityFactor  = Math.min(finalQuality / 5, 2.0);
         const diffPreset     = DIFFICULTY_PRESETS[this.difficulty] || DIFFICULTY_PRESETS.normal;
@@ -446,10 +512,34 @@ class GameState {
         // Rival reacts to player's price for the day just finished.
         this.updateRivalPrice(price);
 
+        // --- Track happy streak (used for leaderboard + story) ---
+        if (summary.tier === 'love' || summary.tier === 'very_happy') {
+            this.happyStreak = (this.happyStreak || 0) + 1;
+        } else {
+            this.happyStreak = 0;
+        }
+
+        // --- Daily challenge evaluation ---
+        const challenge = this.checkChallenge(summary, price);
+        summary.challenge = challenge ? {
+            id: challenge.id,
+            type: challenge.type,
+            target: challenge.target,
+            completed: challenge.completed,
+            reward: challenge.reward
+        } : null;
+
+        // --- Story progression ---
+        summary.storyAdvances = this.checkStoryProgress();
+
+        // --- Leaderboard (persists across resets) ---
+        summary.records = this.updateLeaderboard(summary);
+
         this.day++;
         this.rollWeather();
         this.rollEvent();
         this.rollCustomerMix();
+        this.rollChallenge();
 
         // --- Apply special event side-effects on supply prices for the new day ---
         this.applyEventSupplyEffects();
@@ -499,6 +589,110 @@ class GameState {
     resetFeedback() {
         this.feedback = { angry: 0, happy: 0, waiting: 0, expensive: 0 };
         this.dailyCups = 0;
+    }
+
+    // ----------------------------------------
+    // Daily challenges
+    // ----------------------------------------
+    rollChallenge() {
+        const pick = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+        this.currentChallenge = { ...pick, completed: false, rewardClaimed: false };
+        return this.currentChallenge;
+    }
+
+    /**
+     * Evaluate the active challenge against the day-end state.
+     * Returns the challenge with `completed: true/false` and applies the reward
+     * once (idempotent via rewardClaimed flag).
+     */
+    checkChallenge(summary, price) {
+        const ch = this.currentChallenge;
+        if (!ch || ch.rewardClaimed) return null;
+
+        let met = false;
+        switch (ch.type) {
+            case 'minCups':   met = summary.maxCups >= ch.target; break;
+            case 'minProfit': met = summary.profit  >= ch.target; break;
+            case 'maxAngry':  met = (this.feedback.angry || 0) <= ch.target; break;
+            case 'minHappy':  met = (this.feedback.happy || 0) >= ch.target; break;
+            case 'maxPrice':  met = price <= ch.target && summary.maxCups > 0; break;
+            case 'minTier':   met = TIER_RANK[summary.tier] >= TIER_RANK[ch.target]; break;
+        }
+        ch.completed = met;
+        if (met) {
+            this.money += ch.reward.money || 0;
+            this.reputation = Math.min(100, this.reputation + (ch.reward.rep || 0));
+            ch.rewardClaimed = true;
+        }
+        return ch;
+    }
+
+    // ----------------------------------------
+    // Story chapters
+    // ----------------------------------------
+    /**
+     * Advance through any story chapters whose predicate matches.
+     * Returns an array of newly-completed chapters (usually 0 or 1).
+     */
+    checkStoryProgress() {
+        const completed = [];
+        while (this.storyProgress < STORY_CHAPTERS.length) {
+            const chapter = STORY_CHAPTERS[this.storyProgress];
+            if (!chapter.predicate(this)) break;
+            this.money      += chapter.reward.money || 0;
+            this.reputation  = Math.min(100, this.reputation + (chapter.reward.rep || 0));
+            completed.push(chapter);
+            this.storyProgress++;
+        }
+        return completed;
+    }
+
+    // ----------------------------------------
+    // Leaderboard (separate localStorage entry, persists across resets)
+    // ----------------------------------------
+    static getLeaderboard() {
+        const raw = localStorage.getItem(LEADERBOARD_KEY);
+        if (!raw) return { bestDayProfit: 0, bestTotalProfit: 0, bestStreak: 0, bestLoyal: 0, bestDay: 0 };
+        try { return JSON.parse(raw); }
+        catch (e) { return { bestDayProfit: 0, bestTotalProfit: 0, bestStreak: 0, bestLoyal: 0, bestDay: 0 }; }
+    }
+
+    static saveLeaderboard(lb) {
+        try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb)); }
+        catch (e) { /* quota / private mode — ignore */ }
+    }
+
+    /**
+     * Compare current run against records, store any new bests.
+     * Returns an array of metric keys that improved (for UI to celebrate).
+     */
+    updateLeaderboard(daySummary) {
+        const lb = GameState.getLeaderboard();
+        const improved = [];
+
+        if (daySummary && daySummary.profit > lb.bestDayProfit) {
+            lb.bestDayProfit = daySummary.profit;
+            improved.push('bestDayProfit');
+        }
+        if (this.totalProfit > lb.bestTotalProfit) {
+            lb.bestTotalProfit = this.totalProfit;
+            improved.push('bestTotalProfit');
+        }
+        if (this.happyStreak > lb.bestStreak) {
+            lb.bestStreak = this.happyStreak;
+            improved.push('bestStreak');
+        }
+        if (this.loyalCustomers > lb.bestLoyal) {
+            lb.bestLoyal = this.loyalCustomers;
+            improved.push('bestLoyal');
+        }
+        if (this.day > lb.bestDay) {
+            lb.bestDay = this.day;
+            improved.push('bestDay');
+        }
+
+        if (improved.length) GameState.saveLeaderboard(lb);
+        return improved;
     }
 }
 
