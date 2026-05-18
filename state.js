@@ -3,11 +3,15 @@
 // ========================================
 
 const WEATHER_TYPES = [
-    { type: 'sunny',  name: 'Sunny',    icon: '☀️', demand: 1.5 },
-    { type: 'hot',    name: 'Very Hot', icon: '🥵', demand: 2.0 },
-    { type: 'cloudy', name: 'Cloudy',   icon: '☁️', demand: 1.0 },
-    { type: 'rainy',  name: 'Rainy',    icon: '🌧️', demand: 0.5 }
+    { type: 'sunny',  name: 'Sunny',    icon: '☀️',  demand: 1.5 },
+    { type: 'hot',    name: 'Very Hot', icon: '🥵',  demand: 2.0 },
+    { type: 'cloudy', name: 'Cloudy',   icon: '☁️',  demand: 1.0 },
+    { type: 'rainy',  name: 'Rainy',    icon: '🌧️',  demand: 0.5 },
+    { type: 'fog',    name: 'Foggy',    icon: '🌫️',  demand: 0.6 },
+    { type: 'windy',  name: 'Windy',    icon: '🌬️',  demand: 0.8 }
 ];
+
+const TIME_OF_DAY = ['morning', 'noon', 'evening', 'night'];
 
 const EVENTS = [
     { type: 'festival',    name: 'Festival in the Park',  icon: '🎉', demandBonus:   2.0 },
@@ -88,6 +92,8 @@ class GameState {
             ice:    { 20: 2, 50: 4,  100: 7 }
         };
         this.competitors = 2;
+        this.competitorPrice = 5;       // rival stand's current asking price
+        this.competitorTrend = 0;       // -1 = lowering, 0 = stable, +1 = raising
         this.lastEvent = null;
         this.unlockedAchievements = [];
         this.recipe = { lemons: 3, sugar: 3, ice: 3, price: 5 };
@@ -188,6 +194,36 @@ class GameState {
         return pick;
     }
 
+    /**
+     * Time-of-day for the current day. Cycles morning → noon → evening → night.
+     * Drives the Phaser tint overlay.
+     */
+    getTimeOfDay() {
+        return TIME_OF_DAY[(this.day - 1) % TIME_OF_DAY.length];
+    }
+
+    /**
+     * Rival stand reacts to the player's last price.
+     * Called from applyDayResult with the price the player charged this day.
+     */
+    updateRivalPrice(playerPrice) {
+        const diff = playerPrice - this.competitorPrice;
+        if (diff > 2) {
+            // Player is much more expensive — rival sees room to raise.
+            this.competitorPrice += 1;
+            this.competitorTrend = 1;
+        } else if (diff < -2) {
+            // Player is undercutting — rival drops to compete.
+            this.competitorPrice -= 1;
+            this.competitorTrend = -1;
+        } else {
+            // Small drift to keep things alive even when matched.
+            this.competitorPrice += Math.random() < 0.5 ? -1 : 1;
+            this.competitorTrend = 0;
+        }
+        this.competitorPrice = Math.max(2, Math.min(15, this.competitorPrice));
+    }
+
     rollEvent() {
         const pick = EVENTS[Math.floor(Math.random() * EVENTS.length)];
         this.lastEvent = pick;
@@ -263,7 +299,9 @@ class GameState {
             if (this.lastEvent.demandBonus)   demandMultiplier *= this.lastEvent.demandBonus;
             if (this.lastEvent.demandPenalty) demandMultiplier *= this.lastEvent.demandPenalty;
         }
-        const competitorEffect = Math.max(0.5, 1 - (this.competitors * 0.1));
+        // Competitors drag demand down; the gap to the rival's price amplifies it.
+        const priceGap = (price - this.competitorPrice) / Math.max(1, this.competitorPrice);
+        const competitorEffect = Math.max(0.4, 1 - (this.competitors * 0.1) - Math.max(0, priceGap) * 0.3);
         demandMultiplier *= competitorEffect;
 
         const totalDemand    = Math.floor(baseDemand * demandMultiplier);
@@ -404,6 +442,9 @@ class GameState {
             this.dailyHistory.splice(0, this.dailyHistory.length - HISTORY_LIMIT);
         }
         this.lastReport = summary;
+
+        // Rival reacts to player's price for the day just finished.
+        this.updateRivalPrice(price);
 
         this.day++;
         this.rollWeather();

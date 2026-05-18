@@ -142,6 +142,10 @@ function updateDisplay() {
     document.getElementById('weatherIcon').textContent = weather.icon;
 
     updateCrowdBanner();
+    updateRivalWidget();
+    if (window.updatePhaserAmbience) {
+        window.updatePhaserAmbience(game.weather, game.getTimeOfDay());
+    }
 
     // Bottom icons + particle effect on delta
     const setWithBurst = (id, value, prevKey, icon) => {
@@ -339,6 +343,38 @@ function buyUpgrade(type) {
     }
     updateDisplay();
     updateUpgradeDisplay();
+}
+
+// ----------------------------------------
+// Rival stand widget (price + trend + time of day)
+// ----------------------------------------
+function updateRivalWidget() {
+    const t = translations[currentLang];
+    const labelEl = document.getElementById('rivalLabel');
+    const priceEl = document.getElementById('rivalPrice');
+    const trendEl = document.getElementById('rivalTrend');
+    const timeEl  = document.getElementById('rivalTime');
+    if (!priceEl) return;
+
+    if (labelEl) labelEl.textContent = t.rivalLabel || '🏪 Rival';
+    priceEl.textContent = game.competitorPrice ?? 5;
+
+    trendEl.classList.remove('up', 'down');
+    if (game.competitorTrend > 0) {
+        trendEl.textContent = t.rivalTrendUp || '↑';
+        trendEl.classList.add('up');
+    } else if (game.competitorTrend < 0) {
+        trendEl.textContent = t.rivalTrendDown || '↓';
+        trendEl.classList.add('down');
+    } else {
+        trendEl.textContent = t.rivalTrendStable || '—';
+    }
+
+    const timeMap = {
+        morning: t.timeMorning, noon: t.timeNoon,
+        evening: t.timeEvening, night: t.timeNight
+    };
+    timeEl.textContent = timeMap[game.getTimeOfDay()] || '';
 }
 
 // ----------------------------------------
@@ -813,6 +849,8 @@ function updateTexts() {
     document.getElementById('colorblindBtn').textContent = cbEnabled ? t.colorblindOn : t.colorblindOff;
 
     updateDifficultyDisplay();
+    updateCrowdBanner();
+    updateRivalWidget();
     updateUpgradeDisplay();
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
@@ -829,6 +867,12 @@ function syncPrevSnapshot() {
     prev.happy      = game.feedback.happy;
     prev.waiting    = game.feedback.waiting;
     prev.expensive  = game.feedback.expensive;
+}
+
+function onPhaserReady() {
+    if (game && window.updatePhaserAmbience) {
+        window.updatePhaserAmbience(game.weather, game.getTimeOfDay());
+    }
 }
 
 // Expose what main.js needs
@@ -861,5 +905,6 @@ window.UI = {
     nextTutorialStep,
     endTutorial,
     toggleColorblind,
-    initColorblind
+    initColorblind,
+    onPhaserReady
 };
