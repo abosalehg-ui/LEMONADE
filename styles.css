@@ -233,6 +233,94 @@ body {
     animation: pulse 2s infinite;
 }
 
+/* Today's challenge banner */
+.challenge-banner {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    color: white;
+    font-size: 0.85em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+.challenge-banner #challengeLabel { font-weight: bold; opacity: 0.95; }
+.challenge-banner #challengeText { flex: 1; }
+.challenge-banner .challenge-reward {
+    background: rgba(255, 215, 0, 0.25);
+    color: #FFD700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+.challenge-banner.completed {
+    background: linear-gradient(135deg, #2d5016 0%, #5a8f3a 100%);
+}
+
+/* Advanced upgrades section */
+.advanced-divider {
+    margin: 14px 0 6px;
+    padding: 4px 0;
+    text-align: center;
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 0.9em;
+    border-top: 1px solid rgba(255,215,0,0.3);
+}
+.upgrade-item.advanced {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+.upgrade-item.advanced.locked {
+    opacity: 0.55;
+}
+.upgrade-item.advanced.locked .upgrade-btn {
+    background: linear-gradient(180deg, #888 0%, #555 100%);
+    border-color: #444;
+    cursor: not-allowed;
+}
+
+/* Story chapter list */
+.story-chapter {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    color: white;
+}
+.story-chapter.done {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.1);
+}
+.story-chapter.active {
+    border-color: #7ab84a;
+    background: rgba(122, 184, 74, 0.12);
+    animation: pulse 2.4s infinite;
+}
+.story-chapter.locked {
+    opacity: 0.55;
+}
+.story-chapter-state {
+    display: inline-block;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-inline-start: 8px;
+}
+.story-chapter.done .story-chapter-state { background: #FFD700; color: #000; }
+.story-chapter.active .story-chapter-state { background: #7ab84a; color: #fff; }
+.story-chapter.locked .story-chapter-state { background: #555; color: #aaa; }
+.story-chapter-reward {
+    font-size: 0.8em;
+    color: #FFD700;
+    margin-top: 4px;
+}
+
 /* Today's crowd hint banner */
 .crowd-banner {
     background: linear-gradient(135deg, #2d5016 0%, #5a8f3a 100%);

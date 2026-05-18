@@ -138,6 +138,56 @@ const translations = {
         rivalTrendDown: "↓",
         rivalTrendStable: "—",
 
+        // Phase 5: Tech tree (advanced upgrades)
+        advancedUpgradesTitle: "🔬 Advanced",
+        upgradeIndustrialPress: "🏭 Industrial Press",
+        upgradeNeonSign: "💡 Neon Sign",
+        upgradeLounge: "🛋️ Lounge",
+        upgradeLocked: "🔒 Requires:",
+        reqPitcher2: "Pitcher Lv2",
+        reqSign2: "Sign Lv2",
+        reqTableUmbrella: "Table Lv2 + Umbrella",
+
+        // Phase 5: Daily challenges
+        challengeBannerLabel: "🎯 Today's challenge:",
+        challengeRewardLabel: "Reward:",
+        challengeDone: "✅ Challenge complete! +{m}$ +{r}🪙",
+        challengeFailed: "❌ Challenge missed: {desc}",
+        challengeMinCups: "Sell at least {n} cups",
+        challengeMinProfit: "Earn at least ${n} profit",
+        challengeMaxAngry: "Zero angry customers",
+        challengeMinHappy: "Get at least {n} happy customers",
+        challengeMaxPrice: "Charge ${n} or less per cup",
+        challengeMinTier: "Reach {tier} tier",
+
+        // Phase 5: Story mode
+        storyBtn: "📜 Story",
+        storyTitle: "📜 Story Mode",
+        storyChapterLabel: "Chapter",
+        storyChapterDone: "✅ DONE",
+        storyChapterActive: "🎯 ACTIVE",
+        storyChapterLocked: "🔒 LOCKED",
+        storyAdvance: "📜 Chapter {n} complete! +{m}$ +{r}🪙",
+        storyAllDone: "🌟 All chapters complete! You're a true Lemonade Tycoon.",
+        storyChapter1: "First Sale — sell at least 5 cups",
+        storyChapter2: "Saving Up — reach $250 in cash",
+        storyChapter3: "Marketing — install your first sign",
+        storyChapter4: "Loyal Crowd — gather 10 regulars",
+        storyChapter5: "Reputable — reach 80% reputation",
+        storyChapter6: "Sole Survivor — drive out all competitors",
+        storyChapter7: "Premium Spot — build the Lounge",
+        storyChapter8: "Tycoon — unlock 8 achievements",
+
+        // Phase 5: Leaderboard
+        leaderboardBtn: "🏅 Records",
+        leaderboardTitle: "🏅 Personal Records",
+        recBestDayProfit: "🪙 Best single-day profit",
+        recBestTotalProfit: "💰 Best total profit",
+        recBestStreak: "🔥 Longest happy streak",
+        recBestLoyal: "🤝 Most regulars",
+        recBestDay: "📅 Longest run (days)",
+        newRecord: "🏅 NEW RECORD: {what}!",
+
         // Events
         eventFestival: "Festival in the Park",
         eventCompetition: "New Competitor Nearby",
@@ -389,6 +439,56 @@ const translations = {
         rivalTrendUp: "↑",
         rivalTrendDown: "↓",
         rivalTrendStable: "—",
+
+        // المرحلة 5: شجرة الترقيات
+        advancedUpgradesTitle: "🔬 ترقيات متقدمة",
+        upgradeIndustrialPress: "🏭 معصرة صناعية",
+        upgradeNeonSign: "💡 لافتة نيون",
+        upgradeLounge: "🛋️ صالة استراحة",
+        upgradeLocked: "🔒 يتطلب:",
+        reqPitcher2: "إبريق مستوى 2",
+        reqSign2: "لافتة مستوى 2",
+        reqTableUmbrella: "طاولة مستوى 2 + مظلة",
+
+        // المرحلة 5: التحديات اليومية
+        challengeBannerLabel: "🎯 تحدي اليوم:",
+        challengeRewardLabel: "المكافأة:",
+        challengeDone: "✅ تم إنجاز التحدي! +{m}$ +{r}🪙",
+        challengeFailed: "❌ لم يتحقق التحدي: {desc}",
+        challengeMinCups: "بِع {n} كوباً على الأقل",
+        challengeMinProfit: "اربح {n}$ على الأقل",
+        challengeMaxAngry: "صفر زبائن غاضبين",
+        challengeMinHappy: "احصل على {n} زبائن سعداء",
+        challengeMaxPrice: "السعر ≤ {n}$ للكوب",
+        challengeMinTier: "حقق مستوى {tier}",
+
+        // المرحلة 5: وضع القصة
+        storyBtn: "📜 القصة",
+        storyTitle: "📜 وضع القصة",
+        storyChapterLabel: "الفصل",
+        storyChapterDone: "✅ منجز",
+        storyChapterActive: "🎯 نشط",
+        storyChapterLocked: "🔒 مقفل",
+        storyAdvance: "📜 اكتمل الفصل {n}! +{m}$ +{r}🪙",
+        storyAllDone: "🌟 اكتملت كل الفصول! أنت قطب ليموناضة حقيقي.",
+        storyChapter1: "أول بيع — بع 5 أكواب على الأقل",
+        storyChapter2: "ادّخار — اجمع 250$",
+        storyChapter3: "تسويق — ثبّت أول لافتة",
+        storyChapter4: "جمهور وفي — اجمع 10 زبائن دائمين",
+        storyChapter5: "ذو سمعة — حقق سمعة 80%",
+        storyChapter6: "الناجي الوحيد — أخرج كل المنافسين",
+        storyChapter7: "مكان فاخر — ابنِ صالة الاستراحة",
+        storyChapter8: "قطب — افتح 8 إنجازات",
+
+        // المرحلة 5: لوحة الشرف
+        leaderboardBtn: "🏅 السجلات",
+        leaderboardTitle: "🏅 سجلاتك الشخصية",
+        recBestDayProfit: "🪙 أفضل ربح في يوم",
+        recBestTotalProfit: "💰 أفضل ربح إجمالي",
+        recBestStreak: "🔥 أطول سلسلة أيام سعيدة",
+        recBestLoyal: "🤝 أكثر عدد دائمين",
+        recBestDay: "📅 أطول رحلة (أيام)",
+        newRecord: "🏅 رقم قياسي جديد: {what}!",
 
         // الأحداث
         eventFestival: "مهرجان في الحديقة",
