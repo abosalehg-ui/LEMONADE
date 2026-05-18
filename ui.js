@@ -48,15 +48,33 @@ function addLog(message, type = '') {
 }
 
 // ----------------------------------------
-// Achievements
+// Achievements — toast queue (no overwrite when multiple unlock at once)
 // ----------------------------------------
+const toastQueue = [];
+let toastActive = false;
+
 function showAchievementToast(achievement) {
+    toastQueue.push(achievement);
+    processToastQueue();
+}
+
+function processToastQueue() {
+    if (toastActive || toastQueue.length === 0) return;
+    const achievement = toastQueue.shift();
     const t = translations[currentLang];
     const name = t['ach' + capitalizeId(achievement.id)] || achievement.id;
     const notif = document.getElementById('achievementNotif');
-    notif.textContent = `🏆 ${name} ${t.unlocked}`;
+    notif.textContent = `${achievement.icon} ${name} — ${t.unlockedToast || t.unlocked}`;
     notif.style.display = 'block';
-    setTimeout(() => { notif.style.display = 'none'; }, 3000);
+    toastActive = true;
+    const dismiss = () => {
+        notif.style.display = 'none';
+        notif.onclick = null;
+        toastActive = false;
+        processToastQueue();
+    };
+    notif.onclick = dismiss;
+    setTimeout(dismiss, 3000);
 }
 
 function capitalizeId(id) {
@@ -142,6 +160,7 @@ function updateDisplay() {
 
     updateSuppliesModalButtons();
     game.save();
+    flashSaveIndicator();
     processNewAchievements();
 }
 
@@ -342,38 +361,58 @@ function updateEventBanner() {
 // ----------------------------------------
 // Day simulation orchestration
 // ----------------------------------------
+function readRecipeFromSliders() {
+    return {
+        lemons: parseInt(document.getElementById('lemonSlider').value),
+        sugar:  parseInt(document.getElementById('sugarSlider').value),
+        ice:    parseInt(document.getElementById('iceSlider').value),
+        price:  parseInt(document.getElementById('priceSlider').value)
+    };
+}
+
+function persistRecipe() {
+    game.recipe = readRecipeFromSliders();
+    game.save();
+}
+
+function resetProgressBar() {
+    const fill = document.getElementById('simProgressFill');
+    const text = document.getElementById('simTimer');
+    if (fill) fill.style.width = '0%';
+    if (text) text.textContent = '0%';
+}
+
 function startDay() {
     SoundManager.play('click');
 
-    const lemons = parseInt(document.getElementById('lemonSlider').value);
-    const sugar  = parseInt(document.getElementById('sugarSlider').value);
-    const ice    = parseInt(document.getElementById('iceSlider').value);
-    const price  = parseInt(document.getElementById('priceSlider').value);
+    const recipe = readRecipeFromSliders();
 
-    if (!game.canBrew(lemons, sugar, ice)) {
+    if (!game.canBrew(recipe.lemons, recipe.sugar, recipe.ice)) {
         addLog('❌ Not enough supplies!', 'error');
         return;
     }
 
+    game.recipe = recipe; // persist last-used recipe alongside game state
     game.resetFeedback();
-    const plan = game.planDay({ lemons, sugar, ice, price });
+    const plan = game.planDay(recipe);
 
     window.updatePhaserStand(game.upgrades);
     document.getElementById('simDayDisplay').textContent = game.day;
     document.getElementById('startDayBtn').disabled = true;
     document.getElementById('liveSimulationModal').style.display = 'block';
+    resetProgressBar();
     window.startPhaserSimulation(plan.maxCups, plan.satisfactionRate);
 
-    const simulationDuration = plan.maxCups * 1500 + 3000;
+    const simulationDuration = Math.max(plan.maxCups * 1500 + 3000, 3000);
     const timeoutId = setTimeout(() => {
-        finalizeDay(plan, { lemons, sugar, ice, price });
+        finalizeDay(plan, recipe);
         document.getElementById('startDayBtn').disabled = false;
     }, simulationDuration);
 
     document.getElementById('skipDayBtn').onclick = function () {
         clearTimeout(timeoutId);
         window.skipPhaserDay();
-        finalizeDay(plan, { lemons, sugar, ice, price });
+        finalizeDay(plan, recipe);
         document.getElementById('startDayBtn').disabled = false;
     };
 }
@@ -409,6 +448,75 @@ function finalizeDay(plan, recipe) {
     document.getElementById('liveSimulationModal').style.display = 'none';
     updateEventBanner();
     updateDisplay();
+    showDailyReport(summary);
+}
+
+// ----------------------------------------
+// Daily report modal + profit chart
+// ----------------------------------------
+function showDailyReport(summary) {
+    const t = translations[currentLang];
+
+    // Title contents
+    document.getElementById('reportDay').textContent = summary.day;
+
+    // Tier label
+    const tierMap = {
+        love:          t.tierLove,
+        very_happy:    t.tierVeryHappy,
+        satisfied:     t.tierSatisfied,
+        unhappy:       t.tierUnhappy,
+        good:          t.tierGood,
+        no_supplies:   t.tierNoSupplies,
+        no_customers:  t.tierNoCustomers
+    };
+    document.getElementById('reportTier').textContent = tierMap[summary.tier] || '—';
+
+    // Stat rows
+    document.getElementById('reportCups').textContent     = summary.maxCups;
+    document.getElementById('reportRevenue').textContent  = `$${summary.revenue.toFixed(2)}`;
+    document.getElementById('reportCost').textContent     = `$${summary.cost.toFixed(2)}`;
+    document.getElementById('reportProfit').textContent   = `$${summary.profit.toFixed(2)}`;
+    const repSign = summary.reputationDelta >= 0 ? '+' : '';
+    document.getElementById('reportRep').textContent      = `${repSign}${summary.reputationDelta}`;
+
+    // Localized labels
+    document.getElementById('reportCupsLabel').textContent     = t.reportCups;
+    document.getElementById('reportRevenueLabel').textContent  = t.reportRevenue;
+    document.getElementById('reportCostLabel').textContent     = t.reportCost;
+    document.getElementById('reportProfitLabel').textContent   = t.reportProfit;
+    document.getElementById('reportRepLabel').textContent      = t.reportRep;
+    document.getElementById('reportChartTitle').textContent    = t.reportChartTitle;
+    document.getElementById('closeReportBtn').textContent      = t.reportContinue;
+
+    // Chart
+    renderProfitChart();
+
+    document.getElementById('dailyReportModal').style.display = 'block';
+}
+
+function renderProfitChart() {
+    const chart = document.getElementById('reportChart');
+    chart.innerHTML = '';
+    const history = game.dailyHistory;
+    if (history.length === 0) {
+        chart.innerHTML = '<div style="color:#888;font-size:0.85em;margin:auto;">—</div>';
+        return;
+    }
+    const maxAbs = Math.max(1, ...history.map(d => Math.abs(d.profit)));
+    history.forEach(d => {
+        const bar = document.createElement('div');
+        const height = Math.max(2, Math.round((Math.abs(d.profit) / maxAbs) * 70));
+        bar.className = 'chart-bar' + (d.profit < 0 ? ' negative' : '');
+        bar.style.height = `${height}px`;
+        bar.title = `Day ${d.day}: $${d.profit.toFixed(2)}`;
+        chart.appendChild(bar);
+    });
+}
+
+function closeDailyReport() {
+    SoundManager.play('click');
+    document.getElementById('dailyReportModal').style.display = 'none';
 }
 
 function quickBuySupplies() {
@@ -421,6 +529,47 @@ function quickBuySupplies() {
     SoundManager.play('sell');
     addLog(`🛒 QUICK BUY: ${result.items}🍋 ${result.items}🍯 ${result.items}🧊 (-${result.cost}$)`, 'success');
     updateDisplay();
+}
+
+// ----------------------------------------
+// Reset game
+// ----------------------------------------
+function resetGame() {
+    SoundManager.play('click');
+    const t = translations[currentLang];
+    if (!confirm(t.resetConfirm)) return;
+    GameState.clearSave();
+    toastQueue.length = 0;
+    location.reload();
+}
+
+// ----------------------------------------
+// Save indicator (subtle visual cue when game saves)
+// ----------------------------------------
+let saveIndicatorTimer = null;
+function flashSaveIndicator() {
+    const el = document.getElementById('saveIndicator');
+    if (!el) return;
+    const t = translations[currentLang];
+    el.textContent = t.savedIndicator || '💾 Saved';
+    el.classList.add('visible');
+    clearTimeout(saveIndicatorTimer);
+    saveIndicatorTimer = setTimeout(() => el.classList.remove('visible'), 900);
+}
+
+// ----------------------------------------
+// Slider <-> game.recipe sync
+// ----------------------------------------
+function restoreRecipeToSliders() {
+    const r = game.recipe || { lemons: 3, sugar: 3, ice: 3, price: 5 };
+    document.getElementById('lemonSlider').value = r.lemons;
+    document.getElementById('lemonValue').textContent = r.lemons;
+    document.getElementById('sugarSlider').value = r.sugar;
+    document.getElementById('sugarValue').textContent = r.sugar;
+    document.getElementById('iceSlider').value = r.ice;
+    document.getElementById('iceValue').textContent = r.ice;
+    document.getElementById('priceSlider').value = r.price;
+    document.getElementById('priceValue').textContent = r.price + ' $';
 }
 
 // ----------------------------------------
@@ -493,6 +642,8 @@ function updateTexts() {
     document.getElementById('achievementsModal').querySelector('.modal-title').textContent = t.achievementsTitle;
     document.getElementById('closeAchievementsBtn').textContent = t.close;
 
+    document.getElementById('resetGameBtn').textContent = t.resetButton;
+
     updateUpgradeDisplay();
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
@@ -518,6 +669,10 @@ window.UI = {
     quickBuySupplies,
     toggleSound,
     toggleLanguage,
+    resetGame,
+    restoreRecipeToSliders,
+    persistRecipe,
+    closeDailyReport,
     syncPrevSnapshot() {
         prev.cupsSold   = game.cupsSold;
         prev.profit     = game.totalProfit;

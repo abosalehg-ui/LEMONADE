@@ -38,9 +38,12 @@ const ACHIEVEMENTS = [
 ];
 
 const SAVE_KEY = 'lemonadeTycoonSave';
+const SAVE_VERSION = 2;
+const HISTORY_LIMIT = 14;
 
 class GameState {
     constructor() {
+        this.version = SAVE_VERSION;
         this.money = 100;
         this.lemons = 20;
         this.sugar = 20;
@@ -61,6 +64,9 @@ class GameState {
         this.competitors = 2;
         this.lastEvent = null;
         this.unlockedAchievements = [];
+        this.recipe = { lemons: 3, sugar: 3, ice: 3, price: 5 };
+        this.dailyHistory = [];
+        this.lastReport = null;
     }
 
     save() {
@@ -76,11 +82,25 @@ class GameState {
         const raw = localStorage.getItem(SAVE_KEY);
         if (!raw) return instance;
         try {
-            Object.assign(instance, JSON.parse(raw));
+            const data = JSON.parse(raw);
+            // Discard saves from a version that no longer matches current schema.
+            if (data.version !== SAVE_VERSION) {
+                console.log(`Save version mismatch (${data.version} vs ${SAVE_VERSION}), starting fresh.`);
+                return instance;
+            }
+            Object.assign(instance, data);
         } catch (e) {
             console.log('Error loading game:', e);
         }
         return instance;
+    }
+
+    static hasSave() {
+        return !!localStorage.getItem(SAVE_KEY);
+    }
+
+    static clearSave() {
+        localStorage.removeItem(SAVE_KEY);
     }
 
     buyUpgrade(type) {
@@ -240,6 +260,22 @@ class GameState {
             this.competitors++;
             summary.competitorChange = 'new';
         }
+
+        // Record this day's outcome for the daily report + chart.
+        summary.day = this.day;
+        this.dailyHistory.push({
+            day: this.day,
+            cups: summary.maxCups,
+            revenue: summary.revenue,
+            cost: summary.cost,
+            profit: summary.profit,
+            tier: summary.tier,
+            reputationDelta: summary.reputationDelta
+        });
+        if (this.dailyHistory.length > HISTORY_LIMIT) {
+            this.dailyHistory.splice(0, this.dailyHistory.length - HISTORY_LIMIT);
+        }
+        this.lastReport = summary;
 
         this.day++;
         this.rollWeather();

@@ -11,6 +11,7 @@
 
     UI.setGame(game);
     if (hadSave) UI.addLog('💾 Game loaded successfully!', 'success');
+    UI.restoreRecipeToSliders();
     game.rollWeather();
     game.rollEvent();
 
@@ -43,11 +44,17 @@
     document.getElementById('tableUpgradeBtn').onclick    = () => UI.buyUpgrade('table');
     document.getElementById('umbrellaUpgradeBtn').onclick = () => UI.buyUpgrade('umbrella');
 
-    // ---- Slider value mirrors ----
+    document.getElementById('resetGameBtn').onclick   = UI.resetGame;
+    document.getElementById('closeReportBtn').onclick = UI.closeDailyReport;
+
+    // ---- Slider value mirrors + persist recipe on change ----
     const mirror = (sliderId, valueId, suffix = '') => {
         const slider = document.getElementById(sliderId);
         const value  = document.getElementById(valueId);
-        slider.oninput = function () { value.textContent = this.value + suffix; };
+        slider.oninput = function () {
+            value.textContent = this.value + suffix;
+        };
+        slider.onchange = function () { UI.persistRecipe(); };
     };
     mirror('lemonSlider', 'lemonValue');
     mirror('sugarSlider', 'sugarValue');
