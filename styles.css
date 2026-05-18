@@ -883,35 +883,83 @@ body {
     }
 }
 
+/* ===== Live-simulation modal (compact, centered) ===== */
+.sim-modal-content {
+    max-width: 180px !important;
+    width: calc(100% - 40px);
+    padding: 0 !important;
+    margin: 20px auto !important; /* ensure centered on RTL/mobile */
+    overflow: hidden;
+}
+.sim-modal-title {
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: white;
+    padding: 6px 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    letter-spacing: 0.5px;
+}
+
 /* ===== Day progress bar (replaces text % timer) ===== */
 .sim-progress-bar {
     position: relative;
-    height: 18px;
-    margin: 8px 10px;
+    height: 14px;
+    margin: 4px 8px;
     background: rgba(0,0,0,0.4);
-    border: 2px solid #1a3d0a;
-    border-radius: 9px;
+    border: 1px solid #1a3d0a;
+    border-radius: 7px;
     overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
 }
 .sim-progress-fill {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FF6B35 100%);
     transition: width 0.3s ease-out;
-    box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
+    box-shadow: 0 0 6px rgba(255, 165, 0, 0.5);
 }
 .sim-progress-text {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    line-height: 14px;
+    line-height: 12px;
     text-align: center;
     color: white;
     font-weight: bold;
-    font-size: 0.75em;
+    font-size: 0.65em;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.sim-controls {
+    display: flex;
+    justify-content: space-around;
+    gap: 4px;
+    padding: 4px 6px 6px;
+}
+.sim-btn {
+    flex: 1;
+    padding: 5px 4px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.7em;
+    cursor: pointer;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+.sim-speed-btn {
+    background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+    border: 1px solid #3d5e27;
+    color: white;
+}
+.sim-skip-btn {
+    background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%);
+    border: 1px solid #990000;
+    color: white;
+}
+.sim-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3);
 }
 
 /* ===== Daily report modal ===== */
@@ -1012,35 +1060,35 @@ body {
     bottom: 20px;
     right: 20px;
     background: linear-gradient(135deg, #2d5016 0%, #3d6520 100%);
-    border: 2px solid #FFD700;
-    border-radius: 10px;
-    padding: 6px 12px;
+    border: 1px solid #FFD700;
+    border-radius: 8px;
+    padding: 4px 8px;
     color: white;
-    font-size: 0.8em;
+    font-size: 0.7em;
     z-index: 1400;
     text-align: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-    min-width: 90px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    min-width: 72px;
 }
 .rival-label {
-    font-size: 0.75em;
+    font-size: 0.7em;
     color: #FFD700;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 .rival-price {
     font-weight: bold;
-    font-size: 1em;
+    font-size: 0.95em;
     color: white;
 }
 .rival-trend {
-    margin-left: 4px;
-    font-size: 0.9em;
+    margin-left: 3px;
+    font-size: 0.85em;
 }
 .rival-trend.up   { color: #ff6b6b; }
 .rival-trend.down { color: #51cf66; }
 .rival-time {
-    margin-top: 4px;
-    font-size: 0.7em;
+    margin-top: 2px;
+    font-size: 0.65em;
     opacity: 0.85;
     color: #ddd;
 }
@@ -1049,9 +1097,9 @@ body {
     .rival-widget {
         bottom: 80px;
         right: 12px;
-        padding: 4px 8px;
-        min-width: 75px;
-        font-size: 0.7em;
+        padding: 3px 6px;
+        min-width: 62px;
+        font-size: 0.62em;
     }
 }
 

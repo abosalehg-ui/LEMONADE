@@ -216,16 +216,15 @@
         </div>
 
         <div class="modal" id="liveSimulationModal" role="dialog" aria-modal="true">
-            <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
-                <div class="modal-title" style="margin-bottom: 0;">LIVE - DAY <span id="simDayDisplay">1</span></div>
-
+            <div class="modal-content sim-modal-content">
+                <div class="sim-modal-title">LIVE — DAY <span id="simDayDisplay">1</span></div>
                 <div class="sim-progress-bar">
                     <div class="sim-progress-fill" id="simProgressFill"></div>
                     <span class="sim-progress-text" id="simTimer">0%</span>
                 </div>
-                <div id="simulationControls" style="display: flex; justify-content: space-around; padding: 5px 10px; background: #3d6520; border-top: 2px solid #1a3d0a;">
-                    <button id="speedToggleBtn" class="action-btn" style="width: 30%; padding: 8px 10px;">⏩ x1</button>
-                    <button id="skipDayBtn" class="action-btn" style="width: 30%; padding: 8px 10px; background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%); border-color: #990000;">⏭️ SKIP</button>
+                <div class="sim-controls">
+                    <button id="speedToggleBtn" class="sim-btn sim-speed-btn">⏩ x1</button>
+                    <button id="skipDayBtn" class="sim-btn sim-skip-btn">⏭️ SKIP</button>
                 </div>
             </div>
         </div>
