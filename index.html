@@ -137,16 +137,23 @@
                     </div>
                 </div>
 
-                <button class="reset-btn" id="resetGameBtn">🔄 Reset Game</button>
+                <div class="setting-row difficulty-row">
+                    <span id="currentDifficultyLabel">Difficulty:</span>
+                    <span class="difficulty-badge" id="currentDifficultyValue">Normal</span>
+                </div>
+
+                <button class="settings-extra-btn" id="replayTutorialBtn" type="button">🎓 Tutorial</button>
+                <button class="settings-extra-btn" id="colorblindBtn" type="button">👁️ Colorblind mode</button>
+                <button class="reset-btn" id="resetGameBtn" type="button">🔄 Reset Game</button>
             </div>
         </div>
         <button class="settings-toggle-btn" id="settingsToggleBtn" title="SETTING" aria-label="Toggle Settings Menu">⚙️</button>
     </div>
 
-    <div class="sound-toggle" id="soundToggle">🔊</div>
-    <div class="language-toggle" id="languageToggle" title="التبديل إلى العربية">
+    <button class="sound-toggle" id="soundToggle" type="button" aria-label="Toggle Sound">🔊</button>
+    <button class="language-toggle" id="languageToggle" type="button" title="التبديل إلى العربية" aria-label="Toggle Language">
         <span id="langIcon">🌐</span>
-    </div>
+    </button>
 
     <div class="achievement-notification" id="achievementNotif"></div>
 
@@ -188,7 +195,7 @@
             </div>
         </div>
 
-        <div class="modal" id="liveSimulationModal">
+        <div class="modal" id="liveSimulationModal" role="dialog" aria-modal="true">
             <div class="modal-content" style="max-width: 250px; height: auto; padding: 0;">
                 <div class="modal-title" style="margin-bottom: 0;">LIVE - DAY <span id="simDayDisplay">1</span></div>
 
@@ -203,7 +210,7 @@
             </div>
         </div>
 
-        <div class="modal" id="upgradesModal">
+        <div class="modal" id="upgradesModal" role="dialog" aria-modal="true">
             <div class="modal-content">
                 <div class="modal-title">🏪 UPGRADES</div>
 
@@ -235,7 +242,7 @@
             </div>
         </div>
 
-        <div class="modal" id="suppliesModal">
+        <div class="modal" id="suppliesModal" role="dialog" aria-modal="true">
             <div class="modal-content">
                 <div class="modal-title">📦 BUY SUPPLIES</div>
                 <div id="supplyList">
@@ -297,7 +304,7 @@
             </div>
         </div>
 
-        <div class="modal" id="achievementsModal">
+        <div class="modal" id="achievementsModal" role="dialog" aria-modal="true">
             <div class="modal-content">
                 <div class="modal-title">🏆 ACHIEVEMENTS</div>
                 <div id="achievementsList"></div>
@@ -305,7 +312,7 @@
             </div>
         </div>
 
-        <div class="modal" id="dailyReportModal">
+        <div class="modal" id="dailyReportModal" role="dialog" aria-modal="true">
             <div class="modal-content">
                 <div class="modal-title">📊 DAY <span id="reportDay">1</span> REPORT</div>
                 <div class="report-tier" id="reportTier">—</div>
@@ -324,6 +331,38 @@
     </div>
 
     <div class="save-indicator" id="saveIndicator">💾 Saved</div>
+
+    <!-- Difficulty selector (first run only) -->
+    <div class="modal" id="difficultyModal" role="dialog" aria-modal="true" aria-labelledby="difficultyTitle">
+        <div class="modal-content">
+            <div class="modal-title" id="difficultyTitle">🎮 Choose Difficulty</div>
+            <button class="difficulty-btn" data-diff="easy" type="button">
+                <div class="diff-name" id="diffEasyName">😊 Easy</div>
+                <div class="diff-desc" id="diffEasyDesc">$150 start. Customers forgive higher prices.</div>
+            </button>
+            <button class="difficulty-btn recommended" data-diff="normal" type="button">
+                <div class="diff-name" id="diffNormalName">😐 Normal</div>
+                <div class="diff-desc" id="diffNormalDesc">$100 start. Balanced experience.</div>
+            </button>
+            <button class="difficulty-btn" data-diff="hard" type="button">
+                <div class="diff-name" id="diffHardName">😤 Hard</div>
+                <div class="diff-desc" id="diffHardDesc">$70 start. Customers are picky about price.</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tutorial overlay -->
+    <div class="tutorial-overlay" id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutTitle">
+        <div class="tutorial-card">
+            <div class="tutorial-step"><span id="tutStepLabel">Step</span> <span id="tutStep">1</span> / 5</div>
+            <div class="tutorial-title" id="tutTitle">Welcome</div>
+            <div class="tutorial-text" id="tutText">...</div>
+            <div class="tutorial-actions">
+                <button class="tut-skip" id="tutSkipBtn" type="button">Skip</button>
+                <button class="tut-next" id="tutNextBtn" type="button">Next →</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts: load order matters -->
     <script src="translations.js"></script>

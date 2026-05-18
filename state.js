@@ -38,13 +38,22 @@ const ACHIEVEMENTS = [
 ];
 
 const SAVE_KEY = 'lemonadeTycoonSave';
+const ONBOARD_KEY = 'lemonadeTycoonOnboarded';
 const SAVE_VERSION = 2;
 const HISTORY_LIMIT = 14;
 
+const DIFFICULTY_PRESETS = {
+    easy:   { startingMoney: 150, priceResistance: 0.7 },
+    normal: { startingMoney: 100, priceResistance: 1.0 },
+    hard:   { startingMoney: 70,  priceResistance: 1.3 }
+};
+
 class GameState {
-    constructor() {
+    constructor(difficulty = 'normal') {
+        const preset = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.normal;
         this.version = SAVE_VERSION;
-        this.money = 100;
+        this.difficulty = difficulty;
+        this.money = preset.startingMoney;
         this.lemons = 20;
         this.sugar = 20;
         this.ice = 20;
@@ -83,7 +92,6 @@ class GameState {
         if (!raw) return instance;
         try {
             const data = JSON.parse(raw);
-            // Discard saves from a version that no longer matches current schema.
             if (data.version !== SAVE_VERSION) {
                 console.log(`Save version mismatch (${data.version} vs ${SAVE_VERSION}), starting fresh.`);
                 return instance;
@@ -101,6 +109,19 @@ class GameState {
 
     static clearSave() {
         localStorage.removeItem(SAVE_KEY);
+    }
+
+    static hasOnboarded() {
+        return localStorage.getItem(ONBOARD_KEY) === '1';
+    }
+
+    static markOnboarded() {
+        localStorage.setItem(ONBOARD_KEY, '1');
+    }
+
+    static clearAll() {
+        localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem(ONBOARD_KEY);
     }
 
     buyUpgrade(type) {
@@ -183,7 +204,8 @@ class GameState {
         const pitcherBonus   = 1 + (this.upgrades.pitcher * 0.2);
         const finalQuality   = recipeQuality * pitcherBonus;
         const qualityFactor  = Math.min(finalQuality / 5, 2.0);
-        const priceResistance = Math.max(0.2, 1 - (price - 5) / 10);
+        const diffPreset     = DIFFICULTY_PRESETS[this.difficulty] || DIFFICULTY_PRESETS.normal;
+        const priceResistance = Math.max(0.2, 1 - ((price - 5) / 10) * diffPreset.priceResistance);
         const actualDemand   = Math.floor(totalDemand * qualityFactor * priceResistance);
 
         const maxCups = Math.min(

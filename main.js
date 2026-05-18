@@ -5,7 +5,7 @@
 (function init() {
     SoundManager.init();
 
-    const hadSave = !!localStorage.getItem('lemonadeTycoonSave');
+    const hadSave = GameState.hasSave();
     const game = GameState.load();
     window.game = game; // exposed for game.js / Phaser scene compatibility
 
@@ -19,6 +19,8 @@
     UI.syncPrevSnapshot();
     UI.updateDisplay();
     UI.updateEventBanner();
+    UI.initColorblind();
+    UI.updateDifficultyDisplay();
 
     // ---- Button wiring ----
     document.getElementById('upgradesBtn').onclick     = UI.showUpgrades;
@@ -46,6 +48,17 @@
 
     document.getElementById('resetGameBtn').onclick   = UI.resetGame;
     document.getElementById('closeReportBtn').onclick = UI.closeDailyReport;
+    document.getElementById('replayTutorialBtn').onclick = () => { UI.toggleSettingsDrawer(); UI.startTutorial(); };
+    document.getElementById('colorblindBtn').onclick     = UI.toggleColorblind;
+
+    // Difficulty modal buttons
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.onclick = () => UI.pickDifficulty(btn.getAttribute('data-diff'));
+    });
+
+    // Tutorial buttons
+    document.getElementById('tutSkipBtn').onclick = UI.endTutorial;
+    document.getElementById('tutNextBtn').onclick = UI.nextTutorialStep;
 
     // ---- Slider value mirrors + persist recipe on change ----
     const mirror = (sliderId, valueId, suffix = '') => {
@@ -77,4 +90,13 @@
             SoundManager.play('bgMusic');
         }
     }, { once: true });
+
+    // ---- First-run onboarding: difficulty + tutorial ----
+    if (!hadSave && !GameState.hasOnboarded()) {
+        UI.showDifficultyModal();
+    } else if (hadSave && !GameState.hasOnboarded()) {
+        // Returning user from before onboarding existed: mark as onboarded
+        // silently so we don't interrupt their game. They can replay from settings.
+        GameState.markOnboarded();
+    }
 })();

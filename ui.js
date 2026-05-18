@@ -510,6 +510,7 @@ function renderProfitChart() {
         bar.className = 'chart-bar' + (d.profit < 0 ? ' negative' : '');
         bar.style.height = `${height}px`;
         bar.title = `Day ${d.day}: $${d.profit.toFixed(2)}`;
+        bar.dataset.label = (d.profit >= 0 ? '+' : '') + d.profit.toFixed(0);
         chart.appendChild(bar);
     });
 }
@@ -538,7 +539,7 @@ function resetGame() {
     SoundManager.play('click');
     const t = translations[currentLang];
     if (!confirm(t.resetConfirm)) return;
-    GameState.clearSave();
+    GameState.clearAll();
     toastQueue.length = 0;
     location.reload();
 }
@@ -555,6 +556,124 @@ function flashSaveIndicator() {
     el.classList.add('visible');
     clearTimeout(saveIndicatorTimer);
     saveIndicatorTimer = setTimeout(() => el.classList.remove('visible'), 900);
+}
+
+// ----------------------------------------
+// Difficulty selection (first run)
+// ----------------------------------------
+function showDifficultyModal() {
+    document.getElementById('difficultyModal').style.display = 'block';
+}
+
+function pickDifficulty(diff) {
+    SoundManager.play('click');
+    const newGame = new GameState(diff);
+    newGame.save();
+
+    window.game = newGame;
+    game = newGame;
+    syncPrevSnapshot();
+    updateDisplay();
+    updateEventBanner();
+    restoreRecipeToSliders();
+    updateDifficultyDisplay();
+
+    document.getElementById('difficultyModal').style.display = 'none';
+    startTutorial();
+}
+
+function updateDifficultyDisplay() {
+    const t = translations[currentLang];
+    const labelEl = document.getElementById('currentDifficultyLabel');
+    const valEl = document.getElementById('currentDifficultyValue');
+    if (!labelEl || !valEl) return;
+    labelEl.textContent = t.currentDifficulty;
+    const diffMap = { easy: t.diffEasy, normal: t.diffNormal, hard: t.diffHard };
+    valEl.textContent = diffMap[game.difficulty] || t.diffNormal;
+}
+
+// ----------------------------------------
+// Tutorial overlay
+// ----------------------------------------
+const TUTORIAL_STEPS = [
+    { target: null,                  titleKey: 'tutWelcomeTitle',   textKey: 'tutWelcomeText'   },
+    { target: '.resources-bar',      titleKey: 'tutResourcesTitle', textKey: 'tutResourcesText' },
+    { target: '#settingsToggleBtn',  titleKey: 'tutRecipeTitle',    textKey: 'tutRecipeText'    },
+    { target: '#buySuppliesBtn',     titleKey: 'tutSuppliesTitle',  textKey: 'tutSuppliesText'  },
+    { target: '#startDayBtn',        titleKey: 'tutStartTitle',     textKey: 'tutStartText'     }
+];
+let tutStep = 0;
+
+function startTutorial() {
+    tutStep = 0;
+    document.getElementById('tutorialOverlay').classList.add('visible');
+    showTutorialStep();
+}
+
+function showTutorialStep() {
+    document.querySelectorAll('.tut-highlight').forEach(el => el.classList.remove('tut-highlight'));
+
+    const step = TUTORIAL_STEPS[tutStep];
+    const t = translations[currentLang];
+
+    document.getElementById('tutStep').textContent = tutStep + 1;
+    document.getElementById('tutStepLabel').textContent = t.tutorialStep;
+    document.getElementById('tutTitle').textContent = t[step.titleKey];
+    document.getElementById('tutText').textContent = t[step.textKey];
+
+    const nextBtn = document.getElementById('tutNextBtn');
+    nextBtn.textContent = (tutStep === TUTORIAL_STEPS.length - 1) ? t.tutorialDone : t.tutorialNext;
+    document.getElementById('tutSkipBtn').textContent = t.tutorialSkip;
+
+    if (step.target) {
+        const el = document.querySelector(step.target);
+        if (el) el.classList.add('tut-highlight');
+    }
+}
+
+function nextTutorialStep() {
+    SoundManager.play('click');
+    tutStep++;
+    if (tutStep >= TUTORIAL_STEPS.length) {
+        endTutorial();
+    } else {
+        showTutorialStep();
+    }
+}
+
+function endTutorial() {
+    SoundManager.play('click');
+    document.querySelectorAll('.tut-highlight').forEach(el => el.classList.remove('tut-highlight'));
+    document.getElementById('tutorialOverlay').classList.remove('visible');
+    GameState.markOnboarded();
+}
+
+// ----------------------------------------
+// Colorblind mode (visual cues independent of color)
+// ----------------------------------------
+const COLORBLIND_KEY = 'lemonadeTycoonColorblind';
+
+function applyColorblind(enabled) {
+    document.body.classList.toggle('colorblind', enabled);
+    const btn = document.getElementById('colorblindBtn');
+    if (btn) {
+        const t = translations[currentLang];
+        btn.textContent = enabled ? t.colorblindOn : t.colorblindOff;
+    }
+}
+
+function toggleColorblind() {
+    SoundManager.play('click');
+    const enabled = localStorage.getItem(COLORBLIND_KEY) !== '1';
+    localStorage.setItem(COLORBLIND_KEY, enabled ? '1' : '0');
+    applyColorblind(enabled);
+    if (document.getElementById('dailyReportModal').style.display === 'block') {
+        renderProfitChart();
+    }
+}
+
+function initColorblind() {
+    applyColorblind(localStorage.getItem(COLORBLIND_KEY) === '1');
 }
 
 // ----------------------------------------
@@ -643,12 +762,29 @@ function updateTexts() {
     document.getElementById('closeAchievementsBtn').textContent = t.close;
 
     document.getElementById('resetGameBtn').textContent = t.resetButton;
+    document.getElementById('replayTutorialBtn').textContent = t.tutorialBtn;
 
+    // Refresh colorblind button label
+    const cbEnabled = document.body.classList.contains('colorblind');
+    document.getElementById('colorblindBtn').textContent = cbEnabled ? t.colorblindOn : t.colorblindOff;
+
+    updateDifficultyDisplay();
     updateUpgradeDisplay();
     if (document.getElementById('achievementsModal').style.display === 'block') {
         updateAchievementsList();
     }
     updateEventBanner();
+}
+
+function syncPrevSnapshot() {
+    prev.cupsSold   = game.cupsSold;
+    prev.profit     = game.totalProfit;
+    prev.day        = game.day;
+    prev.reputation = game.reputation;
+    prev.angry      = game.feedback.angry;
+    prev.happy      = game.feedback.happy;
+    prev.waiting    = game.feedback.waiting;
+    prev.expensive  = game.feedback.expensive;
 }
 
 // Expose what main.js needs
@@ -673,14 +809,13 @@ window.UI = {
     restoreRecipeToSliders,
     persistRecipe,
     closeDailyReport,
-    syncPrevSnapshot() {
-        prev.cupsSold   = game.cupsSold;
-        prev.profit     = game.totalProfit;
-        prev.day        = game.day;
-        prev.reputation = game.reputation;
-        prev.angry      = game.feedback.angry;
-        prev.happy      = game.feedback.happy;
-        prev.waiting    = game.feedback.waiting;
-        prev.expensive  = game.feedback.expensive;
-    }
+    syncPrevSnapshot,
+    updateDifficultyDisplay,
+    showDifficultyModal,
+    pickDifficulty,
+    startTutorial,
+    nextTutorialStep,
+    endTutorial,
+    toggleColorblind,
+    initColorblind
 };
