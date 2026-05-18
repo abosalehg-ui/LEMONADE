@@ -1,17 +1,54 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background (rounded square) -->
+  <defs>
+    <!-- Soft drop shadow behind the lemon (gaussian blur) -->
+    <filter id="lemonShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="11"/>
+      <feOffset dx="2" dy="16"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.45"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Lemon body gradient (slight depth) -->
+    <radialGradient id="lemonBody" cx="0.45" cy="0.4" r="0.7">
+      <stop offset="0%" stop-color="#FFF176"/>
+      <stop offset="70%" stop-color="#FFEB3B"/>
+      <stop offset="100%" stop-color="#FDD835"/>
+    </radialGradient>
+
+    <!-- Main shine (soft, top-left) -->
+    <radialGradient id="shine" cx="0.3" cy="0.25" r="0.45">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded square background -->
   <rect width="512" height="512" rx="96" fill="#8BC34A"/>
-  <!-- Inner glow ring -->
-  <circle cx="256" cy="256" r="220" fill="#7ab84a" opacity="0.4"/>
-  <!-- Lemon body -->
-  <ellipse cx="256" cy="270" rx="170" ry="190" fill="#FFEB3B"/>
-  <ellipse cx="256" cy="270" rx="170" ry="190" fill="none" stroke="#F9A825" stroke-width="6"/>
-  <!-- Lemon nub (top) -->
-  <ellipse cx="256" cy="92" rx="22" ry="14" fill="#FDD835"/>
-  <!-- Leaf -->
-  <path d="M 256 80 Q 230 50 260 30 Q 280 50 256 80 Z" fill="#558B2F"/>
-  <!-- Highlights -->
-  <ellipse cx="200" cy="200" rx="40" ry="60" fill="#FFF59D" opacity="0.6"/>
-  <!-- Bottom shadow -->
-  <ellipse cx="256" cy="430" rx="140" ry="20" fill="#000" opacity="0.15"/>
+
+  <!-- Subtle inner glow on the background -->
+  <circle cx="256" cy="256" r="220" fill="#7ab84a" opacity="0.3"/>
+
+  <!-- Lemon body (with drop-shadow filter so shadow sits BEHIND the whole shape) -->
+  <g filter="url(#lemonShadow)">
+    <ellipse cx="256" cy="272" rx="170" ry="190" fill="url(#lemonBody)"/>
+    <ellipse cx="256" cy="272" rx="170" ry="190" fill="none" stroke="#F9A825" stroke-width="6"/>
+    <!-- Lemon nub at top -->
+    <ellipse cx="256" cy="94" rx="22" ry="14" fill="#FDD835"/>
+    <!-- Leaf -->
+    <path d="M 256 82 Q 230 50 262 30 Q 282 52 256 82 Z" fill="#558B2F"/>
+    <path d="M 256 82 Q 248 60 258 38" fill="none" stroke="#33691E" stroke-width="2"/>
+  </g>
+
+  <!-- Main shine highlight (top-left, soft) -->
+  <ellipse cx="200" cy="195" rx="62" ry="88" fill="url(#shine)"/>
+  <!-- Sharp specular dot for extra pop -->
+  <ellipse cx="186" cy="172" rx="16" ry="24" fill="#FFFFFF" opacity="0.75"/>
+  <!-- Tiny second highlight -->
+  <circle cx="212" cy="158" r="6" fill="#FFFFFF" opacity="0.85"/>
 </svg>

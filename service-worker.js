@@ -1,7 +1,7 @@
 // Lemonade Tycoon service worker — offline-first caching.
 // Bump CACHE_NAME on every release so old caches are purged.
 
-const CACHE_NAME = 'lemonade-v1';
+const CACHE_NAME = 'lemonade-v2';
 
 const PRECACHE_URLS = [
     './',
