@@ -26,30 +26,52 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     createAnimatedCustomerAssets() {
+        // Cached spritesheet approach: one canvas per customer TYPE (6 total),
+        // each holds a 6x6 grid (6 directions × 6 frames). Reduces 216 textures → 6.
         const customerTypes = [
             { name: 'child', height: 24, colors: ['#FF6B6B', '#4ECDC4'] },
-            { name: 'teen', height: 30, colors: ['#95E1D3', '#F38181'] },
+            { name: 'teen',  height: 30, colors: ['#95E1D3', '#F38181'] },
             { name: 'adult', height: 36, colors: ['#FFA502', '#2C3E50'] },
             { name: 'elder', height: 34, colors: ['#6C5CE7', '#FDCB6E'] },
             { name: 'woman', height: 34, colors: ['#FF9FF3', '#F368E0'] },
-            { name: 'man', height: 36, colors: ['#54A0FF', '#5F27CD'] }
+            { name: 'man',   height: 36, colors: ['#54A0FF', '#5F27CD'] }
         ];
 
-        // إنشاء 6 اتجاهات للنظر: left, right, up, down, up-left, up-right
-        const directions = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
-        
-        customerTypes.forEach((type, typeIndex) => {
-            directions.forEach(direction => {
-                // إنشاء 6 إطارات للحركة (زيادة عدد الإطارات للأنيميشن الأوضح)
-                for (let frame = 0; frame < 6; frame++) {
-                    const textureKey = `customer_${type.name}_${direction}_${frame}`;
-                    const texture = this.textures.createCanvas(textureKey, 24, type.height);
-                    const ctx = texture.getContext();
-                    
+        this.customerDirections = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
+        this.customerFrameWidth = 24;
+        this.customerFrameCount = 6;
+
+        customerTypes.forEach(type => {
+            const sheetW = this.customerFrameWidth * this.customerFrameCount; // 6 cols
+            const sheetH = type.height * this.customerDirections.length;       // 6 rows
+            const textureKey = `customer_${type.name}`;
+            const texture = this.textures.createCanvas(textureKey, sheetW, sheetH);
+            const ctx = texture.getContext();
+
+            this.customerDirections.forEach((direction, rowIdx) => {
+                for (let frame = 0; frame < this.customerFrameCount; frame++) {
+                    ctx.save();
+                    ctx.translate(frame * this.customerFrameWidth, rowIdx * type.height);
                     this.drawCustomerFrame(ctx, type, direction, frame);
-                    texture.refresh();
+                    ctx.restore();
                 }
             });
+
+            // Register each cell as an addressable frame: `${direction}_${frame}`
+            this.customerDirections.forEach((direction, rowIdx) => {
+                for (let frame = 0; frame < this.customerFrameCount; frame++) {
+                    texture.add(
+                        `${direction}_${frame}`,
+                        0,
+                        frame * this.customerFrameWidth,
+                        rowIdx * type.height,
+                        this.customerFrameWidth,
+                        type.height
+                    );
+                }
+            });
+
+            texture.refresh();
         });
     }
 
@@ -448,19 +470,18 @@ class LemonadeStandScene extends Phaser.Scene {
 
     createCustomerAnimations() {
         const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
-        const directions = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
-        
+
         customerTypes.forEach(type => {
-            directions.forEach(direction => {
+            this.customerDirections.forEach(direction => {
                 const frames = [];
-                for (let i = 0; i < 6; i++) {
-                    frames.push({ key: `customer_${type}_${direction}_${i}` });
+                for (let i = 0; i < this.customerFrameCount; i++) {
+                    frames.push({ key: `customer_${type}`, frame: `${direction}_${i}` });
                 }
-                
+
                 this.anims.create({
                     key: `walk_${type}_${direction}`,
                     frames: frames,
-                    frameRate: 10, // زيادة معدل الإطارات للأنيميشن الأوضح
+                    frameRate: 10,
                     repeat: -1
                 });
             });
@@ -567,8 +588,9 @@ class LemonadeStandScene extends Phaser.Scene {
         const lookDirections = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
         const lookDirection = lookDirections[Phaser.Math.Between(0, lookDirections.length - 1)];
         
-        const customer = this.add.sprite(spawnPoint.x, spawnPoint.y, `customer_${customerType}_${lookDirection}_0`);
-        
+        const customer = this.add.sprite(spawnPoint.x, spawnPoint.y, `customer_${customerType}`, `${lookDirection}_0`);
+        customer.customerType = customerType;
+
         // بدء الأنيميشن مع اتجاه النظر المختلف
         customer.play(`walk_${customerType}_${lookDirection}`);
         
@@ -646,8 +668,9 @@ class LemonadeStandScene extends Phaser.Scene {
             });
             
             // استئناف الأنيميشن مع اتجاه المغادرة
-            customer.setTexture(`customer_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}_0`);
-            customer.play(`walk_${customer.anims.currentAnim.key.split('_')[1]}_${exitPoint.direction}`);
+            const typeName = customer.customerType;
+            customer.setTexture(`customer_${typeName}`, `${exitPoint.direction}_0`);
+            customer.play(`walk_${typeName}_${exitPoint.direction}`);
             
             // الحركة للخروج من الشاشة
             this.tweens.add({

@@ -1,0 +1,779 @@
+#startDayBtn {
+    /* 1. تغيير لون التدرج لجذب الانتباه (مثلاً: لون برتقالي/ذهبي) */
+   background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+
+    /* 2. جعل الحد سميكاً بلون مختلف (مثلاً: الأحمر الداكن) */
+    /border: 3px solid #CC0000;/
+
+    /* 3. إضافة ظل قوي للخارج (لإعطائه بروز) */
+    box-shadow: 0 4px 0 #CD8500, 0 4px 12px rgba(255, 165, 0, 0.7);
+
+    /* 4. تغيير لون النص إلى الأسود ليبرز على الخلفية الجديدة */
+    color: #000 !important;
+}
+
+/* تعديل حالة الضغط لجعلها متناسقة مع الألوان الجديدة */
+#startDayBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #CD8500, 0 2px 8px rgba(255, 165, 0, 0.5);
+}
+/* أنماط CSS الأساسية (لم تتغير) */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(180deg, #6fba52 0%, #8BC34A 100%);
+    min-height: 10vh;
+    padding-top: 60px;
+}
+
+.resources-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(74, 124, 44, 0.9);
+    border-bottom: 3px solid #000;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.resource-icon {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 1px solid #FF8C00;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    border: 1px solid #666;
+}
+
+.language-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 80px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    z-index: 1500;
+    color: #000;
+}
+
+.language-toggle:active {
+    transform: scale(0.95);
+}
+
+.resource-value {
+    color: white;
+    font-weight: bold;
+    font-size: 0.85em;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.menu-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.menu-btn {
+    background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+    border: 2px solid #3d5e27;
+    border-radius: 8px;
+    padding: 8px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 0 #2d4a1d, 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.menu-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.menu-btn-icon {
+    font-size: 1.5em;
+    margin-bottom: 2px;
+}
+
+.menu-btn-text {
+    color: white;
+    font-weight: bold;
+    font-size: 0.7em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    text-transform: lowercase;
+}
+
+/* حجب قسم الأداء القديم */
+.performance-section, .feedback-icons {
+    display: none !important;
+}
+
+/* تنسيقات الصورة وحاوياتها الجديدة والمصححة */
+.image-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    /* **التصحيح: إخفاء أي محتوى يخرج عن حدود الحاوية (القائمة المخفية)** */
+    overflow: hidden;
+}
+
+.lemonade-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 5px solid #FFD700;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* أنماط الأيقونات الجديدة (العلوية والسفلية) */
+.icon-bar {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    padding: 5px;
+    z-index: 500;
+}
+
+.icon-bar.top-bar {
+    top: 6px;
+}
+
+.icon-bar.bottom-bar {
+    bottom: 6px;
+}
+
+.icon-display-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 45px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.icon-display-icon {
+    font-size: 1.2em; /* حجم الأيقونة */
+    line-height: 1;
+}
+
+.icon-display-value {
+    color: white;
+    font-weight: 900;
+    font-size: 0.7em;
+    text-shadow: 1px 1px 2px #000;
+    margin-top: 2px;
+}
+
+/* --- تأثير التطاير --- */
+.particle {
+    position: absolute;
+    font-size: 1.2em;
+    color: yellow; /* لون الأيقونة المتطايرة */
+    pointer-events: none;
+    user-select: none;
+    z-index: 10000;
+    animation: fadeAndFly 1.5s forwards;
+    font-weight: bold;
+}
+
+/* بانر الأحداث */
+.event-banner {
+    background: linear-gradient(135deg, #DC143C 0%, #FF4AFE 100%);
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    margin-bottom: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes fadeAndFly {
+    0% { transform: translate(0, 0); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+}
+
+/* باقي الأنماط (لم تتغير) */
+.weather-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.weather-icon-display {
+    font-size: 1.5em;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.action-btn {
+    background: linear-gradient(180deg, #7ab84a 0%, #5a8f3a 100%);
+    border: 2px solid #3d5e27;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9em;
+    box-shadow: 0 3px 0 #2d4a1d, 0 3px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+}
+.action-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #2d4a1d, 0 1px 4px rgba(0,0,0,0.3);
+}
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+.log-section {
+    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+    border: 2px solid #1a3d0a;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+}
+.log-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+.log-content {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.log-entry {
+    padding: 6px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.log-entry.success {
+    background: rgba(34, 139, 34, 0.3);
+    border-right: 3px solid #32CD32;
+}
+
+.log-entry.warning {
+    background: rgba(255, 165, 0, 0.3);
+    border-right: 3px solid #FFA500;
+}
+
+.log-entry.error {
+    background: rgba(220, 20, 60, 0.3);
+    border-right: 3px solid #DC143C;
+}
+
+.log-entry.info {
+    background: rgba(100, 149, 237, 0.3);
+    border-right: 3px solid #6495ED;
+}
+
+/* أنماط القائمة المنزلقة الجديدة */
+.settings-drawer {
+    position: absolute;
+    top: 0;
+    left: -320px; /* إخفاء القائمة خارج الشاشة لليسار */
+    height: 100%;
+    width: 300px;
+    z-index: 600;
+    transition: left 0.3s ease-in-out;
+    padding: 10px 0;
+}
+
+/* إضافة طبقة تظليل عند فتح القائمة لجعل باقي المحتوى أقل وضوحًا */
+.image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 550;
+    transition: background 0.3s ease-in-out;
+    pointer-events: none; /* للسماح بالنقر على الزر أثناء إغلاق القائمة */
+}
+
+.settings-drawer.open {
+    left: 0; /* إظهار القائمة */
+}
+
+/* عند فتح القائمة، تظهر طبقة التظليل */
+.image-container.drawer-open::before {
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto; /* لحجب النقر على باقي محتوى الصورة */
+}
+
+.settings-toggle-btn {
+    position: absolute;
+    top: 50%;
+    left: 5px; /* موضع الزر الأولي */
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 0 8px 8px 0; /* شكل نصف دائري من اليمين */
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 1;
+    z-index: 700;
+    transition: left 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-drawer.open + .settings-toggle-btn {
+    left: 300px; /* تحريك الزر ليظهر بجانب القائمة المفتوحة */
+}
+
+.settings-section {
+    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+    border: 2px solid #1a3d0a;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+    /* يجب إزالة الهامش ليعمل داخل القائمة المنزلقة */
+    margin-bottom: 0;
+    height: 100%;
+    overflow-y: auto; /* للسماح بالتمرير داخل القائمة */
+}
+
+.settings-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.setting-row {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 3px;
+    margin-bottom: 3px;
+}
+.setting-label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+}
+
+.setting-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.3);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.slider-value {
+    min-width: 40px;
+    text-align: center;
+    font-weight: bold;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #7ab84a;
+    font-size: 0.7em;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 2000;
+    padding: 20px;
+    overflow-y: auto;
+}
+.modal-content {
+    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+    border: 3px solid #1a3d0a;
+    border-radius: 12px;
+    max-width: 450px;
+    margin: 20px auto;
+    padding: 15px;
+    color: white;
+}
+.modal-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+}
+
+.upgrade-item, .achievement-item, .supply-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.upgrade-header, .achievement-header, .supply-header {
+    font-size: 1em;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.supply-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+.supply-buy-btn {
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 0.8em;
+}
+
+.supply-buy-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0px 0 #CD8500;
+}
+
+.supply-buy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.upgrade-status, .achievement-progress {
+    margin-bottom: 8px;
+    color: #7ab84a;
+    font-size: 0.9em;
+}
+
+.upgrade-btn {
+    width: 100%;
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 6px;
+    padding: 8px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #CD8500, 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 0.85em;
+}
+
+.upgrade-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0px 0 #CD8500;
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.close-modal-btn {
+    width: 100%;
+    margin-top: 12px;
+    background: linear-gradient(180deg, #666 0%, #444 100%);
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.achievement-unlocked {
+    border: 2px solid #FFD700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.achievement-locked {
+    opacity: 0.6;
+}
+
+/* إشعار الإنجاز */
+.achievement-notification {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 3px solid #FF8C00;
+    border-radius: 12px;
+    padding: 15px 25px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.1em;
+    z-index: 3000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    animation: achievementPop 3s ease-out;
+    display: none;
+}
+
+@keyframes achievementPop {
+    0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+    10% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    90% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+}
+
+/* زر الصوت */
+.sound-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    z-index: 1500;
+}
+
+.sound-toggle:active {
+    transform: scale(0.95);
+}
+
+#phaser-container {
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+    margin: 0 auto;
+}
+
+#standView {
+    width: 100%;
+    height: 100px !important;
+    position: relative;
+
+    /* **التصحيح 2: جعل منطقة المحاكاة شفافة** */
+    background: none !important;
+    border-bottom: none !important;
+    overflow: hidden;
+}
+
+#standSetup {
+    right: 50%;
+    transform: translateX(50%);
+}
+
+#standSetup #tableDisplay {
+    font-size: 2em; /* تصغير أيقونة الطاولة */
+}
+
+#standSetup #umbrellaDisplay {
+    font-size: 2em; /* تصغير أيقونة المظلة */
+    top: -20px !important; /* تعديل موضع المظلة */
+}
+
+#standSetup #vendor {
+    font-size: 1.8em; /* تصغير أيقونة البائع */
+    top: -20px !important; /* تعديل موضع البائع */
+    left: 40px !important;
+}
+
+#customerQueue {
+    gap: 10px !important; /* تقليل المسافة بين الزبائن */
+    bottom: 5px !important;
+}
+
+#simulationControls {
+    padding: 5px 10px !important; /* تقليل حشوة التحكم */
+
+    /* **التصحيح 3: جعل شريط التحكم السفلي شفافاً** */
+    background: none !important;
+    border-top: none !important;
+}
+
+#simTimer {
+     font-size: 0.9em !important; /* تصغير خط المؤقت */
+}
+
+/* ===== GAME DESCRIPTION DRAWER (Right Side) ===== */
+.description-drawer {
+    position: absolute;
+    top: 0;
+    right: -320px; /* Hidden by default */
+    height: 100%;
+    width: 300px;
+    z-index: 600;
+    transition: right 0.3s ease-in-out;
+    padding: 10px 0;
+}
+
+.description-drawer.open {
+    right: 0; /* Slide into view */
+}
+
+.description-section {
+    background: linear-gradient(180deg, #2d5016 0%, #3d6520 100%);
+    border: 2px solid #1a3d0a;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.description-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Toggle button (❔) */
+.description-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 2px solid #FF8C00;
+    border-radius: 8px 0 0 8px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+    font-size: 1.2em;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: right 0.3s ease-in-out;
+}
+
+.description-drawer.open + .description-toggle-btn {
+    right: 300px; /* Move button beside open drawer */
+}
+
+/* === تأثير التظليل عند فتح قائمة الوصف === */
+.image-container.desc-open::before {
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+@media (max-width: 768px) {
+    /* تحريك زر ⚙️ إلى أعلى قليلاً */
+    #settingsToggleBtn {
+        top: 40%;
+    }
+
+    /* تحريك زر ❔ إلى أسفل قليلاً */
+    #descriptionToggleBtn {
+        top: 60%;
+    }
+}
