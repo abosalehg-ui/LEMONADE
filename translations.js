@@ -217,7 +217,29 @@ const translations = {
         // Accessibility
         colorblindBtn: "👁️ Colorblind mode",
         colorblindOn: "Colorblind: ON",
-        colorblindOff: "Colorblind: OFF"
+        colorblindOff: "Colorblind: OFF",
+
+        // Customer types (today's crowd)
+        crowdLabel: "Today's crowd:",
+        crowdChild: "🧒 Kids — love sweet & cheap drinks",
+        crowdTeen:  "🧑 Teens — want lots of ice, pay more",
+        crowdAdult: "🧑‍💼 Adults — balanced taste, deeper pockets",
+        crowdElder: "👴 Elders — less sweet, low budget",
+        crowdWoman: "👩 Women — balanced, willing to pay",
+        crowdMan:   "👨 Men — balanced, willing to pay",
+
+        // Loyalty / regulars
+        loyalLabel: "🤝 Regulars",
+        loyaltyGained: "🤝 +{n} new regulars",
+        loyaltyLost: "💔 Lost {n} regulars",
+
+        // Spoilage
+        spoilageLog: "🗑️ Spoiled: {l}🍋 {s}🍯 {i}🧊",
+
+        // New events
+        eventLemonShortage: "Lemon Shortage (prices up)",
+        eventViral: "Viral Video on social media!",
+        eventHeatwave: "Heatwave hits the city"
     },
     ar: {
         // شريط الموارد العلوي
@@ -433,7 +455,29 @@ const translations = {
         // إمكانية الوصول
         colorblindBtn: "👁️ وضع عمى الألوان",
         colorblindOn: "عمى الألوان: مُفعَّل",
-        colorblindOff: "عمى الألوان: مُعطَّل"
+        colorblindOff: "عمى الألوان: مُعطَّل",
+
+        // أنواع العملاء (جمهور اليوم)
+        crowdLabel: "جمهور اليوم:",
+        crowdChild: "🧒 أطفال — يحبون الحلو والرخيص",
+        crowdTeen:  "🧑 شباب — يريدون ثلجاً كثيراً، يدفعون أكثر",
+        crowdAdult: "🧑‍💼 بالغون — ذوق متوازن وميزانية أوسع",
+        crowdElder: "👴 كبار — أقل حلاوة وميزانية ضيقة",
+        crowdWoman: "👩 نساء — متوازنات ويدفعن بسخاء",
+        crowdMan:   "👨 رجال — متوازنون ويدفعون بسخاء",
+
+        // الولاء
+        loyalLabel: "🤝 الزبائن الدائمون",
+        loyaltyGained: "🤝 +{n} زبون دائم جديد",
+        loyaltyLost: "💔 فقدت {n} زبون دائم",
+
+        // الفساد
+        spoilageLog: "🗑️ تلف: {l}🍋 {s}🍯 {i}🧊",
+
+        // الأحداث الجديدة
+        eventLemonShortage: "نقص في الليمون (الأسعار ارتفعت)",
+        eventViral: "فيديو فيرال على السوشيال ميديا!",
+        eventHeatwave: "موجة حر تضرب المدينة"
     }
 };
 

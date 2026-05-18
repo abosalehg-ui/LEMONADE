@@ -539,9 +539,10 @@ class LemonadeStandScene extends Phaser.Scene {
         }
     }
 
-    startSimulation(maxCups, satisfactionRate) {
+    startSimulation(maxCups, satisfactionRate, primaryType) {
         if (this.isSimulating) return;
         this.isSimulating = true;
+        this.primaryType = primaryType || null;
         
         this.customerGroup.clear(true, true);
         this.statusText.setText('اليوم جاري...');
@@ -581,9 +582,11 @@ class LemonadeStandScene extends Phaser.Scene {
         const spawnPoint = this.spawnPoints[spawnIndex];
         const exitPoint = this.exitPoints[exitIndex];
         
-        // اختيار عشوائي لنوع العميل
+        // اختيار نوع العميل: نصف الأكواب من النوع المهيمن (إن وُجد) والباقي عشوائي
         const customerTypes = ['child', 'teen', 'adult', 'elder', 'woman', 'man'];
-        const customerType = customerTypes[Phaser.Math.Between(0, customerTypes.length - 1)];
+        const customerType = (this.primaryType && Math.random() < 0.5)
+            ? this.primaryType
+            : customerTypes[Phaser.Math.Between(0, customerTypes.length - 1)];
         
         // إضافة تنوع في اتجاه النظر
         const lookDirections = ['left', 'right', 'up', 'down', 'up-left', 'up-right'];
@@ -780,10 +783,10 @@ window.updatePhaserStand = function(upgrades) {
     }
 };
 
-window.startPhaserSimulation = function(maxCups, satisfactionRate) {
+window.startPhaserSimulation = function(maxCups, satisfactionRate, primaryType) {
     const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
     if (scene) {
-        scene.startSimulation(maxCups, satisfactionRate);
+        scene.startSimulation(maxCups, satisfactionRate, primaryType);
     }
 };
 

@@ -233,6 +233,23 @@ body {
     animation: pulse 2s infinite;
 }
 
+/* Today's crowd hint banner */
+.crowd-banner {
+    background: linear-gradient(135deg, #2d5016 0%, #5a8f3a 100%);
+    border: 2px solid #FFD700;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    color: white;
+    font-size: 0.85em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.crowd-banner #crowdLabel { font-weight: bold; opacity: 0.85; }
+.crowd-banner #crowdValue { font-weight: bold; color: #FFD700; flex: 1; text-align: end; }
+
 @keyframes fadeAndFly {
     0% { transform: translate(0, 0); opacity: 1; }
     100% { transform: translate(var(--x), var(--y)); opacity: 0; }
