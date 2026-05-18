@@ -43,14 +43,25 @@
 |--------|-------|
 | 📊 **إدارة الوصفة** | اضبط كمية الليمون والسكر والثلج لكل كوب |
 | 💵 **تسعير ديناميكي** | حدد سعرك الخاص لكل كوب |
-| 🌡️ **نظام الطقس** | الطقس يؤثر على سلوك العملاء |
-| 📦 **إدارة المخزون** | اشترِ بالجملة للحصول على خصومات |
-| ⬆️ **نظام الترقيات** | طوّر الإبريق واللافتة والطاولة والمظلة |
-| 🏆 **الإنجازات** | افتح إنجازات جديدة مع تقدمك |
-| 😊 **رضا العملاء** | تتبع العملاء السعداء والغاضبين |
-| 📋 **سجل النشاط** | سجل مباشر للأحداث اليومية |
+| 🌡️ **6 أنواع طقس** | مشمس، حار، غائم، ممطر، ضبابي، عاصف — كل منها يؤثر بشكل مختلف |
+| 🌅 **دورة نهار/ليل** | تتغير ألوان المشهد عبر صباح/ظهر/مساء/ليل |
+| 🧑 **6 أنواع عملاء** | لكل ديموغرافيا تفضيلات وصفة وحد أقصى للسعر |
+| 🤝 **عملاء دائمون** | الأيام الناجحة تبني قاعدة زبائن منتظمين |
+| 📦 **إدارة المخزون + فساد** | اشترِ بالجملة لكن احذر التخزين الزائد |
+| ⬆️ **شجرة ترقيات** | 4 أساسيات + 3 متقدّمة (معصرة، لافتة نيون، صالة) |
+| 🎯 **تحديات يومية** | هدف عشوائي كل يوم بمكافآت مال وسمعة |
+| 📜 **وضع القصة** | 8 فصول متدرّجة تروي رحلة بناء إمبراطوريتك |
+| 🏆 **إنجازات** | 10 إنجازات لتفتحها |
+| 🏅 **سجلات شخصية** | أفضل ربح يوم/إجمالي، أطول سلسلة، إلخ |
+| 🏪 **منافس حي** | كشك منافس يضبط أسعاره ردّاً على أسعارك |
+| 🎮 **3 مستويات صعوبة** | سهل/عادي/صعب بمال ابتدائي وحساسية سعر مختلفة |
+| 🎓 **درس تعليمي تفاعلي** | جولة بـ 5 خطوات عند أول تشغيل |
+| 💾 **حفظ تلقائي** | تقدمك يُحفظ في كل لحظة |
+| 📱 **PWA** | قابل للتثبيت كتطبيق ويعمل أوفلاين |
+| ♿ **إمكانية الوصول** | وضع عمى ألوان + keyboard nav + ARIA |
+| 📋 **سجل النشاط + رسم بياني** | تقرير يومي مع رسم بياني للربح |
 | 🔊 **مؤثرات صوتية** | تجربة صوتية غامرة |
-| 🌐 **ثنائي اللغة** | دعم العربية والإنجليزية |
+| 🌐 **ثنائي اللغة** | دعم العربية والإنجليزية كاملاً |
 
 ## 🎮 طريقة اللعب
 
@@ -102,13 +113,40 @@
 | 🍯 سكر | 20 بـ 3$ | 50 بـ 7$ | 100 بـ 13$ |
 | 🧊 ثلج | 20 بـ 2$ | 50 بـ 4$ | 100 بـ 7$ |
 
-### ⬆️ الترقيات
+### ⬆️ شجرة الترقيات
+
+**الأساسية:**
 | الترقية | التأثير |
 |---------|---------|
-| 🥤 جودة الإبريق | جودة مشروب أفضل |
-| 🪧 اللافتة | جذب عملاء أكثر |
-| 🪑 الطاولة | عرض محسّن |
-| ☂️ المظلة | حماية من الطقس |
+| 🥤 جودة الإبريق | bonus على جودة المشروب (3 مستويات) |
+| 🪧 اللافتة | +5 ثم +12 إلى baseDemand (3 مستويات) |
+| 🪑 الطاولة | +15% لكل مستوى على راحة العميل (3 مستويات) |
+| ☂️ المظلة | +30% طلب في الطقس الحار |
+
+**المتقدّمة (تتطلب أساسيات):**
+| الترقية | الشرط | الأثر |
+|---------|------|-------|
+| 🏭 معصرة صناعية | إبريق Lv2 | bonus الإبريق ×1.5 |
+| 💡 لافتة نيون | لافتة Lv2 | +25 إضافية على baseDemand |
+| 🛋️ صالة استراحة | طاولة Lv2 + مظلة | comfort ×1.5 |
+
+### 🧑 أنواع العملاء
+كل ديموغرافيا لها تفضيلات مختلفة. اضبط وصفتك للجمهور المهيمن في اليوم:
+| النوع | يفضّل | أقصى سعر |
+|---|---|---|
+| 🧒 طفل | حلو جداً، قليل الليمون | $5 |
+| 🧑 شاب | ثلج كثير | $8 |
+| 🧑‍💼 بالغ | متوازن | $12 |
+| 👴 كبير | قليل الحلاوة | $7 |
+| 👩 امرأة | متوازن | $10 |
+| 👨 رجل | متوازن | $10 |
+
+### 🎮 مستويات الصعوبة
+| المستوى | المال الابتدائي | حساسية السعر |
+|---|---|---|
+| 😊 سهل | $150 | 0.7× (متسامح) |
+| 😐 عادي | $100 | 1.0× |
+| 😤 صعب | $70 | 1.3× (متطلّب) |
 
 ## 🚀 التشغيل
 
@@ -131,37 +169,48 @@ open index.html
 start index.html
 ```
 
+### 📱 التثبيت كتطبيق (PWA)
+
+اللعبة الآن متوافقة مع PWA — اضغط زر "تثبيت" في شريط العنوان (Chrome/Edge) أو "إضافة إلى الشاشة الرئيسية" (Safari iOS) لتثبيتها كتطبيق مستقل يعمل أوفلاين.
+
 ## 🛠️ التقنيات المستخدمة
 
 | التقنية | الاستخدام |
 |---------|-----------|
 | **HTML5** | الهيكلة والتخطيط |
 | **CSS3** | التصميم والحركات |
-| **JavaScript** | منطق اللعبة والتفاعلات |
+| **JavaScript** (vanilla) | منطق اللعبة والتفاعلات |
+| **Phaser 3** | المشهد المتحرك للعملاء والمؤثرات |
+| **PWA** (Service Worker + Manifest) | تشغيل أوفلاين + قابلية التثبيت |
+| **localStorage** | حفظ التقدّم ولوحة الشرف |
 | **GitHub Pages** | الاستضافة |
 
 ## 📁 هيكل المشروع
 
 ```
 LEMONADE/
-├── index.html              # ملف اللعبة الرئيسي
-├── game.js                 # منطق اللعبة
-├── README.md               # التوثيق
-├── assets/                 # موارد اللعبة
-├── screenshots/            # صور اللعبة
-│   ├── screenshot (1).jpg
-│   ├── screenshot (2).jpg
-│   ├── screenshot (3).jpg
-│   └── screenshot (4).jpg
-└── 🔊 ملفات الصوت
-    ├── background-music.mp3    # موسيقى الخلفية
-    ├── button-click.mp3        # نقر الأزرار
-    ├── cash-register.mp3       # صندوق النقود
-    ├── achievement.mp3         # الإنجازات
-    ├── happy-customer.mp3      # عميل سعيد
-    ├── angry-customer.mp3      # عميل غاضب
-    └── upgrade-sound.mp3       # الترقيات
+├── index.html              # هيكل HTML خفيف
+├── styles.css              # كل التنسيقات
+├── translations.js         # نصوص الترجمة (AR / EN)
+├── state.js                # GameState class — منطق نقي بلا DOM
+├── sounds.js               # نظام الصوت
+├── ui.js                   # تحديث DOM + event handlers
+├── main.js                 # نقطة الدخول
+├── game.js                 # مشهد Phaser — أنيميشن العملاء والمؤثرات
+├── manifest.webmanifest    # ملف PWA
+├── service-worker.js       # تخزين أوفلاين لـ PWA
+├── icon.svg                # أيقونة التطبيق
+├── README.md               # هذا الملف
+├── assets/                 # خلفية اللعبة
+├── screenshots/            # لقطات شاشة
+└── 🔊 ملفات صوتية (mp3)
 ```
+
+### معمارية الكود
+- **حالة نقية** (`state.js`): كل منطق اللعبة في class `GameState`. لا لمس للـ DOM — قابل للاختبار باستقلالية.
+- **طبقة UI** (`ui.js`): تقرأ المدخلات، تستدعي state، تحدّث الـ DOM.
+- **مشهد Phaser** (`game.js`): يعرض العملاء المتحرّكين، تلوين النهار/الليل، مؤثرات الطقس.
+- **الحفظ**: `localStorage` للحالة (بإصدار)، مفتاح منفصل للوحة الشرف يبقى بعد الـ reset.
 
 ## 🎵 المؤثرات الصوتية
 
@@ -205,12 +254,23 @@ LEMONADE/
 |---------|-------------|
 | 📊 **Recipe Management** | Adjust lemons, sugar, and ice per cup |
 | 💵 **Dynamic Pricing** | Set your own price per cup |
-| 🌡️ **Weather System** | Weather affects customer behavior |
-| 📦 **Supply Management** | Buy supplies in bulk for discounts |
-| ⬆️ **Upgrades System** | Improve pitcher, sign, table & umbrella |
-| 🏆 **Achievements** | Unlock achievements as you progress |
-| 😊 **Customer Satisfaction** | Track happy and angry customers |
-| 📋 **Activity Log** | Real-time log of daily events |
+| 🌡️ **6 Weather Types** | Sunny, hot, cloudy, rainy, foggy, windy — each affects demand differently |
+| 🌅 **Day/Night Cycle** | Scene tint cycles through morning, noon, evening, night |
+| 🧑 **6 Customer Types** | Each demographic has its own recipe preferences and price ceiling |
+| 🤝 **Loyal Regulars** | Successful days build a stable base of returning customers |
+| 📦 **Supply Management + Spoilage** | Buy bulk, but over-stocking causes daily decay |
+| ⬆️ **Tech Tree** | 4 basic upgrades + 3 advanced (Industrial Press, Neon Sign, Lounge) |
+| 🎯 **Daily Challenges** | Random goal each day with cash and rep rewards |
+| 📜 **Story Mode** | 8 chapter goals tracking your business journey |
+| 🏆 **Achievements** | 10 achievements to unlock |
+| 🏅 **Personal Records** | Local leaderboard for best single-day profit, longest streak, etc. |
+| 🏪 **Live Rival** | Competitor stand reacts to your pricing every day |
+| 🎮 **3 Difficulty Levels** | Easy / Normal / Hard with different starting cash and price sensitivity |
+| 🎓 **Interactive Tutorial** | 5-step walkthrough on first launch |
+| 💾 **Auto-Save** | Progress is saved automatically every action |
+| 📱 **PWA** | Installable as an app, works offline |
+| ♿ **Accessibility** | Colorblind mode + keyboard navigation + ARIA |
+| 📋 **Activity Log + Chart** | Daily report with profit history bar chart |
 | 🔊 **Sound Effects** | Immersive audio experience |
 | 🌐 **Bilingual** | English & Arabic support |
 
@@ -261,12 +321,38 @@ LEMONADE/
 | 🧊 Ice | 20 for $2 | 50 for $4 | 100 for $7 |
 
 ### ⬆️ Upgrades
+**Basic:**
 | Upgrade | Effect |
 |---------|--------|
-| 🥤 Pitcher Quality | Better drink quality |
-| 🪧 Sign | Attracts more customers |
-| 🪑 Table | Improved presentation |
-| ☂️ Umbrella | Protection from weather |
+| 🥤 Pitcher Quality | Recipe quality bonus (3 levels) |
+| 🪧 Sign | +5 then +12 to baseDemand (3 levels) |
+| 🪑 Table | +15% comfort per level (3 levels) |
+| ☂️ Umbrella | +30% demand on hot days |
+
+**Advanced (tech tree — require basics):**
+| Upgrade | Requires | Effect |
+|---------|----------|--------|
+| 🏭 Industrial Press | Pitcher Lv2 | Pitcher bonus ×1.5 |
+| 💡 Neon Sign | Sign Lv2 | +25 to baseDemand |
+| 🛋️ Lounge | Table Lv2 + Umbrella | Comfort ×1.5 |
+
+### 🧑 Customer Types
+Each demographic prefers a different recipe. Tune for the dominant crowd of the day:
+| Type | Prefers | Max Price |
+|---|---|---|
+| 🧒 Kid | Very sweet, low lemon | $5 |
+| 🧑 Teen | Lots of ice | $8 |
+| 🧑‍💼 Adult | Balanced | $12 |
+| 👴 Elder | Less sweet | $7 |
+| 👩 Woman | Balanced | $10 |
+| 👨 Man | Balanced | $10 |
+
+### 🎮 Difficulty Levels
+| Level | Starting Cash | Price Sensitivity |
+|---|---|---|
+| 😊 Easy | $150 | 0.7× (forgiving) |
+| 😐 Normal | $100 | 1.0× |
+| 😤 Hard | $70 | 1.3× (picky) |
 
 ## 🚀 Getting Started
 
@@ -289,37 +375,48 @@ open index.html
 start index.html
 ```
 
+### 📱 Install as an App (PWA)
+
+The game is now a Progressive Web App — click the "Install" button in your browser's address bar (Chrome / Edge) or "Add to Home Screen" (Safari iOS) to install it as a standalone app that works offline.
+
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |------------|---------|
 | **HTML5** | Structure & Layout |
 | **CSS3** | Styling & Animations |
-| **JavaScript** | Game Logic & Interactions |
+| **JavaScript** (vanilla) | Game Logic & Interactions |
+| **Phaser 3** | Animated customer scene & visual effects |
+| **PWA** (Service Worker + Manifest) | Offline play + installability |
+| **localStorage** | Save data + personal leaderboard |
 | **GitHub Pages** | Hosting |
 
 ## 📁 Project Structure
 
 ```
 LEMONADE/
-├── index.html              # Main game file
-├── game.js                 # Game logic
-├── README.md               # Documentation
-├── assets/                 # Game assets
-├── screenshots/            # Game screenshots
-│   ├── screenshot (1).jpg
-│   ├── screenshot (2).jpg
-│   ├── screenshot (3).jpg
-│   └── screenshot (4).jpg
-└── 🔊 Sound Files
-    ├── background-music.mp3
-    ├── button-click.mp3
-    ├── cash-register.mp3
-    ├── achievement.mp3
-    ├── happy-customer.mp3
-    ├── angry-customer.mp3
-    └── upgrade-sound.mp3
+├── index.html              # Thin HTML shell — markup only
+├── styles.css              # All styling
+├── translations.js         # i18n strings (AR / EN)
+├── state.js                # GameState class — pure logic, no DOM
+├── sounds.js               # Sound manager
+├── ui.js                   # DOM updates + event handlers
+├── main.js                 # Entry point, wires everything together
+├── game.js                 # Phaser scene — customer animation + visuals
+├── manifest.webmanifest    # PWA manifest
+├── service-worker.js       # PWA offline caching
+├── icon.svg                # App icon
+├── README.md               # This file
+├── assets/                 # Background image
+├── screenshots/            # Gameplay screenshots
+└── 🔊 Sound files (mp3)
 ```
+
+### Architecture
+- **Pure state** (`state.js`): All game logic lives in a `GameState` class. No DOM access — fully testable in isolation.
+- **UI layer** (`ui.js`): Reads inputs, calls state methods, updates DOM.
+- **Phaser scene** (`game.js`): Renders animated customers, day/night tint, weather effects.
+- **Persistence**: `localStorage` for save data (versioned), separate key for the personal-records leaderboard so it survives resets.
 
 ## 🎵 Sound Effects
 

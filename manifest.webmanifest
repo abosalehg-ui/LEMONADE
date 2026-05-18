@@ -1,0 +1,22 @@
+{
+  "name": "Lemonade Tycoon",
+  "short_name": "Lemonade",
+  "description": "Run your own lemonade stand — balance the recipe, watch the weather, and grow your business.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#6fba52",
+  "theme_color": "#FFD700",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
