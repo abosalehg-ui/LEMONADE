@@ -185,7 +185,39 @@ const translations = {
         savedIndicator: "💾 Saved",
 
         // Toast
-        unlockedToast: "Unlocked!"
+        unlockedToast: "Unlocked!",
+
+        // Difficulty
+        difficultyTitle: "🎮 Choose Difficulty",
+        diffEasy: "😊 Easy",
+        diffEasyDesc: "$150 start. Customers forgive higher prices.",
+        diffNormal: "😐 Normal",
+        diffNormalDesc: "$100 start. Balanced experience.",
+        diffHard: "😤 Hard",
+        diffHardDesc: "$70 start. Customers are picky about price.",
+        currentDifficulty: "Difficulty:",
+
+        // Tutorial
+        tutorialBtn: "🎓 Tutorial",
+        tutorialSkip: "Skip",
+        tutorialNext: "Next →",
+        tutorialDone: "✅ Done",
+        tutorialStep: "Step",
+        tutWelcomeTitle: "👋 Welcome!",
+        tutWelcomeText: "Let's learn how to run your lemonade stand in 5 quick steps.",
+        tutResourcesTitle: "📊 Your resources",
+        tutResourcesText: "Up top: lemons 🍋, sugar 🍯, ice 🧊, money 💰, pitcher quality 🥤, and current weather.",
+        tutRecipeTitle: "⚙️ Set the recipe",
+        tutRecipeText: "Open the side panel to adjust ingredients per cup and the price you charge. Balance is everything.",
+        tutSuppliesTitle: "🛒 Buy supplies",
+        tutSuppliesText: "Quick-buy or open the supplies menu for bulk deals. You can't sell without ingredients!",
+        tutStartTitle: "🚀 Start the day",
+        tutStartText: "Press Start Day to begin. Watch the live simulation, then check the daily report.",
+
+        // Accessibility
+        colorblindBtn: "👁️ Colorblind mode",
+        colorblindOn: "Colorblind: ON",
+        colorblindOff: "Colorblind: OFF"
     },
     ar: {
         // شريط الموارد العلوي
@@ -369,7 +401,39 @@ const translations = {
         savedIndicator: "💾 تم الحفظ",
 
         // إشعار
-        unlockedToast: "إنجاز جديد!"
+        unlockedToast: "إنجاز جديد!",
+
+        // الصعوبة
+        difficultyTitle: "🎮 اختر مستوى الصعوبة",
+        diffEasy: "😊 سهل",
+        diffEasyDesc: "تبدأ بـ 150$. الزبائن أكثر تسامحاً مع الأسعار.",
+        diffNormal: "😐 عادي",
+        diffNormalDesc: "تبدأ بـ 100$. تجربة متوازنة.",
+        diffHard: "😤 صعب",
+        diffHardDesc: "تبدأ بـ 70$. الزبائن متطلبون في السعر.",
+        currentDifficulty: "الصعوبة:",
+
+        // التعليم
+        tutorialBtn: "🎓 الدرس التعليمي",
+        tutorialSkip: "تخطي",
+        tutorialNext: "التالي ←",
+        tutorialDone: "✅ تم",
+        tutorialStep: "خطوة",
+        tutWelcomeTitle: "👋 أهلاً بك!",
+        tutWelcomeText: "تعلّم إدارة كشك الليموناضة في 5 خطوات سريعة.",
+        tutResourcesTitle: "📊 مواردك",
+        tutResourcesText: "في الأعلى: ليمون 🍋، سكر 🍯، ثلج 🧊، نقود 💰، جودة الإبريق 🥤، والطقس الحالي.",
+        tutRecipeTitle: "⚙️ اضبط الوصفة",
+        tutRecipeText: "افتح القائمة الجانبية لتحديد كمية المكونات لكل كوب وسعر البيع. التوازن هو السر.",
+        tutSuppliesTitle: "🛒 اشترِ الإمدادات",
+        tutSuppliesText: "استخدم الشراء السريع أو افتح قائمة الإمدادات للحصول على عروض. لا يمكنك البيع بدون مكونات!",
+        tutStartTitle: "🚀 ابدأ اليوم",
+        tutStartText: "اضغط ابدأ اليوم. شاهد المحاكاة المباشرة ثم اطّلع على التقرير اليومي.",
+
+        // إمكانية الوصول
+        colorblindBtn: "👁️ وضع عمى الألوان",
+        colorblindOn: "عمى الألوان: مُفعَّل",
+        colorblindOff: "عمى الألوان: مُعطَّل"
     }
 };
 
