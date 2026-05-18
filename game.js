@@ -592,6 +592,9 @@ class LemonadeStandScene extends Phaser.Scene {
         if (this.isSimulating) return;
         this.isSimulating = true;
         this.primaryType = primaryType || null;
+        // Always start each day at normal speed so the previous day's x10
+        // toggle doesn't leak into the next one.
+        this.simSpeed = 1;
         
         this.customerGroup.clear(true, true);
         this.statusText.setText('اليوم جاري...');

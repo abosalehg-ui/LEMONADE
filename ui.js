@@ -605,6 +605,8 @@ function startDay() {
     document.getElementById('startDayBtn').disabled = true;
     document.getElementById('liveSimulationModal').style.display = 'block';
     resetProgressBar();
+    // Reset the speed-toggle UI back to x1 each day so it matches scene.simSpeed.
+    document.getElementById('speedToggleBtn').textContent = '⏩ x1';
     window.startPhaserSimulation(plan.maxCups, plan.satisfactionRate, plan.primaryType);
 
     const simulationDuration = Math.max(plan.maxCups * 1500 + 3000, 3000);
