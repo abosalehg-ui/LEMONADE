@@ -113,6 +113,14 @@
         }
     }, { once: true });
 
+    // ---- PWA: register the service worker for offline play ----
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+                .catch(err => console.log('Service worker registration failed:', err));
+        });
+    }
+
     // ---- First-run onboarding: difficulty + tutorial ----
     if (!hadSave && !GameState.hasOnboarded()) {
         UI.showDifficultyModal();

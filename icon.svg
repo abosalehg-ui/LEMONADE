@@ -1,0 +1,17 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background (rounded square) -->
+  <rect width="512" height="512" rx="96" fill="#8BC34A"/>
+  <!-- Inner glow ring -->
+  <circle cx="256" cy="256" r="220" fill="#7ab84a" opacity="0.4"/>
+  <!-- Lemon body -->
+  <ellipse cx="256" cy="270" rx="170" ry="190" fill="#FFEB3B"/>
+  <ellipse cx="256" cy="270" rx="170" ry="190" fill="none" stroke="#F9A825" stroke-width="6"/>
+  <!-- Lemon nub (top) -->
+  <ellipse cx="256" cy="92" rx="22" ry="14" fill="#FDD835"/>
+  <!-- Leaf -->
+  <path d="M 256 80 Q 230 50 260 30 Q 280 50 256 80 Z" fill="#558B2F"/>
+  <!-- Highlights -->
+  <ellipse cx="200" cy="200" rx="40" ry="60" fill="#FFF59D" opacity="0.6"/>
+  <!-- Bottom shadow -->
+  <ellipse cx="256" cy="430" rx="140" ry="20" fill="#000" opacity="0.15"/>
+</svg>
