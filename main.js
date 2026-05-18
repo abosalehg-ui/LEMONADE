@@ -12,8 +12,17 @@
     UI.setGame(game);
     if (hadSave) UI.addLog('💾 Game loaded successfully!', 'success');
     UI.restoreRecipeToSliders();
-    game.rollWeather();
-    game.rollEvent();
+    if (!hadSave) {
+        // Brand-new game: roll the world.
+        game.rollWeather();
+        game.rollEvent();
+        game.rollCustomerMix();
+        game.applyEventSupplyEffects();
+    } else if (!game.todaysCustomerType) {
+        // Returning player from before Phase 3: pick their crowd once.
+        game.rollCustomerMix();
+        game.applyEventSupplyEffects();
+    }
 
     // Seed the prev-snapshot so the first updateDisplay doesn't trigger particles.
     UI.syncPrevSnapshot();

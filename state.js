@@ -14,8 +14,25 @@ const EVENTS = [
     { type: 'competition', name: 'New Competitor Nearby', icon: '🏪', demandPenalty: 0.7 },
     { type: 'celebrity',   name: 'Celebrity Visit',       icon: '⭐', demandBonus:   1.5 },
     { type: 'roadwork',    name: 'Road Construction',     icon: '🚧', demandPenalty: 0.6 },
-    null, null, null
+    { type: 'lemonShortage', name: 'Lemon Shortage',      icon: '🍋', supplyMultiplier: 1.5 },
+    { type: 'viral',       name: 'Viral Video',           icon: '📺', demandBonus: 2.2, reputationBonus: 5 },
+    { type: 'heatwave',    name: 'Heatwave',              icon: '🔥', demandBonus: 1.4, prefersIce: true },
+    null, null, null, null
 ];
+
+// Per-demographic preferences. Recipe targets are "ideal per cup" values.
+// priceMax is the highest cup price this customer will tolerate.
+const CUSTOMER_PROFILES = {
+    child: { lemonPref: 2, sugarPref: 6, icePref: 4, priceMax: 5,  weight: 1.0 },
+    teen:  { lemonPref: 3, sugarPref: 4, icePref: 6, priceMax: 8,  weight: 1.0 },
+    adult: { lemonPref: 4, sugarPref: 3, icePref: 4, priceMax: 12, weight: 1.5 },
+    elder: { lemonPref: 4, sugarPref: 2, icePref: 2, priceMax: 7,  weight: 0.9 },
+    woman: { lemonPref: 4, sugarPref: 4, icePref: 4, priceMax: 10, weight: 1.1 },
+    man:   { lemonPref: 4, sugarPref: 3, icePref: 4, priceMax: 10, weight: 1.1 }
+};
+
+const SPOILAGE_THRESHOLD = 50;    // No spoilage at or below this
+const SPOILAGE_RATE      = 0.08;  // Lose 8% of the excess per day
 
 const UPGRADE_COSTS = {
     pitcher:  [50, 100],
@@ -76,6 +93,10 @@ class GameState {
         this.recipe = { lemons: 3, sugar: 3, ice: 3, price: 5 };
         this.dailyHistory = [];
         this.lastReport = null;
+        // Phase 3 fields
+        this.todaysCustomerType = null; // dominant demographic for next/current day
+        this.loyalCustomers = 0;         // recurring fan base
+        this.lastSpoilage = null;        // { lemons, sugar, ice } loss from spoilage at end of last day
     }
 
     save() {
@@ -173,6 +194,48 @@ class GameState {
         return pick;
     }
 
+    /**
+     * Pick the dominant customer type for the day, weighted by weather + event.
+     * Returns the chosen type string (e.g. 'child').
+     */
+    rollCustomerMix() {
+        const weights = {};
+        for (const type in CUSTOMER_PROFILES) {
+            weights[type] = CUSTOMER_PROFILES[type].weight;
+        }
+        // Weather affects which demographics come out
+        if (this.weather === 'hot' || this.weather === 'sunny') {
+            weights.child += 1.5;
+            weights.teen  += 0.8;
+        }
+        if (this.weather === 'rainy') {
+            weights.elder -= 0.4;
+            weights.child -= 0.5;
+            weights.adult += 0.3;
+        }
+        if (this.weather === 'cloudy') {
+            weights.adult += 0.5;
+        }
+        // Event biases
+        if (this.lastEvent?.type === 'festival')  { weights.child += 1.0; weights.teen += 0.8; }
+        if (this.lastEvent?.type === 'celebrity') { weights.teen  += 1.2; weights.woman += 0.5; }
+        if (this.lastEvent?.type === 'viral')     { weights.teen  += 1.5; weights.child += 0.5; }
+
+        // Weighted pick
+        const types = Object.keys(weights);
+        const total = types.reduce((s, t) => s + Math.max(0, weights[t]), 0);
+        let r = Math.random() * total;
+        for (const t of types) {
+            r -= Math.max(0, weights[t]);
+            if (r <= 0) {
+                this.todaysCustomerType = t;
+                return t;
+            }
+        }
+        this.todaysCustomerType = 'adult';
+        return 'adult';
+    }
+
     canBrew(lemons, sugar, ice) {
         return this.lemons >= lemons && this.sugar >= sugar && this.ice >= ice;
     }
@@ -184,6 +247,10 @@ class GameState {
     planDay({ lemons, sugar, ice, price }) {
         const weather = WEATHER_TYPES.find(w => w.type === this.weather);
         let baseDemand = Math.floor(10 + Math.random() * 20) + Math.floor(this.reputation / 10);
+
+        // Loyal customers add a stable floor on demand.
+        baseDemand += Math.floor(this.loyalCustomers * 0.7);
+
         let demandMultiplier = weather.demand;
 
         if (this.weather === 'hot' && this.upgrades.umbrella) demandMultiplier *= 1.3;
@@ -206,7 +273,21 @@ class GameState {
         const qualityFactor  = Math.min(finalQuality / 5, 2.0);
         const diffPreset     = DIFFICULTY_PRESETS[this.difficulty] || DIFFICULTY_PRESETS.normal;
         const priceResistance = Math.max(0.2, 1 - ((price - 5) / 10) * diffPreset.priceResistance);
-        const actualDemand   = Math.floor(totalDemand * qualityFactor * priceResistance);
+
+        // How well the recipe matches today's dominant demographic.
+        // matchFactor in [0.5, 1.4] — strong incentive to tune recipe to the crowd.
+        const profile = CUSTOMER_PROFILES[this.todaysCustomerType] || CUSTOMER_PROFILES.adult;
+        const recipeDist = Math.abs(lemons - profile.lemonPref) +
+                           Math.abs(sugar  - profile.sugarPref) +
+                           Math.abs(ice    - profile.icePref);
+        const matchFactor = Math.max(0.5, 1.4 - recipeDist * 0.05);
+
+        // Customers who can't afford it just don't buy.
+        const priceTolerance = price <= profile.priceMax
+            ? 1.0
+            : Math.max(0.2, 1 - (price - profile.priceMax) * 0.15);
+
+        const actualDemand = Math.floor(totalDemand * qualityFactor * priceResistance * matchFactor * priceTolerance);
 
         const maxCups = Math.min(
             Math.floor(this.lemons / lemons),
@@ -215,9 +296,9 @@ class GameState {
             actualDemand
         );
 
-        const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus;
+        const satisfactionRate = ((recipeQuality / 4) / (price / 7)) * comfortBonus * matchFactor;
 
-        return { maxCups, actualDemand, recipeQuality, satisfactionRate, comfortBonus };
+        return { maxCups, actualDemand, recipeQuality, satisfactionRate, comfortBonus, matchFactor, primaryType: this.todaysCustomerType };
     }
 
     /**
@@ -283,8 +364,33 @@ class GameState {
             summary.competitorChange = 'new';
         }
 
+        // --- Loyalty: very-happy days create regulars; bad days lose some ---
+        const loyaltyBefore = this.loyalCustomers;
+        if (summary.tier === 'love') {
+            this.loyalCustomers = Math.min(60, this.loyalCustomers + Math.max(1, Math.floor(summary.maxCups * 0.08)));
+        } else if (summary.tier === 'very_happy') {
+            this.loyalCustomers = Math.min(60, this.loyalCustomers + Math.max(1, Math.floor(summary.maxCups * 0.05)));
+        } else if (summary.tier === 'unhappy') {
+            this.loyalCustomers = Math.max(0, this.loyalCustomers - Math.ceil(this.loyalCustomers * 0.15));
+        }
+        summary.loyaltyDelta = this.loyalCustomers - loyaltyBefore;
+
+        // --- Spoilage: excess raw materials decay each day ---
+        const spoiled = { lemons: 0, sugar: 0, ice: 0 };
+        for (const k of ['lemons', 'sugar', 'ice']) {
+            const excess = this[k] - SPOILAGE_THRESHOLD;
+            if (excess > 0) {
+                const lose = Math.ceil(excess * SPOILAGE_RATE);
+                this[k] -= lose;
+                spoiled[k] = lose;
+            }
+        }
+        this.lastSpoilage = (spoiled.lemons || spoiled.sugar || spoiled.ice) ? spoiled : null;
+        summary.spoilage = this.lastSpoilage;
+
         // Record this day's outcome for the daily report + chart.
         summary.day = this.day;
+        summary.primaryType = this.todaysCustomerType;
         this.dailyHistory.push({
             day: this.day,
             cups: summary.maxCups,
@@ -302,8 +408,36 @@ class GameState {
         this.day++;
         this.rollWeather();
         this.rollEvent();
+        this.rollCustomerMix();
+
+        // --- Apply special event side-effects on supply prices for the new day ---
+        this.applyEventSupplyEffects();
 
         return summary;
+    }
+
+    /**
+     * Some events temporarily change supply prices (e.g. lemonShortage).
+     * Resets to base prices first, then applies modifiers if applicable.
+     */
+    applyEventSupplyEffects() {
+        const base = {
+            lemons: { 20: 4, 50: 10, 100: 18 },
+            sugar:  { 20: 3, 50: 7,  100: 13 },
+            ice:    { 20: 2, 50: 4,  100: 7 }
+        };
+        // Deep clone defaults
+        this.supplyPrices = {
+            lemons: { ...base.lemons },
+            sugar:  { ...base.sugar },
+            ice:    { ...base.ice }
+        };
+        if (this.lastEvent?.type === 'lemonShortage') {
+            const m = this.lastEvent.supplyMultiplier || 1.5;
+            for (const k of [20, 50, 100]) {
+                this.supplyPrices.lemons[k] = Math.ceil(base.lemons[k] * m);
+            }
+        }
     }
 
     /**

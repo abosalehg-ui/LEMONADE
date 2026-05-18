@@ -133,12 +133,15 @@ function updateDisplay() {
     document.getElementById('lemons').textContent = game.lemons;
     document.getElementById('sugar').textContent  = game.sugar;
     document.getElementById('ice').textContent    = game.ice;
+    document.getElementById('loyalCount').textContent = game.loyalCustomers || 0;
 
     const pitcherLevels = ['N', 'G', 'P'];
     document.getElementById('pitcher-display').textContent = pitcherLevels[game.upgrades.pitcher];
 
     const weather = WEATHER_TYPES.find(w => w.type === game.weather);
     document.getElementById('weatherIcon').textContent = weather.icon;
+
+    updateCrowdBanner();
 
     // Bottom icons + particle effect on delta
     const setWithBurst = (id, value, prevKey, icon) => {
@@ -339,6 +342,26 @@ function buyUpgrade(type) {
 }
 
 // ----------------------------------------
+// Today's crowd banner (hints at dominant demographic preferences)
+// ----------------------------------------
+function updateCrowdBanner() {
+    const banner = document.getElementById('crowdBanner');
+    const labelEl = document.getElementById('crowdLabel');
+    const valueEl = document.getElementById('crowdValue');
+    if (!banner || !valueEl) return;
+    const t = translations[currentLang];
+    const type = game.todaysCustomerType;
+    if (!type) { banner.style.display = 'none'; return; }
+    const map = {
+        child: t.crowdChild, teen: t.crowdTeen, adult: t.crowdAdult,
+        elder: t.crowdElder, woman: t.crowdWoman, man: t.crowdMan
+    };
+    labelEl.textContent = t.crowdLabel;
+    valueEl.textContent = map[type] || t.crowdAdult;
+    banner.style.display = 'flex';
+}
+
+// ----------------------------------------
 // Event banner
 // ----------------------------------------
 function updateEventBanner() {
@@ -351,7 +374,10 @@ function updateEventBanner() {
         festival: t.eventFestival,
         competition: t.eventCompetition,
         celebrity: t.eventCelebrity,
-        roadwork: t.eventRoadwork
+        roadwork: t.eventRoadwork,
+        lemonShortage: t.eventLemonShortage,
+        viral: t.eventViral,
+        heatwave: t.eventHeatwave
     };
     const eventName = map[event.type] || event.name;
     banner.style.display = 'block';
@@ -401,7 +427,7 @@ function startDay() {
     document.getElementById('startDayBtn').disabled = true;
     document.getElementById('liveSimulationModal').style.display = 'block';
     resetProgressBar();
-    window.startPhaserSimulation(plan.maxCups, plan.satisfactionRate);
+    window.startPhaserSimulation(plan.maxCups, plan.satisfactionRate, plan.primaryType);
 
     const simulationDuration = Math.max(plan.maxCups * 1500 + 3000, 3000);
     const timeoutId = setTimeout(() => {
@@ -444,6 +470,20 @@ function finalizeDay(plan, recipe) {
     if (summary.competitorChange === 'only_stand') addLog('🏆 You are the only stand!', 'success');
     else if (summary.competitorChange === 'closed') addLog('👋 A competitor closed!', 'success');
     else if (summary.competitorChange === 'new')    addLog('🏪 New competitor opened!', 'warning');
+
+    const t = translations[currentLang];
+    if (summary.loyaltyDelta > 0) {
+        addLog((t.loyaltyGained || '🤝 +{n} regulars').replace('{n}', summary.loyaltyDelta), 'success');
+    } else if (summary.loyaltyDelta < 0) {
+        addLog((t.loyaltyLost || '💔 Lost {n} regulars').replace('{n}', Math.abs(summary.loyaltyDelta)), 'warning');
+    }
+    if (summary.spoilage) {
+        const s = summary.spoilage;
+        addLog((t.spoilageLog || '🗑️ Spoiled: {l}🍋 {s}🍯 {i}🧊')
+                .replace('{l}', s.lemons || 0)
+                .replace('{s}', s.sugar  || 0)
+                .replace('{i}', s.ice    || 0), 'warning');
+    }
 
     document.getElementById('liveSimulationModal').style.display = 'none';
     updateEventBanner();
@@ -568,6 +608,10 @@ function showDifficultyModal() {
 function pickDifficulty(diff) {
     SoundManager.play('click');
     const newGame = new GameState(diff);
+    newGame.rollWeather();
+    newGame.rollEvent();
+    newGame.rollCustomerMix();
+    newGame.applyEventSupplyEffects();
     newGame.save();
 
     window.game = newGame;
