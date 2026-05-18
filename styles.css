@@ -918,6 +918,55 @@ body {
     box-shadow: 0 0 0 #690000;
 }
 
+/* ===== Rival stand widget ===== */
+.rival-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #2d5016 0%, #3d6520 100%);
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 0.8em;
+    z-index: 1400;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    min-width: 90px;
+}
+.rival-label {
+    font-size: 0.75em;
+    color: #FFD700;
+    margin-bottom: 2px;
+}
+.rival-price {
+    font-weight: bold;
+    font-size: 1em;
+    color: white;
+}
+.rival-trend {
+    margin-left: 4px;
+    font-size: 0.9em;
+}
+.rival-trend.up   { color: #ff6b6b; }
+.rival-trend.down { color: #51cf66; }
+.rival-time {
+    margin-top: 4px;
+    font-size: 0.7em;
+    opacity: 0.85;
+    color: #ddd;
+}
+
+@media (max-width: 480px) {
+    .rival-widget {
+        bottom: 80px;
+        right: 12px;
+        padding: 4px 8px;
+        min-width: 75px;
+        font-size: 0.7em;
+    }
+}
+
 /* ===== Save indicator ===== */
 .save-indicator {
     position: fixed;

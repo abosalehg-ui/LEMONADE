@@ -123,6 +123,20 @@ const translations = {
         hot: "Very Hot",
         cloudy: "Cloudy",
         rainy: "Rainy",
+        fog: "Foggy",
+        windy: "Windy",
+
+        // Time of day
+        timeMorning: "🌅 Morning",
+        timeNoon: "☀️ Noon",
+        timeEvening: "🌇 Evening",
+        timeNight: "🌙 Night",
+
+        // Rival stand
+        rivalLabel: "🏪 Rival price",
+        rivalTrendUp: "↑",
+        rivalTrendDown: "↓",
+        rivalTrendStable: "—",
 
         // Events
         eventFestival: "Festival in the Park",
@@ -361,6 +375,20 @@ const translations = {
         hot: "حار جدًا",
         cloudy: "غائم",
         rainy: "ممطر",
+        fog: "ضبابي",
+        windy: "عاصف",
+
+        // وقت اليوم
+        timeMorning: "🌅 صباح",
+        timeNoon: "☀️ ظهر",
+        timeEvening: "🌇 مساء",
+        timeNight: "🌙 ليل",
+
+        // الكشك المنافس
+        rivalLabel: "🏪 سعر المنافس",
+        rivalTrendUp: "↑",
+        rivalTrendDown: "↓",
+        rivalTrendStable: "—",
 
         // الأحداث
         eventFestival: "مهرجان في الحديقة",

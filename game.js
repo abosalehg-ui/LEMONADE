@@ -409,6 +409,14 @@ class LemonadeStandScene extends Phaser.Scene {
         // الخلفية - صورة LEMONADE.jpg
         this.background = this.add.image(200, 200, 'background').setDisplaySize(400, 400);
 
+        // طبقة لون لوقت اليوم (صباح/ظهر/مساء/ليل) — تُغلّف المشهد كاملاً
+        this.timeOverlay = this.add.rectangle(200, 200, 400, 400, 0xffffff, 0);
+        this.timeOverlay.setDepth(50);
+
+        // طبقة الضباب — تكون شفافة عادةً، تظهر مع طقس fog
+        this.fogOverlay = this.add.rectangle(200, 200, 400, 400, 0xcccccc, 0);
+        this.fogOverlay.setDepth(51);
+
         // تعريف نقاط الظهور والمغادرة من 4 جهات
         this.setupSpawnAndExitPoints();
 
@@ -430,6 +438,12 @@ class LemonadeStandScene extends Phaser.Scene {
 
         // إعداد المطر
         this.setupRain();
+
+        // Notify UI so it can push the current ambience (time of day + weather)
+        // — needed because updateDisplay() in main.js fires before Phaser is ready.
+        if (window.UI && typeof window.UI.onPhaserReady === 'function') {
+            window.UI.onPhaserReady();
+        }
     }
 
     setupSpawnAndExitPoints() {
@@ -453,6 +467,7 @@ class LemonadeStandScene extends Phaser.Scene {
     setupRain() {
         // إنشاء جزيئات المطر
         this.rainParticles = this.add.particles('raindrop');
+        this.rainParticles.setDepth(60); // فوق طبقات الوقت والضباب
         this.rainEmitter = this.rainParticles.createEmitter({
             x: { min: 0, max: 400 },
             y: -10,
@@ -489,8 +504,6 @@ class LemonadeStandScene extends Phaser.Scene {
     }
 
     updateStandVisuals(upgrades) {
-        console.log('Upgrades updated:', upgrades);
-        
         if (upgrades.table > 0) {
             this.tweens.add({
                 targets: this.background,
@@ -503,6 +516,42 @@ class LemonadeStandScene extends Phaser.Scene {
 
         // تشغيل المطر إذا كان هناك ترقية related to weather
         if (upgrades.weather === 'rain') {
+            this.startRain();
+        } else {
+            this.stopRain();
+        }
+    }
+
+    /**
+     * Apply time-of-day tint + per-weather overlay.
+     * Called from UI on init and whenever the day / weather changes.
+     */
+    applyAmbience(weather, timeOfDay) {
+        const tints = {
+            morning: { color: 0xffaa55, alpha: 0.18 },
+            noon:    { color: 0xffffff, alpha: 0.0  },
+            evening: { color: 0xff7733, alpha: 0.28 },
+            night:   { color: 0x1a2255, alpha: 0.45 }
+        };
+        const t = tints[timeOfDay] || tints.noon;
+        if (this.timeOverlay) this.timeOverlay.setFillStyle(t.color, t.alpha);
+
+        if (this.fogOverlay) {
+            const fogAlpha = (weather === 'fog') ? 0.35 : 0;
+            this.fogOverlay.setFillStyle(0xcccccc, fogAlpha);
+        }
+
+        // Wind tilts the rain particles sideways (if rain is running).
+        if (this.rainEmitter) {
+            if (weather === 'windy') {
+                this.rainEmitter.setSpeedX({ min: 80, max: 140 });
+            } else {
+                this.rainEmitter.setSpeedX({ min: -20, max: 20 });
+            }
+        }
+
+        // Show/hide rain based on weather (replaces the old upgrades.weather hack).
+        if (weather === 'rainy' || weather === 'windy') {
             this.startRain();
         } else {
             this.stopRain();
@@ -780,6 +829,13 @@ window.updatePhaserStand = function(upgrades) {
     const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
     if (scene) {
         scene.updateStandVisuals(upgrades);
+    }
+};
+
+window.updatePhaserAmbience = function(weather, timeOfDay) {
+    const scene = window.phaserGame?.scene.getScene('LemonadeStandScene');
+    if (scene && scene.applyAmbience) {
+        scene.applyAmbience(weather, timeOfDay);
     }
 };
 
